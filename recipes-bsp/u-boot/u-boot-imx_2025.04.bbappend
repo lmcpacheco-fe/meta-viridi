@@ -1,11 +1,13 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 # Add your generated C file to the U-Boot source.
 # The 'subdir' parameter specifies where BitBake will place this file
 # within the U-Boot source tree during the build.
 # VERIFY THIS PATH by inspecting your U-Boot source tree for the i.MX91 QSB.
 # A common path for i.MX91 QSB board-specific files is `board/nxp/imx91_qsb/`.
-SRC_URI += "file://lpddr4_timing.c;subdir=board/nxp/imx91_qsb" # Adjust 'imx91_qsb' to your board's actual directory
+
+# Adjust 'imx91_qsb' to your board's actual directory
+SRC_URI += "file://lpddr4_timing.c;subdir=board/nxp/imx91_qsb"
 
 # --- IMPORTANT: Integration Logic within U-Boot ---
 # The generated lpddr4_timing.c contains the DDR initialization code.
