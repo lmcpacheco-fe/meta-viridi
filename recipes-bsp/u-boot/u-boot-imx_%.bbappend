@@ -47,8 +47,8 @@ SRC_URI += " \
 # This documentation will guide you on the precise integration point for DDR code.
 
 do_override_files() {
-	install -Dm 0644 ${WORKDIR}/viridi-imx91.dts ${S}/dts/upstream/src/arm64/freescale/viridi-imx91.dts
-	install -Dm 0644 ${WORKDIR}/viridi-imx93.dts ${S}/dts/upstream/src/arm64/freescale/viridi-imx93.dts
+	install -Dm 0644 ${WORKDIR}/sources-unpack/viridi-imx91.dts ${S}/dts/upstream/src/arm64/freescale/viridi-imx91.dts
+	install -Dm 0644 ${WORKDIR}/sources-unpack/viridi-imx93.dts ${S}/dts/upstream/src/arm64/freescale/viridi-imx93.dts
 }
 
 addtask override_files after do_patch before do_configure
