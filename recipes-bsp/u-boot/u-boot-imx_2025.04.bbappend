@@ -7,7 +7,11 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 # A common path for i.MX91 QSB board-specific files is `board/nxp/imx91_qsb/`.
 
 # Adjust 'imx91_qsb' to your board's actual directory
-SRC_URI += "file://lpddr4_timing.c;subdir=board/nxp/imx91_qsb"
+SRC_URI += " \
+	file://lpddr4_timing.c;subdir=board/nxp/imx91_qsb \
+	file://viridi-imx91.dts \
+	file://viridi-imx93.dts \
+"
 
 # --- IMPORTANT: Integration Logic within U-Boot ---
 # The generated lpddr4_timing.c contains the DDR initialization code.
@@ -41,3 +45,10 @@ SRC_URI += "file://lpddr4_timing.c;subdir=board/nxp/imx91_qsb"
 
 # Consult NXP's i.MX U-Boot documentation for your BSP version.
 # This documentation will guide you on the precise integration point for DDR code.
+
+do_override_files() {
+	install -Dm 0644 ${WORKDIR}/viridi-imx91.dts ${S}/dts/upstream/src/arm64/freescale/viridi-imx91.dts
+	install -Dm 0644 ${WORKDIR}/viridi-imx93.dts ${S}/dts/upstream/src/arm64/freescale/viridi-imx93.dts
+}
+
+addtask override_files after do_patch before do_configure
