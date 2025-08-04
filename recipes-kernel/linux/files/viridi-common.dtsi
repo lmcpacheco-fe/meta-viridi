@@ -1,0 +1,11 @@
+&lpi2c1 {
+	// LED Controller
+	gpio_expander_44: gpio-expander@44 {
+		compatible = "fcs,fxl6408";
+		reg = <0x44>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		gpio-line-names = "LED1_nEN", "LED2_nEN", "LED3_nEN", "LED4_nEN",
+			"DSP_EN_3V3", "DSP_CTRL_3V3", "NO_CONNECT", "NO_CONNECT";
+	};
+};
