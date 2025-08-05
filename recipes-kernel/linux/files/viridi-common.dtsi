@@ -1,1 +1,30 @@
+/* Possible reference:
+https://community.nxp.com/t5/i-MX-Processors/GPIO-Wake-up/m-p/1832148#M221532
+*/
+&gpio3 {
+	gpio-keys {
+		compatible = "gpio-keys";
+		pinctrl-0 = <&pinctrl_wakeup>;
+		pinctrl-names = "default";
 
+		wakeup {
+			label = "WAKEUP PINS";
+			gpios = <&gpio3 0 GPIO_ACTIVE_LOW>,
+				<&gpio3 5 GPIO_ACTIVE_LOW>,
+				<&gpio3 7 GPIO_ACTIVE_LOW>;
+			linux,code = "KEY_WAKEUP";
+			wakeup-source;
+		};
+	};
+};
+
+&iomuxc {
+	pinctrl_wakeup: wakeupgrp {
+		// TODO: find correct pad values (these were the ones for sd card use)
+		fsl,pins = <
+			MX93_PAD_SD2_CD_B__GPIO3_IO00		0x31e
+			MX93_PAD_SD2_DATA2__GPIO3_IO05		0x51e
+			MX93_PAD_SD2_RESET_B__GPIO3_IO07	0x31e
+		>;
+	};
+};
