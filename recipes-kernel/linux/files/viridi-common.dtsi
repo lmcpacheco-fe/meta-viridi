@@ -9,3 +9,51 @@
 			"DSP_EN_3V3", "DSP_CTRL_3V3", "NO_CONNECT", "NO_CONNECT";
 	};
 };
+
+&eqos {
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&pinctrl_eqos>;
+	pinctrl-1 = <&pinctrl_eqos_sleep>;
+	phy-mode = "rmii";
+	phy-handle = <&ethphy1>;
+	status = "okay";
+
+	mdio {
+		compatible = "snps,dwmac-mdio";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		//clock-frequency = <5000000>;		// No need for 'clock-frequency'; PHY provides 50 MHz REF_CLK to SoC via RMII
+
+		ethphy1: ethernet-phy@1 {
+			compatible = "microchip,ksz8081";
+			reg = <1>;										//Strapping 15 --> PHYAD[0] pull-down
+			reset-gpios = <&pcal6524 15 GPIO_ACTIVE_LOW>;	//&lpi2c2
+			reset-assert-us = <10000>;
+			reset-deassert-us = <80000>;
+		};
+	};
+};
+
+&fec {
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&pinctrl_fec>;
+	pinctrl-1 = <&pinctrl_fec_sleep>;
+	phy-mode = "rmii";
+	phy-handle = <&ethphy2>;
+	fsl,magic-packet;
+	status = "okay";
+
+	mdio {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		//clock-frequency = <5000000>;  // No need for 'clock-frequency'; PHY provides 50 MHz REF_CLK to SoC via RMII
+
+		ethphy2: ethernet-phy@2 {
+		compatible = "microchip,ksz8081";
+			reg = <2>;										//Strapping 15 --> PHYAD[0] pull-up 
+			reset-gpios = <&pcal6524 16 GPIO_ACTIVE_LOW>;	//&lpi2c2
+			reset-assert-us = <10000>;
+			reset-deassert-us = <80000>;
+		};
+	};
+};
