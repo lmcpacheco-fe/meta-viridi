@@ -1,6 +1,30 @@
 /* Possible reference:
 https://community.nxp.com/t5/i-MX-Processors/GPIO-Wake-up/m-p/1832148#M221532
 */
+&gpio1 {
+	gpio-line-names = 
+		"gpio1-00", "gpio1-01", "gpio1-02", "gpio1-03",
+		"gpio1-04", "gpio1-05", "gpio1-06", "gpio1-07",
+		"gpio1-08", "gpio1-09", "gpio1-10", "gpio1-11",
+		"gpio1-12", "gpio1-13", "gpio1-14", "gpio1-15",
+		"gpio1-16", "gpio1-17", "gpio1-18", "gpio1-19",
+		"gpio1-20", "gpio1-21", "gpio1-22", "gpio1-23",
+		"gpio1-24", "gpio1-25", "gpio1-26", "gpio1-27",
+		"gpio1-28", "gpio1-29", "gpio1-30", "gpio1-31";
+};
+
+&gpio2 {
+	gpio-line-names = 
+		"gpio2-00", "gpio2-01", "gpio2-02", "gpio2-03",
+		"gpio2-04", "gpio2-05", "gpio2-06", "gpio2-07",
+		"gpio2-08", "gpio2-09", "gpio2-10", "gpio2-11",
+		"gpio2-12", "gpio2-13", "gpio2-14", "gpio2-15",
+		"gpio2-16", "gpio2-17", "gpio2-18", "gpio2-19",
+		"gpio2-20", "gpio2-21", "gpio2-22", "gpio2-23",
+		"gpio2-24", "gpio2-25", "gpio2-26", "gpio2-27",
+		"gpio2-28", "gpio2-29", "gpio2-30", "gpio2-31";
+};
+
 &gpio3 {
 	gpio-line-names = 
 		"gpio3-00", "gpio3-01", "gpio3-02", "gpio3-03",
