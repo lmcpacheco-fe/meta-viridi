@@ -695,8 +695,8 @@
 			MX91_PAD_ENET1_TD0__GPIO4_IO5                          0x31e
 			MX91_PAD_ENET1_TD1__GPIO4_IO4                          0x31e
 			MX91_PAD_ENET1_TD2__GPIO4_IO3				0x31e
-			MX91_PAD_ENET1_TD3__GPIO4_IO2				0x31e
-			MX91_PAD_ENET1_TXC__GPIO4_IO7                          0x31e
+			// MX91_PAD_ENET1_TD3__GPIO4_IO2				0x31e
+			// MX91_PAD_ENET1_TXC__GPIO4_IO7                          0x31e
 			MX91_PAD_ENET1_TX_CTL__GPIO4_IO6                       0x31e
 		>;
 	};
@@ -733,8 +733,8 @@
 			MX91_PAD_ENET2_TD0__GPIO4_IO19			0x51e
 			MX91_PAD_ENET2_TD1__GPIO4_IO18			0x51e
 			MX91_PAD_ENET2_TD2__GPIO4_IO17			0x51e
-			MX91_PAD_ENET2_TD3__GPIO4_IO16			0x51e
-			MX91_PAD_ENET2_TXC__GPIO4_IO21                  0x51e
+			// MX91_PAD_ENET2_TD3__GPIO4_IO16			0x51e
+			// MX91_PAD_ENET2_TXC__GPIO4_IO21                  0x51e
 			MX91_PAD_ENET2_TX_CTL__GPIO4_IO20               0x51e
 		>;
 	};
