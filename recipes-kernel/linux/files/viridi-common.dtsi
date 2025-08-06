@@ -2,6 +2,16 @@
 https://community.nxp.com/t5/i-MX-Processors/GPIO-Wake-up/m-p/1832148#M221532
 */
 &gpio3 {
+	gpio-line-names = 
+		"gpio3-00", "gpio3-01", "gpio3-02", "gpio3-03",
+		"gpio3-04", "gpio3-05", "gpio3-06", "gpio3-07",
+		"gpio3-08", "gpio3-09", "gpio3-10", "gpio3-11",
+		"gpio3-12", "gpio3-13", "gpio3-14", "gpio3-15",
+		"gpio3-16", "gpio3-17", "gpio3-18", "gpio3-19",
+		"gpio3-20", "gpio3-21", "gpio3-22", "gpio3-23",
+		"gpio3-24", "gpio3-25", "gpio3-26", "gpio3-27",
+		"gpio3-28", "gpio3-29", "gpio3-30", "gpio3-31";
+
 	gpio-keys {
 		compatible = "gpio-keys";
 		pinctrl-0 = <&pinctrl_wakeup>;
