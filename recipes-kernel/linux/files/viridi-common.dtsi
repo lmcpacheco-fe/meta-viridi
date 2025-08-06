@@ -30,6 +30,18 @@ https://community.nxp.com/t5/i-MX-Processors/GPIO-Wake-up/m-p/1832148#M221532
 	};
 };
 
+&gpio4 {
+	gpio-line-names = 
+		"gpio4-00", "gpio4-01", "gpio4-02", "gpio4-03",
+		"gpio4-04", "gpio4-05", "gpio4-06", "gpio4-07",
+		"gpio4-08", "gpio4-09", "gpio4-10", "gpio4-11",
+		"gpio4-12", "gpio4-13", "gpio4-14", "gpio4-15",
+		"gpio4-16", "gpio4-17", "gpio4-18", "gpio4-19",
+		"gpio4-20", "gpio4-21", "gpio4-22", "gpio4-23",
+		"gpio4-24", "gpio4-25", "gpio4-26", "gpio4-27",
+		"gpio4-28", "gpio4-29", "gpio4-30", "gpio4-31";
+};
+
 &iomuxc {
 	pinctrl_wakeup: wakeupgrp {
 		// Configured to be pullups, as the signal should be active low
