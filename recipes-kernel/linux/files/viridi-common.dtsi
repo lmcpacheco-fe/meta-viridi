@@ -24,13 +24,6 @@
 			linux,code = <KEY_SUSPEND>;
 			wakeup-source;
 		};
-
-		wakeup4 {
-			label = "WAKEUP4";
-			gpios = <&gpio4 21 GPIO_ACTIVE_LOW>;
-			linux,code = <KEY_SLEEP>;
-			wakeup-source;
-		};
 	};
 };
 
