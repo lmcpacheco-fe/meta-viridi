@@ -1026,5 +1026,14 @@
 			MX91_PAD_GPIO_IO23__GPIO2_IO23		0x31e
 		>;
 	};
+
+	pinctrl_wakeup: wakeupgrp {
+		fsl,pins = <
+			MX91_PAD_ENET1_TD3__GPIO4_IO2		0x31e
+			MX91_PAD_ENET1_TXC__GPIO4_IO7		0x31e
+			MX91_PAD_ENET2_TD3__GPIO4_IO16		0x31e
+			MX91_PAD_ENET2_TXC__GPIO4_IO21		0x31e
+		>;
+	};
 };
 

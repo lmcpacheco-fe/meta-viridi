@@ -1,6 +1,42 @@
 /* Possible reference:
 https://community.nxp.com/t5/i-MX-Processors/GPIO-Wake-up/m-p/1832148#M221532
 */
+/ {
+	gpio-keys {
+		compatible = "gpio-keys";
+		pinctrl-0 = <&pinctrl_wakeup>;
+		pinctrl-names = "default";
+
+		wakeup1 {
+			label = "WAKEUP1";
+			gpios = <&gpio4 2 GPIO_ACTIVE_LOW>;
+			linux,code = "KEY_WAKEUP";
+			wakeup-source;
+		};
+		
+		wakeup2 {
+			label = "WAKEUP2";
+			gpios = <&gpio4 7 GPIO_ACTIVE_LOW>;
+			linux,code = "KEY_WAKEUP";
+			wakeup-source;
+		};
+		
+		wakeup3 {
+			label = "WAKEUP2";
+			gpios = <&gpio4 16 GPIO_ACTIVE_LOW>;
+			linux,code = "KEY_WAKEUP";
+			wakeup-source;
+		};
+		
+		wakeup4 {
+			label = "WAKEUP2";
+			gpios = <&gpio4 21 GPIO_ACTIVE_LOW>;
+			linux,code = "KEY_WAKEUP";
+			wakeup-source;
+		};
+	};
+};
+
 &gpio1 {
 	gpio-line-names = 
 		"gpio1-00", "gpio1-01", "gpio1-02", "gpio1-03",
@@ -36,22 +72,6 @@ https://community.nxp.com/t5/i-MX-Processors/GPIO-Wake-up/m-p/1832148#M221532
 		"gpio3-24", "gpio3-25", "gpio3-26", "gpio3-27",
 		"gpio3-28", "gpio3-29", "gpio3-30", "gpio3-31";
 
-	gpio-keys {
-		compatible = "gpio-keys";
-		pinctrl-0 = <&pinctrl_wakeup>;
-		pinctrl-names = "default";
-
-		wakeup {
-			label = "WAKEUP PINS";
-			gpios = <&gpio4 2 GPIO_ACTIVE_LOW>,
-				<&gpio4 7 GPIO_ACTIVE_LOW>,
-				<&gpio4 16 GPIO_ACTIVE_LOW>,
-				<&gpio4 21 GPIO_ACTIVE_LOW>;
-			linux,code = "KEY_WAKEUP";
-			debounce-interval = <10>;
-			wakeup-source;
-		};
-	};
 };
 
 &gpio4 {
@@ -64,16 +84,4 @@ https://community.nxp.com/t5/i-MX-Processors/GPIO-Wake-up/m-p/1832148#M221532
 		"gpio4-20", "gpio4-21", "gpio4-22", "gpio4-23",
 		"gpio4-24", "gpio4-25", "gpio4-26", "gpio4-27",
 		"gpio4-28", "gpio4-29", "gpio4-30", "gpio4-31";
-};
-
-&iomuxc {
-	pinctrl_wakeup: wakeupgrp {
-		// Configured to be pullups, as the signal should be active low
-		fsl,pins = <
-			MX91_PAD_ENET1_TD3__GPIO4_IO2		0x31e
-			MX91_PAD_ENET1_TXC__GPIO4_IO7		0x31e
-			MX91_PAD_ENET2_TD3__GPIO4_IO16		0x31e // was 0x51e (a pulldown)
-			MX91_PAD_ENET2_TXC__GPIO4_IO21		0x31e // was 0x51e (a pulldown)
-		>;
-	};
 };
