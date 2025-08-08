@@ -1,3 +1,91 @@
+/ {
+	// TODO:
+	// - assign more descriptive labels and node names
+	// - remove the one of four pins which is not used for wakeup
+	gpio-keys {
+		compatible = "gpio-keys";
+		pinctrl-0 = <&pinctrl_wakeup>;
+		pinctrl-names = "default";
+
+		wakeup1 {
+			label = "WAKEUP1";
+			gpios = <&gpio4 2 GPIO_ACTIVE_LOW>;
+			linux,code = "KEY_WAKEUP";
+			wakeup-source;
+		};
+		
+		wakeup2 {
+			label = "WAKEUP2";
+			gpios = <&gpio4 7 GPIO_ACTIVE_LOW>;
+			linux,code = "KEY_WAKEUP";
+			wakeup-source;
+		};
+		
+		wakeup3 {
+			label = "WAKEUP2";
+			gpios = <&gpio4 16 GPIO_ACTIVE_LOW>;
+			linux,code = "KEY_WAKEUP";
+			wakeup-source;
+		};
+		
+		wakeup4 {
+			label = "WAKEUP2";
+			gpios = <&gpio4 21 GPIO_ACTIVE_LOW>;
+			linux,code = "KEY_WAKEUP";
+			wakeup-source;
+		};
+	};
+};
+
+&gpio1 {
+	gpio-line-names = 
+		"gpio1-00", "gpio1-01", "gpio1-02", "gpio1-03",
+		"gpio1-04", "gpio1-05", "gpio1-06", "gpio1-07",
+		"gpio1-08", "gpio1-09", "gpio1-10", "gpio1-11",
+		"gpio1-12", "gpio1-13", "gpio1-14", "gpio1-15",
+		"gpio1-16", "gpio1-17", "gpio1-18", "gpio1-19",
+		"gpio1-20", "gpio1-21", "gpio1-22", "gpio1-23",
+		"gpio1-24", "gpio1-25", "gpio1-26", "gpio1-27",
+		"gpio1-28", "gpio1-29", "gpio1-30", "gpio1-31";
+};
+
+&gpio2 {
+	gpio-line-names = 
+		"gpio2-00", "gpio2-01", "gpio2-02", "gpio2-03",
+		"gpio2-04", "gpio2-05", "gpio2-06", "gpio2-07",
+		"gpio2-08", "gpio2-09", "gpio2-10", "gpio2-11",
+		"gpio2-12", "gpio2-13", "gpio2-14", "gpio2-15",
+		"gpio2-16", "gpio2-17", "gpio2-18", "gpio2-19",
+		"gpio2-20", "gpio2-21", "gpio2-22", "gpio2-23",
+		"gpio2-24", "gpio2-25", "gpio2-26", "gpio2-27",
+		"gpio2-28", "gpio2-29", "gpio2-30", "gpio2-31";
+};
+
+&gpio3 {
+	gpio-line-names = 
+		"gpio3-00", "gpio3-01", "gpio3-02", "gpio3-03",
+		"gpio3-04", "gpio3-05", "gpio3-06", "gpio3-07",
+		"gpio3-08", "gpio3-09", "gpio3-10", "gpio3-11",
+		"gpio3-12", "gpio3-13", "gpio3-14", "gpio3-15",
+		"gpio3-16", "gpio3-17", "gpio3-18", "gpio3-19",
+		"gpio3-20", "gpio3-21", "gpio3-22", "gpio3-23",
+		"gpio3-24", "gpio3-25", "gpio3-26", "gpio3-27",
+		"gpio3-28", "gpio3-29", "gpio3-30", "gpio3-31";
+
+};
+
+&gpio4 {
+	gpio-line-names = 
+		"gpio4-00", "gpio4-01", "gpio4-02", "gpio4-03",
+		"gpio4-04", "gpio4-05", "gpio4-06", "gpio4-07",
+		"gpio4-08", "gpio4-09", "gpio4-10", "gpio4-11",
+		"gpio4-12", "gpio4-13", "gpio4-14", "gpio4-15",
+		"gpio4-16", "gpio4-17", "gpio4-18", "gpio4-19",
+		"gpio4-20", "gpio4-21", "gpio4-22", "gpio4-23",
+		"gpio4-24", "gpio4-25", "gpio4-26", "gpio4-27",
+		"gpio4-28", "gpio4-29", "gpio4-30", "gpio4-31";
+};
+
 &lpi2c1 {
 	// LED Controller
 	gpio_expander_44: gpio-expander@44 {
