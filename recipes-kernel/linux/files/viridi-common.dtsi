@@ -7,21 +7,28 @@
 		wakeup1 {
 			label = "WAKEUP1";
 			gpios = <&gpio4 2 GPIO_ACTIVE_LOW>;
-			linux,code = "KEY_WAKEUP";
+			linux,code = <KEY_WAKEUP>;
 			wakeup-source;
 		};
 		
 		wakeup2 {
 			label = "WAKEUP2";
 			gpios = <&gpio4 7 GPIO_ACTIVE_LOW>;
-			linux,code = "KEY_WAKEUP";
+			linux,code = <KEY_WAKEUP>;
 			wakeup-source;
 		};
 		
 		wakeup3 {
-			label = "WAKEUP2";
+			label = "WAKEUP3";
 			gpios = <&gpio4 16 GPIO_ACTIVE_LOW>;
-			linux,code = "KEY_SUSPEND";
+			linux,code = <KEY_SUSPEND>;
+			wakeup-source;
+		};
+
+		wakeup4 {
+			label = "WAKEUP4";
+			gpios = <&gpio4 21 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_SLEEP>;
 			wakeup-source;
 		};
 	};
