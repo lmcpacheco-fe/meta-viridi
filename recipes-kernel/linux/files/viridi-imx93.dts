@@ -133,35 +133,21 @@
 		status = "disabled";
 	};
 
-	reg_m2_pwr: regulator-m2-pwr {
-		compatible = "regulator-fixed";
-		regulator-name = "M.2-power";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-		gpio = <&pcal6524 13 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
-	};
-
-	reg_usdhc3_vmmc: regulator-usdhc3 {
+	reg_wifi_3v3: regulator-wifi-3v3 {
 		compatible = "regulator-fixed";
 		regulator-name = "WLAN_EN";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
-		vin-supply = <&reg_m2_pwr>;
-		gpio = <&pcal6524 20 GPIO_ACTIVE_HIGH>;
-		/*
-		 * IW612 wifi chip needs more delay than other wifi chips to complete
-		 * the host interface initialization after power up, otherwise the
-		 * internal state of IW612 may be unstable, resulting in the failure of
-		 * the SDIO3.0 switch voltage.
-		 */
-		startup-delay-us = <20000>;
-		enable-active-high;
+		enable-gpios = <&pca9555_21 5 GPIO_ACTIVE_LOW>;		//P0_5 = WF_nEN
+		regulator-boot-on;
 	};
 
-	usdhc3_pwrseq: usdhc3_pwrseq {
-		compatible = "mmc-pwrseq-simple";
-		reset-gpios = <&pcal6524 12 GPIO_ACTIVE_LOW>;
+	reg_wifi_1v8: regulator-wifi-1v8 {
+		compatible = "regulator-fixed";
+		regulator-name = "reg_wifi_1v8";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		regulator-always-on;
 	};
 
 	reg_audio_pwr: regulator-audio-pwr {
@@ -400,12 +386,26 @@
 		#interrupt-cells = <2>;
 		interrupt-parent = <&gpio3>;
 		interrupts = <27 IRQ_TYPE_LEVEL_LOW>;
+	};
 
-		m2-pcm-level-shifter-hog {
-			gpio-hog;
-			gpios = <19 GPIO_ACTIVE_HIGH>;
-			output-high;
-		};
+	pca9555_21: gpio@21 {
+		compatible = "nxp,pca9555";
+		reg = <0x21>;                           //I2C Address (7bit) 0x21 expander
+		#gpio-cells = <2>;
+		gpio-controller;
+		ngpios = <16>;                          //PCA9555 have 16 GPIOs
+		interrupt-parent = <&gpio1>;
+		interrupts = <9 IRQ_TYPE_LEVEL_LOW>;    //GPIO1_IO09 --> CPU
+	};
+
+	pca9555_20: gpio@20 {
+		compatible = "nxp,pca9555";
+		reg = <0x20>;				//I2C Address (7bit) 0x20 expander
+		gpio-controller;
+		#gpio-cells = <2>;
+		ngpio = <16>;				//PCA9555 have 16 GPIOs
+		interrupt-parent = <&gpio1>;
+		interrupts = <8 IRQ_TYPE_LEVEL_LOW>;	//GPIO1_IO09 --> CPU
 	};
 
 	pmic@25 {
@@ -652,10 +652,6 @@
         pinctrl-names = "default";
         pinctrl-0 = <&pinctrl_uart5>;
         status = "okay";
-
-        bluetooth {
-                compatible = "nxp,88w8987-bt";
-        };
 };
 
 &lpuart6 {
@@ -784,19 +780,34 @@
 	pinctrl-1 = <&pinctrl_usdhc3_100mhz>, <&pinctrl_usdhc3_wlan>;
 	pinctrl-2 = <&pinctrl_usdhc3_200mhz>, <&pinctrl_usdhc3_wlan>;
 	pinctrl-3 = <&pinctrl_usdhc3_sleep>, <&pinctrl_usdhc3_wlan>;
-	mmc-pwrseq = <&usdhc3_pwrseq>;
-	vmmc-supply = <&reg_usdhc3_vmmc>;
+
+	vmmc-supply = <&reg_wifi_3v3>;
+	vqmmc-supply = <&reg_wifi_1v8>;
 	bus-width = <4>;
 	keep-power-in-suspend;
 	non-removable;
 	wakeup-source;
 	status = "okay";
 
-	wifi_wake_host {
-		compatible = "nxp,wifi-wake-host";
-		interrupt-parent = <&gpio3>;
-		interrupts = <26 IRQ_TYPE_LEVEL_LOW>;
-		interrupt-names = "host-wake";
+	/* Control GPIOs WiFi/BT */
+
+	bt-reset-gpios	= <&pca9555_20 7 GPIO_ACTIVE_LOW>;	//BT_nRST_1V8
+	wifi-reset-gpios  = <&pca9555_20 6 GPIO_ACTIVE_LOW>;	//WF_nRST_1V8
+
+	bt-dev-wake-gpios  = <&gpio1 24 GPIO_ACTIVE_HIGH>;	//BT_DEV_WAKE_1V8
+	wifi-dev-wake-gpios= <&gpio1 25 GPIO_ACTIVE_HIGH>;	//WF_DEV_WAKE_1V8
+	bt-wake-host-gpios = <&gpio1 26 GPIO_ACTIVE_HIGH>;	//BT_WAKE_HOST_1V8
+	wifi-wake-host-gpios = <&gpio1 27 GPIO_ACTIVE_HIGH>;	//WF_WAKE_HOST_1V8
+
+	/* Power sequence for reset and enable */
+
+	mmc-pwrseq {
+		compatible = "mmc-pwrseq-simple";
+		reset-gpios = <&pca9555_20 6 GPIO_ACTIVE_LOW>;	//WF_nRST_1V8
+		enable-gpios = <&pca9555_20 5 GPIO_ACTIVE_LOW>;	//WF_nEN
+		power-on-delay-ms = <100>;
+		reset-delay-ms = <20>;
+		reset-active-high;
 	};
 };
 
@@ -819,14 +830,14 @@
 &iomuxc {
 	pinctrl_eqos: eqosgrp {
 		fsl,pins = <
-			MX93_PAD_ENET1_MDC__ENET_QOS_MDC						0x57e
-			MX93_PAD_ENET1_MDIO__ENET_QOS_MDIO						0x57e
-			MX93_PAD_ENET1_RD0__ENET_QOS_RGMII_RD0					0x57e
-			MX93_PAD_ENET1_RD1__ENET_QOS_RGMII_RD1					0x57e
-			MX93_PAD_ENET1_RXC__CCM_ENET_QOS_CLOCK_GENERATE_RX_CLK	0x58e
+			MX93_PAD_ENET1_MDC__ENET_QOS_MDC				0x57e
+			MX93_PAD_ENET1_MDIO__ENET_QOS_MDIO				0x57e
+			MX93_PAD_ENET1_RD0__ENET_QOS_RGMII_RD0				0x57e
+			MX93_PAD_ENET1_RD1__ENET_QOS_RGMII_RD1				0x57e
+			MX93_PAD_ENET1_RXC__CCM_ENET_QOS_CLOCK_GENERATE_RX_CLK		0x58e
 			MX93_PAD_ENET1_RX_CTL__ENET_QOS_RGMII_RX_CTL			0x57e
-			MX93_PAD_ENET1_TD0__ENET_QOS_RGMII_TD0					0x57e
-			MX93_PAD_ENET1_TD1__ENET_QOS_RGMII_TD1					0x57e
+			MX93_PAD_ENET1_TD0__ENET_QOS_RGMII_TD0				0x57e
+			MX93_PAD_ENET1_TD1__ENET_QOS_RGMII_TD1				0x57e
 			MX93_PAD_ENET1_TX_CTL__ENET_QOS_RGMII_TX_CTL			0x57e
 		>;
 	};
@@ -847,14 +858,14 @@
 
 	pinctrl_fec: fecgrp {
 		fsl,pins = <
-			MX93_PAD_ENET2_MDC__ENET1_MDC				0x57e
-			MX93_PAD_ENET2_MDIO__ENET1_MDIO				0x57e
-			MX93_PAD_ENET2_RD0__ENET1_RGMII_RD0			0x57e
-			MX93_PAD_ENET2_RD1__ENET1_RGMII_RD1			0x57e
-			MX93_PAD_ENET2_RXC__ENET1_RGMII_RXC			0x58e
+			MX93_PAD_ENET2_MDC__ENET1_MDC			0x57e
+			MX93_PAD_ENET2_MDIO__ENET1_MDIO			0x57e
+			MX93_PAD_ENET2_RD0__ENET1_RGMII_RD0		0x57e
+			MX93_PAD_ENET2_RD1__ENET1_RGMII_RD1		0x57e
+			MX93_PAD_ENET2_RXC__ENET1_RGMII_RXC		0x58e
 			MX93_PAD_ENET2_RX_CTL__ENET1_RGMII_RX_CTL	0x57e
-			MX93_PAD_ENET2_TD0__ENET1_RGMII_TD0			0x57e
-			MX93_PAD_ENET2_TD1__ENET1_RGMII_TD1			0x57e
+			MX93_PAD_ENET2_TD0__ENET1_RGMII_TD0		0x57e
+			MX93_PAD_ENET2_TD1__ENET1_RGMII_TD1		0x57e
 			MX93_PAD_ENET2_TX_CTL__ENET1_RGMII_TX_CTL	0x57e
 		>;
 	};
@@ -953,7 +964,7 @@
 
 	pinctrl_pcal6524: pcal6524grp {
 		fsl,pins = <
-			MX93_PAD_CCM_CLKO2__GPIO3_IO27			0x31e
+			MX93_PAD_CCM_CLKO2__GPIO3_IO27                  0x31e
 		>;
 	};
 
@@ -1175,26 +1186,27 @@
 	pinctrl_usdhc3_wlan: usdhc3wlangrp {
 		fsl,pins = <
 			MX93_PAD_CCM_CLKO1__GPIO3_IO26		0x31e
+			MX93_PAD_CCM_CLKO2__GPIO3_IO27		0x31e
 		>;
 	};
 
 	pinctrl_sai3: sai3grp {
 		fsl,pins = <
-			MX93_PAD_GPIO_IO26__SAI3_TX_SYNC		0x31e
-			MX93_PAD_GPIO_IO16__SAI3_TX_BCLK		0x31e
-			MX93_PAD_GPIO_IO17__SAI3_MCLK			0x31e
-			MX93_PAD_GPIO_IO19__SAI3_TX_DATA00		0x31e
-			MX93_PAD_GPIO_IO20__SAI3_RX_DATA00		0x31e
+			MX93_PAD_GPIO_IO26__SAI3_TX_SYNC	0x31e
+			MX93_PAD_GPIO_IO16__SAI3_TX_BCLK	0x31e
+			MX93_PAD_GPIO_IO17__SAI3_MCLK		0x31e
+			MX93_PAD_GPIO_IO19__SAI3_TX_DATA00	0x31e
+			MX93_PAD_GPIO_IO20__SAI3_RX_DATA00	0x31e
 		>;
 	};
 
 	pinctrl_sai3_sleep: sai3grpsleep {
 		fsl,pins = <
-			MX93_PAD_GPIO_IO26__GPIO2_IO26			0x51e
-			MX93_PAD_GPIO_IO16__GPIO2_IO16			0x51e
-			MX93_PAD_GPIO_IO17__GPIO2_IO17			0x51e
-			MX93_PAD_GPIO_IO19__GPIO2_IO19			0x51e
-			MX93_PAD_GPIO_IO20__GPIO2_IO20			0x51e
+			MX93_PAD_GPIO_IO26__GPIO2_IO26		0x51e
+			MX93_PAD_GPIO_IO16__GPIO2_IO16		0x51e
+			MX93_PAD_GPIO_IO17__GPIO2_IO17		0x51e
+			MX93_PAD_GPIO_IO19__GPIO2_IO19		0x51e
+			MX93_PAD_GPIO_IO20__GPIO2_IO20		0x51e
 		>;
 	};
 
