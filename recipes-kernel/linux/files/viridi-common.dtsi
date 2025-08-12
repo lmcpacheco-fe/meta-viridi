@@ -1,9 +1,25 @@
 / {
-	// TODO: assign more descriptive labels and node names instead of wakeupX
-	gpio-keys {
-		compatible = "gpio-keys";
-		pinctrl-0 = <&pinctrl_wakeup>;
-		pinctrl-names = "default";
+
+		reg_usdhc3_vmmc: regulator-usdhc3 {
+			compatible = "regulator-fixed";
+			regulator-name = "WLAN_EN";
+			regulator-min-microvolt = <1800000>;
+			regulator-max-microvolt = <1800000>;
+			//gpio = <&gpio2 13 GPIO_ACTIVE_LOW>;			//CPU(GPIO2_13) = WF_nPD_1V8
+			gpios = <&pca9555_21 5 GPIO_ACTIVE_LOW>;		//IO_Exp(P0_5) = WF_nEN_1V8
+			enable-active-low;
+		};
+
+		usdhc3_pwrseq: usdhc3_pwrseq {
+			compatible = "mmc-pwrseq-simple";
+			reset-gpios = <&pca9555_21 6 GPIO_ACTIVE_LOW>;		//IO_Exp(P0_6) = WF_nRST_1V8
+		};
+
+		// TODO: assign more descriptive labels and node names instead of wakeupX
+		gpio-keys {
+			compatible = "gpio-keys";
+			pinctrl-0 = <&pinctrl_wakeup>;
+			pinctrl-names = "default";
 
 		wakeup1 {
 			label = "WAKEUP1";
@@ -91,6 +107,17 @@
 	};
 };
 
+&lpuart5 {
+	/* BT */
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart5>;
+	status = "okay";
+
+	bluetooth {
+		compatible = "nxp,88w8987-bt";
+	};
+};
+
 &eqos {
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&pinctrl_eqos>;
@@ -103,11 +130,11 @@
 		compatible = "snps,dwmac-mdio";
 		#address-cells = <1>;
 		#size-cells = <0>;
-		//clock-frequency = <5000000>;				// No need for 'clock-frequency'; PHY provides 50 MHz REF_CLK to SoC via RMII
+		//clock-frequency = <5000000>;			// No need for 'clock-frequency'; PHY provides 50 MHz REF_CLK to SoC via RMII
 
 		ethphy1: ethernet-phy@1 {
 			compatible = "microchip,ksz8081";
-			reg = <1>;					//Strapping 15 --> PHYAD[0] pull-down
+			reg = <1>;										//Strapping 15 --> PHYAD[0] pull-down
 			reset-gpios = <&pcal6524 15 GPIO_ACTIVE_LOW>;	//&lpi2c2
 			reset-assert-us = <10000>;
 			reset-deassert-us = <80000>;
@@ -127,14 +154,39 @@
 	mdio {
 		#address-cells = <1>;
 		#size-cells = <0>;
-		//clock-frequency = <5000000>;				// No need for 'clock-frequency'; PHY provides 50 MHz REF_CLK to SoC via RMII
+		//clock-frequency = <5000000>;			// No need for 'clock-frequency'; PHY provides 50 MHz REF_CLK to SoC via RMII
 
 		ethphy2: ethernet-phy@2 {
 		compatible = "microchip,ksz8081";
-			reg = <2>;					//Strapping 15 --> PHYAD[0] pull-up 
+			reg = <2>;										//Strapping 15 --> PHYAD[0] pull-up
 			reset-gpios = <&pcal6524 16 GPIO_ACTIVE_LOW>;	//&lpi2c2
 			reset-assert-us = <10000>;
 			reset-deassert-us = <80000>;
 		};
+	};
+};
+
+&usdhc3 {
+	pinctrl-names = "default", "state_100mhz", "state_200mhz", "sleep";
+	pinctrl-0 = <&pinctrl_usdhc3>, <&pinctrl_usdhc3_wlan>;
+	pinctrl-1 = <&pinctrl_usdhc3_100mhz>, <&pinctrl_usdhc3_wlan>;
+	pinctrl-2 = <&pinctrl_usdhc3_200mhz>, <&pinctrl_usdhc3_wlan>;
+	pinctrl-3 = <&pinctrl_usdhc3_sleep>, <&pinctrl_usdhc3_wlan>;
+
+	mmc-pwrseq = <&usdhc3_pwrseq>;
+	vmmc-supply = <&reg_usdhc3_vmmc>;
+	bus-width = <4>;
+	keep-power-in-suspend;
+	non-removable;
+	wakeup-source;
+	status = "okay";
+
+	//wifi-dev-wake-gpios= <&gpio2 25 GPIO_ACTIVE_HIGH>;	//CPU(GPIO2_25) = WF_DEV_WAKE_1V8
+
+	wifi_wake_host {
+		compatible = "nxp,wifi-wake-host";
+		interrupt-parent = <&gpio2>;
+		interrupts = <27 IRQ_TYPE_LEVEL_LOW>;		//CPU(GPIO2_27) = WF_WAKE_HOST_1V8
+		interrupt-names = "host-wake";
 	};
 };

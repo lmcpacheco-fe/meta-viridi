@@ -133,23 +133,6 @@
 		status = "disabled";
 	};
 
-	reg_wifi_3v3: regulator-wifi-3v3 {
-		compatible = "regulator-fixed";
-		regulator-name = "WLAN_EN";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-		enable-gpios = <&pca9555_21 5 GPIO_ACTIVE_LOW>;		//P0_5 = WF_nEN
-		regulator-boot-on;
-	};
-
-	reg_wifi_1v8: regulator-wifi-1v8 {
-		compatible = "regulator-fixed";
-		regulator-name = "reg_wifi_1v8";
-		regulator-min-microvolt = <1800000>;
-		regulator-max-microvolt = <1800000>;
-		regulator-always-on;
-	};
-
 	reg_audio_pwr: regulator-audio-pwr {
 		compatible = "regulator-fixed";
 		regulator-name = "audio-pwr";
@@ -647,13 +630,6 @@
         status = "okay";
 };
 
-&lpuart5 {
-        /* BT */
-        pinctrl-names = "default";
-        pinctrl-0 = <&pinctrl_uart5>;
-        status = "okay";
-};
-
 &lpuart6 {
 	/* RS232/RS485 */
         pinctrl-0 = <&pinctrl_uart6>;
@@ -774,43 +750,6 @@
 	no-mmc;
 };
 
-&usdhc3 {
-	pinctrl-names = "default", "state_100mhz", "state_200mhz", "sleep";
-	pinctrl-0 = <&pinctrl_usdhc3>, <&pinctrl_usdhc3_wlan>;
-	pinctrl-1 = <&pinctrl_usdhc3_100mhz>, <&pinctrl_usdhc3_wlan>;
-	pinctrl-2 = <&pinctrl_usdhc3_200mhz>, <&pinctrl_usdhc3_wlan>;
-	pinctrl-3 = <&pinctrl_usdhc3_sleep>, <&pinctrl_usdhc3_wlan>;
-
-	vmmc-supply = <&reg_wifi_3v3>;
-	vqmmc-supply = <&reg_wifi_1v8>;
-	bus-width = <4>;
-	keep-power-in-suspend;
-	non-removable;
-	wakeup-source;
-	status = "okay";
-
-	/* Control GPIOs WiFi/BT */
-
-	bt-reset-gpios	= <&pca9555_20 7 GPIO_ACTIVE_LOW>;	//BT_nRST_1V8
-	wifi-reset-gpios  = <&pca9555_20 6 GPIO_ACTIVE_LOW>;	//WF_nRST_1V8
-
-	bt-dev-wake-gpios  = <&gpio1 24 GPIO_ACTIVE_HIGH>;	//BT_DEV_WAKE_1V8
-	wifi-dev-wake-gpios= <&gpio1 25 GPIO_ACTIVE_HIGH>;	//WF_DEV_WAKE_1V8
-	bt-wake-host-gpios = <&gpio1 26 GPIO_ACTIVE_HIGH>;	//BT_WAKE_HOST_1V8
-	wifi-wake-host-gpios = <&gpio1 27 GPIO_ACTIVE_HIGH>;	//WF_WAKE_HOST_1V8
-
-	/* Power sequence for reset and enable */
-
-	mmc-pwrseq {
-		compatible = "mmc-pwrseq-simple";
-		reset-gpios = <&pca9555_20 6 GPIO_ACTIVE_LOW>;	//WF_nRST_1V8
-		enable-gpios = <&pca9555_20 5 GPIO_ACTIVE_LOW>;	//WF_nEN
-		power-on-delay-ms = <100>;
-		reset-delay-ms = <20>;
-		reset-active-high;
-	};
-};
-
 &wdog3 {
 	status = "okay";
 };
@@ -894,7 +833,7 @@
 	pinctrl_flexcan2_sleep: flexcan2sleepgrp {
 		fsl,pins = <
 			MX93_PAD_GPIO_IO25__GPIO2_IO25			0x31e
-			MX93_PAD_GPIO_IO27__GPIO2_IO27			0x31e
+			//MX93_PAD_GPIO_IO27__GPIO2_IO27			0x31e
 		>;
 	};
 
@@ -1185,8 +1124,7 @@
 
 	pinctrl_usdhc3_wlan: usdhc3wlangrp {
 		fsl,pins = <
-			MX93_PAD_CCM_CLKO1__GPIO3_IO26		0x31e
-			MX93_PAD_CCM_CLKO2__GPIO3_IO27		0x31e
+			MX93_PAD_GPIO_IO27__GPIO2_IO27		0x31e
 		>;
 	};
 
