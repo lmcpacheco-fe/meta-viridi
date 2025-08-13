@@ -405,7 +405,7 @@
 		#gpio-cells = <2>;
 		ngpio = <16>;				//PCA9555 have 16 GPIOs
 		interrupt-parent = <&gpio1>;
-		interrupts = <8 IRQ_TYPE_LEVEL_LOW>;	//GPIO1_IO09 --> CPU
+		interrupts = <8 IRQ_TYPE_LEVEL_LOW>;	//GPIO1_IO08 --> CPU
 	};
 
 	adp5585: io-expander@34 {
@@ -499,13 +499,6 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart1>;
 	status = "okay";
-};
-
-&lpuart3 {
-	/* LTE */
-        pinctrl-0 = <&pinctrl_uart3>;
-        pinctrl-names = "default";
-        status = "okay";
 };
 
 &lpuart6 {
@@ -701,15 +694,14 @@
 		>;
 	};
 
-	
-        pinctrl_uart3: uart3grp {
-                fsl,pins = <
-                        MX91_PAD_ENET1_TD0__LPUART3_TX			0x31e
-                        MX91_PAD_ENET1_RD0__LPUART3_RX			0x31e
-                        MX91_PAD_ENET1_RD1__LPUART3_CTS_B		0x31e
-                        MX91_PAD_ENET1_TD1__LPUART3_RTS_B		0x31e
-                >;
-        };
+	pinctrl_uart3: uart3_pins {
+		fsl,pins = <
+			MX91_PAD_GPIO_IO14__LPUART3_TX			0x31e
+			MX91_PAD_GPIO_IO15__LPUART3_RX			0x31e
+			MX91_PAD_GPIO_IO16__LPUART3_CTS_B		0x31e
+			MX91_PAD_GPIO_IO17__LPUART3_RTS_B		0x31e
+		>;
+	};
 
 	pinctrl_uart5: uart5grp {
 		fsl,pins = <
@@ -720,24 +712,24 @@
 		>;
 	};
 
-        pinctrl_uart6: uart6grp {
-                fsl,pins = <
-                        MX91_PAD_GPIO_IO04__LPUART6_TX			0x31e
-                        MX91_PAD_GPIO_IO05__LPUART6_RX			0x31e
-                        MX91_PAD_GPIO_IO06__LPUART6_CTS_B		0x31e
-                        MX91_PAD_GPIO_IO07__LPUART6_RTS_B		0x31e
-                >;
-        };
+	pinctrl_uart6: uart6grp {
+		fsl,pins = <
+			MX91_PAD_GPIO_IO04__LPUART6_TX			0x31e
+			MX91_PAD_GPIO_IO05__LPUART6_RX			0x31e
+			MX91_PAD_GPIO_IO06__LPUART6_CTS_B		0x31e
+			MX91_PAD_GPIO_IO07__LPUART6_RTS_B		0x31e
+		>;
+	};
 
-        pinctrl_uart7: uart7grp {
-                fsl,pins = <
-                        MX91_PAD_GPIO_IO08__LPUART7_TX			0x31e
-                        MX91_PAD_GPIO_IO09__LPUART7_RX			0x31e
-                        MX91_PAD_GPIO_IO10__LPUART7_CTS_B		0x31e
-                        MX91_PAD_GPIO_IO11__LPUART7_RTS_B		0x31e
-                >;
-        };
-        
+	pinctrl_uart7: uart7grp {
+		fsl,pins = <
+			MX91_PAD_GPIO_IO08__LPUART7_TX			0x31e
+			MX91_PAD_GPIO_IO09__LPUART7_RX			0x31e
+			MX91_PAD_GPIO_IO10__LPUART7_CTS_B		0x31e
+			MX91_PAD_GPIO_IO11__LPUART7_RTS_B		0x31e
+		>;
+	};
+
 	pinctrl_usdhc1: usdhc1grp {
 		fsl,pins = <
 			MX91_PAD_SD1_CLK__USDHC1_CLK		0x1582
@@ -788,7 +780,7 @@
 
 	pinctrl_reg_usdhc2_vmmc: regusdhc2vmmcgrp {
 		fsl,pins = <
-			MX91_PAD_SD2_RESET_B__GPIO3_IO7	0x31e
+			MX91_PAD_SD2_RESET_B__GPIO3_IO7		0x31e
 		>;
 	};
 
