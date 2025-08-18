@@ -597,6 +597,15 @@
 		>;
 	};
 
+	pinctrl_lpspi4: lpspi4grp {
+		fsl,pins = <
+			MX91_PAD_GPIO_IO18__LPSPI4_PCS0			0x43	// CS0 (chip select)
+			MX91_PAD_GPIO_IO19__LPSPI4_SIN			0x43
+			MX91_PAD_GPIO_IO20__LPSPI4_SOUT			0x43
+			MX91_PAD_GPIO_IO21__LPSPI4_SCK			0x43
+		>;
+	};
+
 	pinctrl_uart1: uart1grp {
 		fsl,pins = <
 			MX91_PAD_UART1_RXD__LPUART1_RX			0x31e

@@ -217,25 +217,39 @@
 };
 
 &usbotg1 {
-        dr_mode = "peripheral";
-        hnp-disable;
-        srp-disable;
-        adp-disable;
-        //usb-role-switch;              //No Type-C controller used
-        disable-over-current;
-        samsung,picophy-pre-emp-curr-control = <3>;
-        samsung,picophy-dc-vol-level-adjust = <7>;
-        status = "okay";
+	dr_mode = "peripheral";
+	hnp-disable;
+	srp-disable;
+	adp-disable;
+	//usb-role-switch;		//No Type-C controller used
+	disable-over-current;
+	samsung,picophy-pre-emp-curr-control = <3>;
+	samsung,picophy-dc-vol-level-adjust = <7>;
+	status = "okay";
 };
 
 &usbotg2 {
-        dr_mode = "otg";
-        hnp-disable;
-        srp-disable;
-        adp-disable;
-        //usb-role-switch;              //No Type-C controller used
-        disable-over-current;
-        samsung,picophy-pre-emp-curr-control = <3>;
-        samsung,picophy-dc-vol-level-adjust = <7>;
-        status = "okay";
+	dr_mode = "otg";
+	hnp-disable;
+	srp-disable;
+	adp-disable;
+	//usb-role-switch;		//No Type-C controller used
+	disable-over-current;
+	samsung,picophy-pre-emp-curr-control = <3>;
+	samsung,picophy-dc-vol-level-adjust = <7>;
+	status = "okay";
+};
+
+&lpspi4 {
+	fsl,spi-num-chipselects = <1>;
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&pinctrl_lpspi4>;
+	cs-gpios = <&gpio2 18 GPIO_ACTIVE_LOW>;
+	status = "okay";
+
+	spidev0: spi@0 {
+		reg = <0>;                              // CS0
+		compatible = "spidev";                  // Generic driver for testing
+		spi-max-frequency = <1000000>;          // 1 MHz, adjust according to peripheral
+	};
 };
