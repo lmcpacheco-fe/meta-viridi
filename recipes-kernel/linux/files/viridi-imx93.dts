@@ -124,12 +124,12 @@
 
 	backlight_lvds: backlight-lvds {
 		compatible = "pwm-backlight";
-		pwms = <&adp5585 0 100000 0>;
+		pwms = <&fxl6408 0 100000 0>;
 		brightness-levels = <0 100>;
 		num-interpolated-steps = <100>;
 		default-brightness-level = <100>;
 		power-supply = <&reg_vdd_12v>;
-		enable-gpios = <&adp5585 9 GPIO_ACTIVE_HIGH>;
+		enable-gpios = <&fxl6408 5 GPIO_ACTIVE_HIGH>;
 		status = "disabled";
 	};
 
@@ -331,13 +331,16 @@
 		>;
 	};
 
-	adv7535: hdmi@3d {
+	adv7535: dtsi@3d {
 		compatible = "adi,adv7535";
 		reg = <0x3d>;
 		adi,addr-cec = <0x3b>;
 		adi,dsi-lanes = <4>;
 		status = "okay";
-
+		// The interrupt will be handled from GPIO4 of the IO Expander.
+		// The thing is, I don’t know how the SoC will detect the interrupt if no GPIO is connected.
+		interrupt-parent = <&fxl6408>;
+		interrupts = <4 IRQ_TYPE_LEVEL_LOW>;	//DSI_EN_3V3 GPIO4 of the IO Expander acts as init when the screen is touched
 		port {
 			adv7535_to_dsi: endpoint {
 				remote-endpoint = <&dsi_to_adv7535>;
@@ -348,6 +351,17 @@
 	inertial-meter@6a {
 		compatible = "st,lsm6dso";
 		reg = <0x6a>;
+	};
+
+	fxl6408: io-expander@44 {
+		compatible = "nxp,fxl6408";
+		reg = <0x44>;				//I2C Address (7bit) 0x44 expander
+		vdd-supply = <&buck4>;			//buck4 --> 3v3
+		#gpio-cells = <2>;
+		gpio-controller;
+		ngpios = <8>;				//PCA9555 have 8 GPIOs
+		gpio-reserved-ranges = <5 1>;		//Reserv DSP_CTRL_3V3 always
+		#pwm-cells = <3>;
 	};
 };
 
