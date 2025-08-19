@@ -102,6 +102,10 @@
 	status = "okay";
 };
 
+&media_blk_ctrl {
+	status = "okay";
+};
+
 &lpi2c1 {
 	clock-frequency = <400000>;
 	pinctrl-names = "default";
@@ -260,10 +264,6 @@
         pinctrl-0 = <&pinctrl_uart7>;
         pinctrl-names = "default";
         status = "okay";
-};
-
-&media_blk_ctrl {
-	status = "okay";
 };
 
 &usdhc1 {
