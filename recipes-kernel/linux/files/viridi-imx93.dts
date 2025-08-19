@@ -120,26 +120,22 @@
 	status = "okay";
 };
 
-&sai1 {
-	pinctrl-names = "default", "sleep";
-	pinctrl-0 = <&pinctrl_sai1>;
-	pinctrl-1 = <&pinctrl_sai1_sleep>;
-	assigned-clocks = <&clk IMX93_CLK_SAI1>;
-	assigned-clock-parents = <&clk IMX93_CLK_AUDIO_PLL>;
-	assigned-clock-rates = <12288000>;
-	fsl,sai-mclk-direction-output;
+&flexcan1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_flexcan1>;
 	status = "okay";
+
+	//standby-gpios = <&gpio1 14 GPIO_ACTIVE_HIGH>;		//CAN1_STBY
+	//eol-gpios = <&gpio1 11 GPIO_ACTIVE_HIGH>;		//CAN1_EOL
 };
 
-&sai3 {
-	pinctrl-names = "default", "sleep";
-	pinctrl-0 = <&pinctrl_sai3>;
-	pinctrl-1 = <&pinctrl_sai3_sleep>;
-	assigned-clocks = <&clk IMX93_CLK_SAI3>;
-	assigned-clock-parents = <&clk IMX93_CLK_AUDIO_PLL>;
-	assigned-clock-rates = <12288000>;
-	fsl,sai-mclk-direction-output;
+&flexcan2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_flexcan2>;
 	status = "okay";
+
+	//standby-gpios = <&gpio3 2 GPIO_ACTIVE_HIGH>;		//CAN2_STBY
+	//eol-gpios = <&gpio3 1 GPIO_ACTIVE_HIGH>;		//CAN2_EOL
 };
 
 &cm33 {						//Cortex-M33
@@ -216,7 +212,7 @@
 		interrupts = <7 IRQ_TYPE_EDGE_FALLING>;	//GPIO3_IO07 --> CPU
 	};
 
-	/*Io Expander --> FXL6408UMX*/	
+	/*Io Expander --> FXL6408UMX*/
 	fxl6408: io-expander@44 {
 		compatible = "nxp,fxl6408";
 		reg = <0x44>;				//I2C Address (7bit) 0x44 expander
@@ -351,24 +347,24 @@
 	/*Io Expander --> PCA9555AHF,128*/
 	pca9555_21: gpio@21 {
 		compatible = "nxp,pca9555";
-		reg = <0x21>;				//I2C Address (7bit) 0x21 expander
+		reg = <0x21>;                           //I2C Address (7bit) 0x21 expander
 		#gpio-cells = <2>;
 		gpio-controller;
-		ngpios = <16>;				//PCA9555 have 16 GPIOs
+		ngpios = <16>;                          //PCA9555 have 16 GPIOs
 		interrupt-parent = <&gpio1>;
-		interrupts = <9 IRQ_TYPE_LEVEL_LOW>;	//GPIO1_IO09 --> CPU
+		interrupts = <9 IRQ_TYPE_LEVEL_LOW>;    //GPIO1_IO09 --> CPU
 	};
 };
 
-&lpuart1 {
-        /* Console */
-        pinctrl-names = "default";
-        pinctrl-0 = <&pinctrl_uart1>;
-        status = "okay";
+&lpuart1 { 
+	/* Console */
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart1>;
+	status = "okay";
 };
 
 &lpuart6 {
-	/* RS232/RS485 */
+        /* RS232/RS485 */
         pinctrl-0 = <&pinctrl_uart6>;
         pinctrl-names = "default";
         status = "okay";
@@ -426,7 +422,7 @@
 		>;
 	};
 
-	pinctrl_eqos_sleep: eqossleepgrp {
+	pinctrl_eqos_sleep: eqosgrpsleep {
 		fsl,pins = <
 			MX93_PAD_ENET1_MDC__GPIO4_IO00			0x31e
 			MX93_PAD_ENET1_MDIO__GPIO4_IO01			0x31e
@@ -491,10 +487,28 @@
 
 	pinctrl_lpspi4: lpspi4grp {
 		fsl,pins = <
-			MX93_PAD_GPIO_IO18__LPSPI4_PCS0			0x43	// CS0 (chip select)
+			MX93_PAD_GPIO_IO18__LPSPI4_PCS0			0x43		// CS0 (chip select)
 			MX93_PAD_GPIO_IO19__LPSPI4_SIN			0x43
 			MX93_PAD_GPIO_IO20__LPSPI4_SOUT			0x43
 			MX93_PAD_GPIO_IO21__LPSPI4_SCK			0x43
+		>;
+	};
+
+	pinctrl_flexcan1: flexcan1grp {
+		fsl,pins = <
+			MX93_PAD_SAI1_TXD0__CAN1_TX			0x139e
+			MX93_PAD_SAI1_TXC__CAN1_RX			0x139e
+			MX93_PAD_SAI1_RXD0__GPIO1_IO14			0x139e		//CAN1_STBY
+			MX93_PAD_SAI1_TXFS__GPIO1_IO11			0x139e		//CAN1_EOL
+		>;
+	};
+
+	pinctrl_flexcan2: flexcan2grp {
+		fsl,pins = <
+			MX93_PAD_SD2_DATA0__CAN2_TX			0x139e
+			MX93_PAD_SD2_DATA1__CAN2_RX			0x139e
+			MX93_PAD_SD2_CMD__GPIO3_IO02			0x139e		//CAN2_STBY
+			MX93_PAD_SD2_CLK__GPIO3_IO01			0x139e		//CAN2_EOL
 		>;
 	};
 
@@ -601,7 +615,7 @@
 		>;
 	};
 
-	pinctrl_usdhc2_gpio_sleep: usdhc2gpiosleepgrp {
+	pinctrl_usdhc2_gpio_sleep: usdhc2gpiogrpsleep {
 		fsl,pins = <
 			MX93_PAD_SD2_CD_B__GPIO3_IO00		0x51e
 		>;
@@ -643,7 +657,7 @@
 		>;
 	};
 
-	pinctrl_usdhc2_sleep: usdhc2sleepgrp {
+	pinctrl_usdhc2_sleep: usdhc2grpsleep {
 		fsl,pins = <
 			MX93_PAD_SD2_CLK__GPIO3_IO01		0x51e
 			MX93_PAD_SD2_CMD__GPIO3_IO02		0x51e
@@ -702,62 +716,6 @@
 	pinctrl_usdhc3_wlan: usdhc3wlangrp {
 		fsl,pins = <
 			MX93_PAD_GPIO_IO27__GPIO2_IO27		0x31e
-		>;
-	};
-
-	pinctrl_sai1: sai1grp {
-		fsl,pins = <
-			MX93_PAD_SAI1_TXC__SAI1_TX_BCLK		0x31e
-			MX93_PAD_SAI1_TXFS__SAI1_TX_SYNC	0x31e
-			MX93_PAD_SAI1_TXD0__SAI1_TX_DATA00	0x31e
-			MX93_PAD_SAI1_RXD0__SAI1_RX_DATA00	0x31e
-		>;
-	};
-
-	pinctrl_sai1_sleep: sai1sleepgrp {
-		fsl,pins = <
-			MX93_PAD_SAI1_TXC__GPIO1_IO12		0x51e
-			MX93_PAD_SAI1_TXFS__GPIO1_IO11		0x51e
-			MX93_PAD_SAI1_TXD0__GPIO1_IO13		0x51e
-			MX93_PAD_SAI1_RXD0__GPIO1_IO14		0x51e
-		>;
-	};
-
-	pinctrl_sai1: sai1grp {
-		fsl,pins = <
-			MX93_PAD_SAI1_TXC__SAI1_TX_BCLK		0x31e
-			MX93_PAD_SAI1_TXFS__SAI1_TX_SYNC	0x31e
-			MX93_PAD_SAI1_TXD0__SAI1_TX_DATA00	0x31e
-			MX93_PAD_SAI1_RXD0__SAI1_RX_DATA00	0x31e
-		>;
-	};
-
-	pinctrl_sai1_sleep: sai1sleepgrp {
-		fsl,pins = <
-			MX93_PAD_SAI1_TXC__GPIO1_IO12		0x51e
-			MX93_PAD_SAI1_TXFS__GPIO1_IO11		0x51e
-			MX93_PAD_SAI1_TXD0__GPIO1_IO13		0x51e
-			MX93_PAD_SAI1_RXD0__GPIO1_IO14		0x51e
-		>;
-	};
-
-	pinctrl_sai3: sai3grp {
-		fsl,pins = <
-			MX93_PAD_GPIO_IO26__SAI3_TX_SYNC	0x31e
-			MX93_PAD_GPIO_IO16__SAI3_TX_BCLK	0x31e
-			MX93_PAD_GPIO_IO17__SAI3_MCLK		0x31e
-			MX93_PAD_GPIO_IO19__SAI3_TX_DATA00	0x31e
-			MX93_PAD_GPIO_IO20__SAI3_RX_DATA00	0x31e
-		>;
-	};
-
-	pinctrl_sai3_sleep: sai3grpsleep {
-		fsl,pins = <
-			MX93_PAD_GPIO_IO26__GPIO2_IO26		0x51e
-			MX93_PAD_GPIO_IO16__GPIO2_IO16		0x51e
-			MX93_PAD_GPIO_IO17__GPIO2_IO17		0x51e
-			MX93_PAD_GPIO_IO19__GPIO2_IO19		0x51e
-			MX93_PAD_GPIO_IO20__GPIO2_IO20		0x51e
 		>;
 	};
 
