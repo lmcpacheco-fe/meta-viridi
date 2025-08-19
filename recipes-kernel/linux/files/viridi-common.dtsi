@@ -160,7 +160,7 @@
 		ethphy1: ethernet-phy@1 {
 			compatible = "microchip,ksz8081";
 			reg = <1>;										//Strapping 15 --> PHYAD[0] pull-down
-			reset-gpios = <&pcal6524 15 GPIO_ACTIVE_LOW>;	//&lpi2c2
+			reset-gpios = <&gpio4 12 GPIO_ACTIVE_LOW>;		//Reset controlled by SoC GPIO4_IO12
 			reset-assert-us = <10000>;
 			reset-deassert-us = <80000>;
 		};
@@ -184,7 +184,7 @@
 		ethphy2: ethernet-phy@2 {
 		compatible = "microchip,ksz8081";
 			reg = <2>;										//Strapping 15 --> PHYAD[0] pull-up
-			reset-gpios = <&pcal6524 16 GPIO_ACTIVE_LOW>;	//&lpi2c2
+			reset-gpios = <&gpio4 26 GPIO_ACTIVE_LOW>;		//Reset controlled by SoC GPIO4_IO26
 			reset-assert-us = <10000>;
 			reset-deassert-us = <80000>;
 		};
