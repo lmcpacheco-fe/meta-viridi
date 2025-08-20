@@ -1,4 +1,26 @@
+/*
+ * Copyright 2025 Future Electronics
+ */
+
 / {
+		reg_vref_1v8: regulator-adc-vref {
+			compatible = "regulator-fixed";
+			regulator-name = "vref_1v8";
+			regulator-min-microvolt = <1800000>;
+			regulator-max-microvolt = <1800000>;
+		};
+
+		reg_usdhc2_vmmc: regulator-usdhc2 {
+			compatible = "regulator-fixed";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_reg_usdhc2_vmmc>;
+			regulator-name = "VSD_3V3";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			gpio = <&gpio3 7 GPIO_ACTIVE_HIGH>;
+			off-on-delay-us = <12000>;
+			enable-active-high;
+		};
 
 		reg_usdhc3_vmmc: regulator-usdhc3 {
 			compatible = "regulator-fixed";
@@ -18,17 +40,14 @@
 		lte {
 			compatible = "telit,fe910c04";
 			status = "okay";
-
 			serial = <&lpuart3>;
-
-			shutdown-gpios = <&pca9555_21 9 GPIO_ACTIVE_LOW>;       //IO_Exp(P1_1) = LTE_ON_OFF_1V8
-			reset-gpios = <&pca9555_21 10 GPIO_ACTIVE_LOW>;         //IO_Exp(P1_2) = LTE_nSHTD_1V8
-			//gnss-lna-gpios = <&pca9555_21 8 GPIO_ACTIVE_HIGH>;              //Opcional: IO_Exp(P1_0) = GNSS LNA controled by SW
-
+			shutdown-gpios = <&pca9555_21 9 GPIO_ACTIVE_LOW>;			//IO_Exp(P1_1) = LTE_ON_OFF_1V8
+			reset-gpios = <&pca9555_21 10 GPIO_ACTIVE_LOW>;				//IO_Exp(P1_2) = LTE_nSHTD_1V8
+			//gnss-lna-gpios = <&pca9555_21 8 GPIO_ACTIVE_HIGH>;			//Opcional: IO_Exp(P1_0) = GNSS LNA controled by SW
 			lte_wake_ready {
 				compatible = "nxp,lte_wake_ready";
 				interrupt-parent = <&gpio2>;
-				interrupts = <12 IRQ_TYPE_LEVEL_LOW>;           //CPU(GPIO2_12) = LTE_SW_RDY_1V8 (Has to be an interruption?)
+				interrupts = <12 IRQ_TYPE_LEVEL_LOW>;		//CPU(GPIO2_12) = LTE_SW_RDY_1V8 (Has to be an interruption?)
 				interrupt-names = "lte-ready";
 			};
 		};
@@ -38,6 +57,7 @@
 			compatible = "gpio-keys";
 			pinctrl-0 = <&pinctrl_wakeup>;
 			pinctrl-names = "default";
+		};
 
 		wakeup1 {
 			label = "WAKEUP1";
@@ -61,68 +81,32 @@
 			linux,code = <KEY_SUSPEND>;
 			wakeup-source;
 		};
-	};
 };
 
-&gpio1 {
-	gpio-line-names = 
-		"gpio1-00", "gpio1-01", "gpio1-02", "gpio1-03",
-		"gpio1-04", "gpio1-05", "gpio1-06", "gpio1-07",
-		"gpio1-08", "gpio1-09", "gpio1-10", "gpio1-11",
-		"gpio1-12", "gpio1-13", "gpio1-14", "gpio1-15",
-		"gpio1-16", "gpio1-17", "gpio1-18", "gpio1-19",
-		"gpio1-20", "gpio1-21", "gpio1-22", "gpio1-23",
-		"gpio1-24", "gpio1-25", "gpio1-26", "gpio1-27",
-		"gpio1-28", "gpio1-29", "gpio1-30", "gpio1-31";
+&adc1 {
+	vref-supply = <&reg_vref_1v8>;
+	status = "okay";
 };
 
-&gpio2 {
-	gpio-line-names = 
-		"gpio2-00", "gpio2-01", "gpio2-02", "gpio2-03",
-		"gpio2-04", "gpio2-05", "gpio2-06", "gpio2-07",
-		"gpio2-08", "gpio2-09", "gpio2-10", "gpio2-11",
-		"gpio2-12", "gpio2-13", "gpio2-14", "gpio2-15",
-		"gpio2-16", "gpio2-17", "gpio2-18", "gpio2-19",
-		"gpio2-20", "gpio2-21", "gpio2-22", "gpio2-23",
-		"gpio2-24", "gpio2-25", "gpio2-26", "gpio2-27",
-		"gpio2-28", "gpio2-29", "gpio2-30", "gpio2-31";
+&lpuart1 {
+	/* Console */
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart1>;
+	status = "okay";
 };
 
-&gpio3 {
-	gpio-line-names = 
-		"gpio3-00", "gpio3-01", "gpio3-02", "gpio3-03",
-		"gpio3-04", "gpio3-05", "gpio3-06", "gpio3-07",
-		"gpio3-08", "gpio3-09", "gpio3-10", "gpio3-11",
-		"gpio3-12", "gpio3-13", "gpio3-14", "gpio3-15",
-		"gpio3-16", "gpio3-17", "gpio3-18", "gpio3-19",
-		"gpio3-20", "gpio3-21", "gpio3-22", "gpio3-23",
-		"gpio3-24", "gpio3-25", "gpio3-26", "gpio3-27",
-		"gpio3-28", "gpio3-29", "gpio3-30", "gpio3-31";
-
+&lpuart6 {
+	/* RS232/RS485 */
+	pinctrl-0 = <&pinctrl_uart6>;
+	pinctrl-names = "default";
+	status = "okay";
 };
 
-&gpio4 {
-	gpio-line-names = 
-		"gpio4-00", "gpio4-01", "gpio4-02", "gpio4-03",
-		"gpio4-04", "gpio4-05", "gpio4-06", "gpio4-07",
-		"gpio4-08", "gpio4-09", "gpio4-10", "gpio4-11",
-		"gpio4-12", "gpio4-13", "gpio4-14", "gpio4-15",
-		"gpio4-16", "gpio4-17", "gpio4-18", "gpio4-19",
-		"gpio4-20", "gpio4-21", "gpio4-22", "gpio4-23",
-		"gpio4-24", "gpio4-25", "gpio4-26", "gpio4-27",
-		"gpio4-28", "gpio4-29", "gpio4-30", "gpio4-31";
-};
-
-&lpi2c1 {
-	// LED Controller
-	gpio_expander_44: gpio-expander@44 {
-		compatible = "fcs,fxl6408";
-		reg = <0x44>;
-		gpio-controller;
-		#gpio-cells = <2>;
-		gpio-line-names = "LED1_nEN", "LED2_nEN", "LED3_nEN", "LED4_nEN",
-			"DSP_EN_3V3", "DSP_CTRL_3V3", "NO_CONNECT", "NO_CONNECT";
-	};
+&lpuart7 {
+	/* Connector */
+	pinctrl-0 = <&pinctrl_uart7>;
+	pinctrl-names = "default";
+	status = "okay";
 };
 
 &lpuart5 {
@@ -130,7 +114,6 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart5>;
 	status = "okay";
-
 	bluetooth {
 		compatible = "nxp,88w8987-bt";
 	};
@@ -150,13 +133,11 @@
 	phy-mode = "rmii";
 	phy-handle = <&ethphy1>;
 	status = "okay";
-
 	mdio {
 		compatible = "snps,dwmac-mdio";
 		#address-cells = <1>;
 		#size-cells = <0>;
 		//clock-frequency = <5000000>;			// No need for 'clock-frequency'; PHY provides 50 MHz REF_CLK to SoC via RMII
-
 		ethphy1: ethernet-phy@1 {
 			compatible = "microchip,ksz8081";
 			reg = <1>;										//Strapping 15 --> PHYAD[0] pull-down
@@ -175,12 +156,10 @@
 	phy-handle = <&ethphy2>;
 	fsl,magic-packet;
 	status = "okay";
-
 	mdio {
 		#address-cells = <1>;
 		#size-cells = <0>;
 		//clock-frequency = <5000000>;			// No need for 'clock-frequency'; PHY provides 50 MHz REF_CLK to SoC via RMII
-
 		ethphy2: ethernet-phy@2 {
 		compatible = "microchip,ksz8081";
 			reg = <2>;										//Strapping 15 --> PHYAD[0] pull-up
@@ -191,13 +170,39 @@
 	};
 };
 
+&usdhc1 {
+	pinctrl-names = "default", "state_100mhz", "state_200mhz";
+	pinctrl-0 = <&pinctrl_usdhc1>;
+	pinctrl-1 = <&pinctrl_usdhc1_100mhz>;
+	pinctrl-2 = <&pinctrl_usdhc1_200mhz>;
+	bus-width = <8>;
+	fsl,tuning-step = <1>;
+	non-removable;
+	status = "okay";
+};
+
+&usdhc2 {
+	pinctrl-names = "default", "state_100mhz", "state_200mhz", "sleep";
+	pinctrl-0 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
+	pinctrl-1 = <&pinctrl_usdhc2_100mhz>, <&pinctrl_usdhc2_gpio>;
+	pinctrl-2 = <&pinctrl_usdhc2_200mhz>, <&pinctrl_usdhc2_gpio>;
+	pinctrl-3 = <&pinctrl_usdhc2_sleep>, <&pinctrl_usdhc2_gpio_sleep>;
+	cd-gpios = <&gpio3 00 GPIO_ACTIVE_LOW>;
+	fsl,cd-gpio-wakeup-disable;
+	vmmc-supply = <&reg_usdhc2_vmmc>;
+	bus-width = <4>;
+	fsl,tuning-step = <1>;
+	status = "okay";
+	//no-sdio;
+	no-mmc;
+};
+
 &usdhc3 {
 	pinctrl-names = "default", "state_100mhz", "state_200mhz", "sleep";
 	pinctrl-0 = <&pinctrl_usdhc3>, <&pinctrl_usdhc3_wlan>;
 	pinctrl-1 = <&pinctrl_usdhc3_100mhz>, <&pinctrl_usdhc3_wlan>;
 	pinctrl-2 = <&pinctrl_usdhc3_200mhz>, <&pinctrl_usdhc3_wlan>;
 	pinctrl-3 = <&pinctrl_usdhc3_sleep>, <&pinctrl_usdhc3_wlan>;
-
 	mmc-pwrseq = <&usdhc3_pwrseq>;
 	vmmc-supply = <&reg_usdhc3_vmmc>;
 	bus-width = <4>;
@@ -205,9 +210,7 @@
 	non-removable;
 	wakeup-source;
 	status = "okay";
-
 	//wifi-dev-wake-gpios= <&gpio2 25 GPIO_ACTIVE_HIGH>;	//CPU(GPIO2_25) = WF_DEV_WAKE_1V8
-
 	wifi_wake_host {
 		compatible = "nxp,wifi-wake-host";
 		interrupt-parent = <&gpio2>;
@@ -246,11 +249,10 @@
 	pinctrl-0 = <&pinctrl_lpspi4>;
 	cs-gpios = <&gpio2 18 GPIO_ACTIVE_LOW>;
 	status = "okay";
-
 	spidev0: spi@0 {
-		reg = <0>;                              // CS0
-		compatible = "spidev";                  // Generic driver for testing
-		spi-max-frequency = <1000000>;          // 1 MHz, adjust according to peripheral
+		reg = <0>;								// CS0
+		compatible = "spidev";					// Generic driver for testing
+		spi-max-frequency = <1000000>;			// 1 MHz, adjust according to peripheral
 	};
 };
 
@@ -258,16 +260,72 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexcan1>;
 	status = "okay";
-
 	//standby-gpios = <&gpio1 14 GPIO_ACTIVE_HIGH>;		//CAN1_STBY
-	//eol-gpios = <&gpio1 11 GPIO_ACTIVE_HIGH>;		//CAN1_EOL
+	//eol-gpios = <&gpio1 11 GPIO_ACTIVE_HIGH>;			//CAN1_EOL
 };
 
 &flexcan2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexcan2>;
 	status = "okay";
-
 	//standby-gpios = <&gpio3 2 GPIO_ACTIVE_HIGH>;		//CAN2_STBY
-	//eol-gpios = <&gpio3 1 GPIO_ACTIVE_HIGH>;		//CAN2_EOL
+	//eol-gpios = <&gpio3 1 GPIO_ACTIVE_HIGH>;			//CAN2_EOL
+};
+
+&gpio1 {
+	gpio-line-names =
+		"gpio1-00", "gpio1-01", "gpio1-02", "gpio1-03",
+		"gpio1-04", "gpio1-05", "gpio1-06", "gpio1-07",
+		"gpio1-08", "gpio1-09", "gpio1-10", "gpio1-11",
+		"gpio1-12", "gpio1-13", "gpio1-14", "gpio1-15",
+		"gpio1-16", "gpio1-17", "gpio1-18", "gpio1-19",
+		"gpio1-20", "gpio1-21", "gpio1-22", "gpio1-23",
+		"gpio1-24", "gpio1-25", "gpio1-26", "gpio1-27",
+		"gpio1-28", "gpio1-29", "gpio1-30", "gpio1-31";
+};
+
+&gpio2 {
+	gpio-line-names =
+		"gpio2-00", "gpio2-01", "gpio2-02", "gpio2-03",
+		"gpio2-04", "gpio2-05", "gpio2-06", "gpio2-07",
+		"gpio2-08", "gpio2-09", "gpio2-10", "gpio2-11",
+		"gpio2-12", "gpio2-13", "gpio2-14", "gpio2-15",
+		"gpio2-16", "gpio2-17", "gpio2-18", "gpio2-19",
+		"gpio2-20", "gpio2-21", "gpio2-22", "gpio2-23",
+		"gpio2-24", "gpio2-25", "gpio2-26", "gpio2-27",
+		"gpio2-28", "gpio2-29", "gpio2-30", "gpio2-31";
+};
+
+&gpio3 {
+	gpio-line-names =
+		"gpio3-00", "gpio3-01", "gpio3-02", "gpio3-03",
+		"gpio3-04", "gpio3-05", "gpio3-06", "gpio3-07",
+		"gpio3-08", "gpio3-09", "gpio3-10", "gpio3-11",
+		"gpio3-12", "gpio3-13", "gpio3-14", "gpio3-15",
+		"gpio3-16", "gpio3-17", "gpio3-18", "gpio3-19",
+		"gpio3-20", "gpio3-21", "gpio3-22", "gpio3-23",
+		"gpio3-24", "gpio3-25", "gpio3-26", "gpio3-27",
+		"gpio3-28", "gpio3-29", "gpio3-30", "gpio3-31";
+
+};
+
+&gpio4 {
+	gpio-line-names =
+		"gpio4-00", "gpio4-01", "gpio4-02", "gpio4-03",
+		"gpio4-04", "gpio4-05", "gpio4-06", "gpio4-07",
+		"gpio4-08", "gpio4-09", "gpio4-10", "gpio4-11",
+		"gpio4-12", "gpio4-13", "gpio4-14", "gpio4-15",
+		"gpio4-16", "gpio4-17", "gpio4-18", "gpio4-19",
+		"gpio4-20", "gpio4-21", "gpio4-22", "gpio4-23",
+		"gpio4-24", "gpio4-25", "gpio4-26", "gpio4-27",
+		"gpio4-28", "gpio4-29", "gpio4-30", "gpio4-31";
+};
+
+&lpm {						//Low Power Mode
+	soc-supply = <&buck1>;
+	status = "okay";
+};
+
+&wdog3 {					//Watchdog Timer
+	status = "okay";
 };

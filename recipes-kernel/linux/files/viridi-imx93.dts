@@ -85,25 +85,6 @@
 		power-domains = <&mlmix>;
 	};
 
-	reg_vref_1v8: regulator-adc-vref {
-		compatible = "regulator-fixed";
-		regulator-name = "vref_1v8";
-		regulator-min-microvolt = <1800000>;
-		regulator-max-microvolt = <1800000>;
-	};
-
-	reg_usdhc2_vmmc: regulator-usdhc2 {
-		compatible = "regulator-fixed";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_reg_usdhc2_vmmc>;
-		regulator-name = "VSD_3V3";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-		gpio = <&gpio3 7 GPIO_ACTIVE_HIGH>;
-		off-on-delay-us = <12000>;
-		enable-active-high;
-	};
-
 	backlight_lvds: backlight-lvds {
 		compatible = "pwm-backlight";
 		pwms = <&fxl6408 0 100000 0>;
@@ -115,12 +96,7 @@
 	};
 };
 
-&adc1 {
-	vref-supply = <&reg_vref_1v8>;
-	status = "okay";
-};
-
-&cm33 {						//Cortex-M33
+&cm33 {						//Cortex-M33 (CM33)
 	mbox-names = "tx", "rx", "rxdb";
 	mboxes = <&mu1 0 1>,
 		 <&mu1 1 1>,
@@ -131,16 +107,28 @@
 	status = "okay";
 };
 
-&mu1 {
+&mu1 {						//Message Units (CPU ↔ CM33)
 	status = "okay";
 };
 
-&mu2 {
+&mu2 {						//Message Units (CPU ↔ CM33)
 	status = "okay";
 };
 
-&epxp {
+&epxp {						//Expansion port
 	status = "okay";
+};
+
+&dsi {
+	status = "okay";
+	ports {
+		port@1 {
+			reg = <1>;
+			dsi_to_adv7535: endpoint {
+				remote-endpoint = <&adv7535_to_dsi>;
+			};
+		};
+	};
 };
 
 &dphy {
@@ -149,25 +137,6 @@
 
 &dphy_rx {
 	status = "okay";
-};
-
-&lpm {
-	soc-supply = <&buck1>;
-	status = "okay";
-};
-
-&dsi {
-	status = "okay";
-
-	ports {
-		port@1 {
-			reg = <1>;
-
-			dsi_to_adv7535: endpoint {
-				remote-endpoint = <&adv7535_to_dsi>;
-			};
-		};
-	};
 };
 
 &lcdif {
@@ -186,7 +155,7 @@
 	status = "okay";
 
 	/*RTC --> PCF2131TFY*/
-		pcf2131: pcf2131@51 {
+	pcf2131: pcf2131@51 {
 		compatible = "nxp,pcf2131";
 		reg = <0x51>;				//I2C Address (7bit) 0x51 expander --> 0xa3 (8bit)
 		status = "okay";
@@ -223,6 +192,16 @@
 			};
 		};
 	};
+
+	/*LED Controller*/
+	gpio_expander_44: gpio-expander@44 {
+		compatible = "fcs,fxl6408";
+		reg = <0x44>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		gpio-line-names = "LED1_nEN", "LED2_nEN", "LED3_nEN", "LED4_nEN",
+			"DSP_EN_3V3", "DSP_CTRL_3V3", "NO_CONNECT", "NO_CONNECT";
+	};
 };
 
 &lpi2c2 {
@@ -238,7 +217,6 @@
 		reg = <0x25>;
 		interrupt-parent = <&gpio1>;
 		interrupts = <10 IRQ_TYPE_EDGE_FALLING>;
-
 		regulators {
 			buck1: BUCK1 {
 				regulator-name = "BUCK1";
@@ -329,64 +307,13 @@
 	/*Io Expander --> PCA9555AHF,128*/
 	pca9555_21: gpio@21 {
 		compatible = "nxp,pca9555";
-		reg = <0x21>;                           //I2C Address (7bit) 0x21 expander
+		reg = <0x21>;				//I2C Address (7bit) 0x21 expander
 		#gpio-cells = <2>;
 		gpio-controller;
-		ngpios = <16>;                          //PCA9555 have 16 GPIOs
+		ngpios = <16>;				//PCA9555 have 16 GPIOs
 		interrupt-parent = <&gpio1>;
-		interrupts = <9 IRQ_TYPE_LEVEL_LOW>;    //GPIO1_IO09 --> CPU
+		interrupts = <9 IRQ_TYPE_LEVEL_LOW>;	//GPIO1_IO09 --> CPU
 	};
-};
-
-&lpuart1 { 
-	/* Console */
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_uart1>;
-	status = "okay";
-};
-
-&lpuart6 {
-        /* RS232/RS485 */
-        pinctrl-0 = <&pinctrl_uart6>;
-        pinctrl-names = "default";
-        status = "okay";
-};
-
-&lpuart7 {
-	/* Connector */
-        pinctrl-0 = <&pinctrl_uart7>;
-        pinctrl-names = "default";
-        status = "okay";
-};
-
-&usdhc1 {
-	pinctrl-names = "default", "state_100mhz", "state_200mhz";
-	pinctrl-0 = <&pinctrl_usdhc1>;
-	pinctrl-1 = <&pinctrl_usdhc1_100mhz>;
-	pinctrl-2 = <&pinctrl_usdhc1_200mhz>;
-	bus-width = <8>;
-	fsl,tuning-step = <1>;
-	non-removable;
-	status = "okay";
-};
-
-&usdhc2 {
-	pinctrl-names = "default", "state_100mhz", "state_200mhz", "sleep";
-	pinctrl-0 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
-	pinctrl-1 = <&pinctrl_usdhc2_100mhz>, <&pinctrl_usdhc2_gpio>;
-	pinctrl-2 = <&pinctrl_usdhc2_200mhz>, <&pinctrl_usdhc2_gpio>;
-	pinctrl-3 = <&pinctrl_usdhc2_sleep>, <&pinctrl_usdhc2_gpio_sleep>;
-	cd-gpios = <&gpio3 00 GPIO_ACTIVE_LOW>;
-	fsl,cd-gpio-wakeup-disable;
-	vmmc-supply = <&reg_usdhc2_vmmc>;
-	bus-width = <4>;
-	fsl,tuning-step = <1>;
-	status = "okay";
-	no-mmc;
-};
-
-&wdog3 {
-	status = "okay";
 };
 
 &iomuxc {
