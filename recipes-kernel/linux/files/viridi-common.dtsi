@@ -100,6 +100,11 @@
 	pinctrl-0 = <&pinctrl_uart6>;
 	pinctrl-names = "default";
 	status = "okay";
+	/*RS485*/
+	fsl,uart-has-rtscts;
+	rs485-rts-gpio = <&gpio3 5 GPIO_ACTIVE_HIGH>;
+	rs485-rts-active-high;
+	rs485-delay = <1 1>;
 };
 
 &lpuart7 {
