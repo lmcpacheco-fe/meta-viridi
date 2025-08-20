@@ -66,24 +66,6 @@
 	status = "okay";
 };
 
-&flexcan1 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_flexcan1>;
-	status = "okay";
-
-	//standby-gpios = <&gpio1 14 GPIO_ACTIVE_HIGH>;		//CAN1_STBY
-	//eol-gpios = <&gpio1 11 GPIO_ACTIVE_HIGH>;		//CAN1_EOL
-};
-
-&flexcan2 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_flexcan2>;
-	status = "okay";
-
-	//standby-gpios = <&gpio3 2 GPIO_ACTIVE_HIGH>;		//CAN2_STBY
-	//eol-gpios = <&gpio3 1 GPIO_ACTIVE_HIGH>;		//CAN2_EOL
-};
-
 &mu1 {
 	status = "okay";
 };
