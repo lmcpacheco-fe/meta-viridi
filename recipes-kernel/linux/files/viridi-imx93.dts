@@ -10,7 +10,7 @@
 #include "viridi-common.dtsi"
 
 &ele_fw2 {
-	memory-region = <&ele_reserved>;
+	memory-region = <&ele_reserved>;	// Link firmware region to reserved memory
 };
 
 / {
@@ -26,60 +26,60 @@
 		#size-cells = <2>;
 		ranges;
 
-		linux,cma {
+		linux,cma {						//Contiguous memory for DMA usage
 			compatible = "shared-dma-pool";
 			reusable;
-			alloc-ranges = <0 0x80000000 0 0x40000000>;
-			size = <0 0x10000000>;
+			alloc-ranges = <0 0x80000000 0 0x40000000>;	//Available region: 1 GB
+			size = <0 0x10000000>;				//CMA size = 256 MB
 			linux,cma-default;
 		};
 
 		ethosu_mem: ethosu_region@C0000000 {
 			compatible = "shared-dma-pool";
 			reusable;
-			reg = <0x0 0xC0000000 0x0 0x10000000>;
+			reg = <0x0 0xC0000000 0x0 0x10000000>;	//256 MB reserved for Arm Ethos-U NPU
 		};
 
 		vdev0vring0: vdev0vring0@a4000000 {
-			reg = <0 0xa4000000 0 0x8000>;
-			no-map;
+			reg = <0 0xa4000000 0 0x8000>;		//Vring0 for RPMsg (aligned at 32 KB)
+			no-map;					//Prevent normal kernel mapping
 		};
 
 		vdev0vring1: vdev0vring1@a4008000 {
-			reg = <0 0xa4008000 0 0x8000>;
-			no-map;
+			reg = <0 0xa4008000 0 0x8000>;		//Vring1 for RPMsg
+			no-map;					//Prevent normal kernel mapping
 		};
 
 		vdev1vring0: vdev1vring0@a4010000 {
-			reg = <0 0xa4010000 0 0x8000>;
-			no-map;
+			reg = <0 0xa4010000 0 0x8000>;		//Second channel Vring0
+			no-map;					//Prevent normal kernel mapping
 		};
 
 		vdev1vring1: vdev1vring1@a4018000 {
-			reg = <0 0xa4018000 0 0x8000>;
-			no-map;
+			reg = <0 0xa4018000 0 0x8000>;		//Second channel Vring1
+			no-map;					//Prevent normal kernel mapping
 		};
 
 		rsc_table: rsc-table@2021e000 {
-			reg = <0 0x2021e000 0 0x1000>;
-			no-map;
+			reg = <0 0x2021e000 0 0x1000>;		//Resource table for CM33 remoteproc
+			no-map;					//Prevent normal kernel mapping
 		};
 
 		vdevbuffer: vdevbuffer@a4020000 {
 			compatible = "shared-dma-pool";
-			reg = <0 0xa4020000 0 0x100000>;
-			no-map;
+			reg = <0 0xa4020000 0 0x100000>;	//Shared buffer for RPMsg (1 MB)
+			no-map;					//Prevent normal kernel mapping
 		};
 
 		ele_reserved: ele-reserved@a4120000 {
-			compatible = "shared-dma-pool";
+			compatible = "shared-dma-pool";		//Memory region reserved for EdgeLock Enclave (ELE)
 			reg = <0 0xa4120000 0 0x100000>;
-			no-map;
+			no-map;					//Prevent normal kernel mapping
 		};
 	};
 
 	ethosu {
-		compatible = "arm,ethosu";
+		compatible = "arm,ethosu";		// Arm Ethos-U NPU Linked to Cortex-M33 processor
 		fsl,cm33-proc = <&cm33>;
 		memory-region = <&ethosu_mem>;
 		power-domains = <&mlmix>;
@@ -173,6 +173,8 @@
 		ngpios = <8>;				//PCA9555 have 8 GPIOs
 		gpio-reserved-ranges = <5 1>;		//Reserv DSP_CTRL_3V3 always
 		#pwm-cells = <3>;
+		gpio-line-names = "LED1_nEN", "LED2_nEN", "LED3_nEN", "LED4_nEN",
+			"DSP_EN_3V3", "DSP_CTRL_3V3", "NC", "NC";
 	};
 
 	/*MIPI --> DSI*/
@@ -192,16 +194,6 @@
 			};
 		};
 	};
-
-	/*LED Controller*/
-	gpio_expander_44: gpio-expander@44 {
-		compatible = "fcs,fxl6408";
-		reg = <0x44>;
-		gpio-controller;
-		#gpio-cells = <2>;
-		gpio-line-names = "LED1_nEN", "LED2_nEN", "LED3_nEN", "LED4_nEN",
-			"DSP_EN_3V3", "DSP_CTRL_3V3", "NO_CONNECT", "NO_CONNECT";
-	};
 };
 
 &lpi2c2 {
@@ -211,12 +203,12 @@
 	pinctrl-1 = <&pinctrl_lpi2c2>;
 	status = "okay";
 
-	/*PMIC PCA9451AHNY*/
+	/*PMIC --> PCA9451AHNY*/
 	pmic@25 {
 		compatible = "nxp,pca9451a";
 		reg = <0x25>;
 		interrupt-parent = <&gpio1>;
-		interrupts = <10 IRQ_TYPE_EDGE_FALLING>;
+		interrupts = <10 IRQ_TYPE_EDGE_FALLING>;	//PMIC interrupt on GPIO1_IO10
 		regulators {
 			buck1: BUCK1 {
 				regulator-name = "BUCK1";
@@ -287,10 +279,10 @@
 	};
 };
 
-&lpi2c3 {
+&lpi2c5 {
 	clock-frequency = <400000>;
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_lpi2c3>;
+	pinctrl-0 = <&pinctrl_lpi2c5>;
 	status = "okay";
 
 	/*Io Expander --> PCA9555AHF,128*/
@@ -299,9 +291,11 @@
 		reg = <0x20>;				//I2C Address (7bit) 0x20 expander
 		gpio-controller;
 		#gpio-cells = <2>;
-		ngpio = <16>;				//PCA9555 have 16 GPIOs
 		interrupt-parent = <&gpio1>;
-		interrupts = <8 IRQ_TYPE_LEVEL_LOW>;	//GPIO1_IO09 --> CPU
+		interrupts = <8 IRQ_TYPE_LEVEL_LOW>;	//Io Expander interrupt on GPIO1_IO08
+		gpio-line-names = "CONA_EN", "CONB_EN",
+			"DIGITAL_IN0", "DIGITAL_IN1","DIGITAL_IN2", "DIGITAL_IN3",
+			"OUT0_EN", "OUT1_EN", "OUT2_EN", "OUT3_EN";
 	};
 
 	/*Io Expander --> PCA9555AHF,128*/
@@ -310,9 +304,13 @@
 		reg = <0x21>;				//I2C Address (7bit) 0x21 expander
 		#gpio-cells = <2>;
 		gpio-controller;
-		ngpios = <16>;				//PCA9555 have 16 GPIOs
 		interrupt-parent = <&gpio1>;
-		interrupts = <9 IRQ_TYPE_LEVEL_LOW>;	//GPIO1_IO09 --> CPU
+		interrupts = <9 IRQ_TYPE_LEVEL_LOW>;	//Io Expander interrupt on GPIO1_IO09
+		gpio-line-names = "EXP_IO1", "EXP_IO2",
+			"EXP_IO3", "EXP_IO4", "EXP_PWR_EN",
+			"WF_nEN_1V8", "WF_nRST_1V8", "BT_nRST_1V8",
+			"GNSS_LNA_EN1", "LTE_ON_OFF_1V8",
+			"NC", "NC", "NC", "NC", "NC", "NC";
 	};
 };
 
@@ -387,16 +385,16 @@
 		>;
 	};
 
-	pinctrl_lpi2c3: lpi2c3grp {
+	pinctrl_lpi2c5: lpi2c5grp {
 		fsl,pins = <
-			MX93_PAD_GPIO_IO28__LPI2C3_SDA			0x40000b9e
-			MX93_PAD_GPIO_IO29__LPI2C3_SCL			0x40000b9e
+			MX93_PAD_GPIO_IO22__LPI2C5_SDA			0x40000b9e
+			MX93_PAD_GPIO_IO23__LPI2C5_SCL			0x40000b9e
 		>;
 	};
 
 	pinctrl_lpspi4: lpspi4grp {
 		fsl,pins = <
-			MX93_PAD_GPIO_IO18__LPSPI4_PCS0			0x43		// CS0 (chip select)
+			MX93_PAD_GPIO_IO18__LPSPI4_PCS0			0x43		//CS0 (chip select)
 			MX93_PAD_GPIO_IO19__LPSPI4_SIN			0x43
 			MX93_PAD_GPIO_IO20__LPSPI4_SOUT			0x43
 			MX93_PAD_GPIO_IO21__LPSPI4_SCK			0x43
