@@ -47,7 +47,7 @@
 			lte_wake_ready {
 				compatible = "nxp,lte_wake_ready";
 				interrupt-parent = <&gpio2>;
-				interrupts = <12 IRQ_TYPE_LEVEL_LOW>;		//CPU(GPIO2_12) = LTE_SW_RDY_1V8 (Has to be an interruption?)
+				interrupts = <12 IRQ_TYPE_LEVEL_LOW>;					//CPU(GPIO2_12) = LTE_SW_RDY_1V8 (Has to be an interruption?)
 				interrupt-names = "lte-ready";
 			};
 		};
@@ -142,7 +142,7 @@
 		compatible = "snps,dwmac-mdio";
 		#address-cells = <1>;
 		#size-cells = <0>;
-		//clock-frequency = <5000000>;			// No need for 'clock-frequency'; PHY provides 50 MHz REF_CLK to SoC via RMII
+		//clock-frequency = <5000000>;						// No need for 'clock-frequency'; PHY provides 50 MHz REF_CLK to SoC via RMII
 		ethphy1: ethernet-phy@1 {
 			compatible = "microchip,ksz8081";
 			reg = <1>;										//Strapping 15 --> PHYAD[0] pull-down
@@ -164,7 +164,7 @@
 	mdio {
 		#address-cells = <1>;
 		#size-cells = <0>;
-		//clock-frequency = <5000000>;			// No need for 'clock-frequency'; PHY provides 50 MHz REF_CLK to SoC via RMII
+		//clock-frequency = <5000000>;						// No need for 'clock-frequency'; PHY provides 50 MHz REF_CLK to SoC via RMII
 		ethphy2: ethernet-phy@2 {
 		compatible = "microchip,ksz8081";
 			reg = <2>;										//Strapping 15 --> PHYAD[0] pull-up
@@ -215,11 +215,11 @@
 	non-removable;
 	wakeup-source;
 	status = "okay";
-	//wifi-dev-wake-gpios= <&gpio2 25 GPIO_ACTIVE_HIGH>;	//CPU(GPIO2_25) = WF_DEV_WAKE_1V8
+	//wifi-dev-wake-gpios= <&gpio2 25 GPIO_ACTIVE_HIGH>;		//CPU(GPIO2_25) = WF_DEV_WAKE_1V8
 	wifi_wake_host {
 		compatible = "nxp,wifi-wake-host";
 		interrupt-parent = <&gpio2>;
-		interrupts = <27 IRQ_TYPE_LEVEL_LOW>;		//CPU(GPIO2_27) = WF_WAKE_HOST_1V8
+		interrupts = <27 IRQ_TYPE_LEVEL_LOW>;				//CPU(GPIO2_27) = WF_WAKE_HOST_1V8
 		interrupt-names = "host-wake";
 	};
 };
