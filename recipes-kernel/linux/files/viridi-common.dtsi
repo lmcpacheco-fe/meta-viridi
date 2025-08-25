@@ -28,7 +28,7 @@
 			regulator-min-microvolt = <1800000>;
 			regulator-max-microvolt = <1800000>;
 			//gpio = <&gpio2 13 GPIO_ACTIVE_LOW>;			//CPU(GPIO2_13) = WF_nPD_1V8
-			gpios = <&pca9555_21 5 GPIO_ACTIVE_LOW>;		//IO_Exp(P0_5) = WF_nEN_1V8
+			gpio = <&pca9555_21 5 GPIO_ACTIVE_LOW>;		//IO_Exp(P0_5) = WF_nEN_1V8
 			enable-active-low;
 		};
 
@@ -95,6 +95,23 @@
 	status = "okay";
 };
 
+&lpuart3 {
+	/* LTE */
+	pinctrl-0 = <&pinctrl_uart3>;
+	pinctrl-names = "default";
+	status = "okay";
+};
+
+&lpuart5 {
+	/* BT */
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart5>;
+	status = "okay";
+	bluetooth {
+		compatible = "nxp,88w8987-bt";
+	};
+};
+
 &lpuart6 {
 	/* RS232/RS485 */
 	pinctrl-0 = <&pinctrl_uart6>;
@@ -110,23 +127,6 @@
 &lpuart7 {
 	/* Connector */
 	pinctrl-0 = <&pinctrl_uart7>;
-	pinctrl-names = "default";
-	status = "okay";
-};
-
-&lpuart5 {
-	/* BT */
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_uart5>;
-	status = "okay";
-	bluetooth {
-		compatible = "nxp,88w8987-bt";
-	};
-};
-
-&lpuart3 {
-	/* LTE */
-	pinctrl-0 = <&pinctrl_uart3>;
 	pinctrl-names = "default";
 	status = "okay";
 };

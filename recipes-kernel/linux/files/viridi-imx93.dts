@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
  * Copyright 2025 Future Electronics
  */
@@ -537,13 +536,13 @@
 
 	pinctrl_usdhc2_gpio: usdhc2gpiogrp {
 		fsl,pins = <
-			MX93_PAD_SD2_CD_B__GPIO3_IO00			0x31e
+			MX93_PAD_SD2_CD_B__GPIO3_IO00			0x31e		//0x31e GPIO config
 		>;
 	};
 
 	pinctrl_usdhc2_gpio_sleep: usdhc2gpiogrpsleep {
 		fsl,pins = <
-			MX93_PAD_SD2_CD_B__GPIO3_IO00			0x51e
+			MX93_PAD_SD2_CD_B__GPIO3_IO00			0x51e		//0x51e Sleep config
 		>;
 	};
 

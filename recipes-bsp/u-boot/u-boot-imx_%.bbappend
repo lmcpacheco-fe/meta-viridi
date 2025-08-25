@@ -12,13 +12,13 @@ SRC_URI += " \
 # Copy the files to their destinations within the U-Boot source tree
 do_override_files() {
     if [ "${MACHINE}" = "viridi-imx91" ]; then
-        install -Dm 0644 ${WORKDIR}/sources-unpack/viridi-imx91_defconfig ${S}/configs/viridi-imx91_defconfig     
-        install -Dm 0644 ${WORKDIR}/sources-unpack/viridi-imx91.dts ${S}/dts/upstream/src/arm64/freescale/viridi-imx91.dts
+        install -Dm 0644 ${WORKDIR}/sources-unpack/viridi-imx91_defconfig ${S}/configs/viridi-imx91_defconfig
+        install -Dm 0644 ${WORKDIR}/sources-unpack/viridi-imx91.dts ${S}/dts/upstream/src/arm64/viridi-imx91.dts
     fi
 
     if [ "${MACHINE}" = "viridi-imx93" ]; then
-        install -Dm 0644 ${WORKDIR}/sources-unpack/viridi-imx93_defconfig ${S}/configs/viridi-imx93_defconfig   
-        install -Dm 0644 ${WORKDIR}/sources-unpack/viridi-imx93.dts ${S}/dts/upstream/src/arm64/freescale/viridi-imx93.dts        
+        install -Dm 0644 ${WORKDIR}/sources-unpack/viridi-imx93_defconfig ${S}/configs/viridi-imx93_defconfig
+        install -Dm 0644 ${WORKDIR}/sources-unpack/viridi-imx93.dts ${S}/dts/upstream/src/arm64/viridi-imx93.dts
     fi
 }
 

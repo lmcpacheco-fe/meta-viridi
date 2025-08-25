@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
  * Copyright 2025 Future Electronics
  */
@@ -85,87 +84,87 @@
 };
 
 &lpi2c2 {
-		clock-frequency = <400000>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_lpi2c2>;
-		status = "okay";
+	clock-frequency = <400000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lpi2c2>;
+	status = "okay";
 
 	/*PMIC --> PCA9451AHNY*/
-		pmic@25 {
-				compatible = "nxp,pca9451a";
-				reg = <0x25>;
-				pinctrl-names = "default";
-				pinctrl-0 = <&pinctrl_pmic>;
-				interrupt-parent = <&gpio1>;
-				interrupts = <10 IRQ_TYPE_EDGE_FALLING>;	//PMIC INT on GPIO1_IO10
-				regulators {
-                        buck1: BUCK1 {
-                                regulator-name = "BUCK1";
-                                regulator-min-microvolt = <650000>;
-                                regulator-max-microvolt = <2237500>;
-                                regulator-boot-on;
-                                regulator-always-on;
-                                regulator-ramp-delay = <3125>;
-                        };
+	pmic@25 {
+		compatible = "nxp,pca9451a";
+		reg = <0x25>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_pmic>;
+		interrupt-parent = <&gpio1>;
+		interrupts = <10 IRQ_TYPE_EDGE_FALLING>;	//PMIC INT on GPIO1_IO10
+		regulators {
+			buck1: BUCK1 {
+				regulator-name = "BUCK1";
+				regulator-min-microvolt = <650000>;
+				regulator-max-microvolt = <2237500>;
+				regulator-boot-on;
+				regulator-always-on;
+				regulator-ramp-delay = <3125>;
+			};
 
-                        buck2: BUCK2 {
-                                regulator-name = "BUCK2";
-                                regulator-min-microvolt = <600000>;
-                                regulator-max-microvolt = <2187500>;
-                                regulator-boot-on;
-                                regulator-always-on;
-                                regulator-ramp-delay = <3125>;
-                        };
+			buck2: BUCK2 {
+				regulator-name = "BUCK2";
+				regulator-min-microvolt = <600000>;
+				regulator-max-microvolt = <2187500>;
+				regulator-boot-on;
+				regulator-always-on;
+				regulator-ramp-delay = <3125>;
+			};
 
-                        buck4: BUCK4{
-                                regulator-name = "BUCK4";
-                                regulator-min-microvolt = <600000>;
-                                regulator-max-microvolt = <3400000>;
-                                regulator-boot-on;
-                                regulator-always-on;
-                        };
+			buck4: BUCK4{
+				regulator-name = "BUCK4";
+				regulator-min-microvolt = <600000>;
+				regulator-max-microvolt = <3400000>;
+				regulator-boot-on;
+				regulator-always-on;
+			};
 
-                        buck5: BUCK5{
-                                regulator-name = "BUCK5";
-                                regulator-min-microvolt = <600000>;
-                                regulator-max-microvolt = <3400000>;
-                                regulator-boot-on;
-                                regulator-always-on;
-                        };
+			buck5: BUCK5{
+				regulator-name = "BUCK5";
+				regulator-min-microvolt = <600000>;
+				regulator-max-microvolt = <3400000>;
+				regulator-boot-on;
+				regulator-always-on;
+			};
 
-                        buck6: BUCK6 {
-                                regulator-name = "BUCK6";
-                                regulator-min-microvolt = <600000>;
-                                regulator-max-microvolt = <3400000>;
-                                regulator-boot-on;
-                                regulator-always-on;
-                        };
+			buck6: BUCK6 {
+				regulator-name = "BUCK6";
+				regulator-min-microvolt = <600000>;
+				regulator-max-microvolt = <3400000>;
+				regulator-boot-on;
+				regulator-always-on;
+			};
 
-                        ldo1: LDO1 {
-                                regulator-name = "LDO1";
-                                regulator-min-microvolt = <1600000>;
-                                regulator-max-microvolt = <3300000>;
-                                regulator-boot-on;
-                                regulator-always-on;
-                        };
+			ldo1: LDO1 {
+				regulator-name = "LDO1";
+				regulator-min-microvolt = <1600000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-boot-on;
+				regulator-always-on;
+			};
 
-                        ldo4: LDO4 {
-                                regulator-name = "LDO4";
-                                regulator-min-microvolt = <800000>;
-                                regulator-max-microvolt = <3300000>;
-                                regulator-boot-on;
-                                regulator-always-on;
-                        };
+			ldo4: LDO4 {
+				regulator-name = "LDO4";
+				regulator-min-microvolt = <800000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-boot-on;
+				regulator-always-on;
+			};
 
-                        ldo5: LDO5 {
-                                regulator-name = "LDO5";
-                                regulator-min-microvolt = <1800000>;
-                                regulator-max-microvolt = <3300000>;
-                                regulator-boot-on;
-                                regulator-always-on;
-                        };
-                };
-        };
+			ldo5: LDO5 {
+				regulator-name = "LDO5";
+				regulator-min-microvolt = <1800000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-boot-on;
+				regulator-always-on;
+			};
+		};
+	};
 };
 
 &lpi2c5 {
@@ -422,6 +421,18 @@
 		>;
 	};
 
+	pinctrl_usdhc2: usdhc2grp {
+		fsl,pins = <
+			MX91_PAD_SD2_CLK__USDHC2_CLK			0x1582
+			MX91_PAD_SD2_CMD__USDHC2_CMD			0x1382
+			MX91_PAD_SD2_DATA0__USDHC2_DATA0		0x1382
+			MX91_PAD_SD2_DATA1__USDHC2_DATA1		0x1382
+			MX91_PAD_SD2_DATA2__USDHC2_DATA2		0x1382
+			MX91_PAD_SD2_DATA3__USDHC2_DATA3		0x1382
+			MX91_PAD_SD2_VSELECT__USDHC2_VSELECT	0x51e
+		>;
+	};
+
 	pinctrl_reg_usdhc2_vmmc: regusdhc2vmmcgrp {
 		fsl,pins = <
 			MX91_PAD_SD2_RESET_B__GPIO3_IO7			0x31e
@@ -437,18 +448,6 @@
 	pinctrl_usdhc2_gpio_sleep: usdhc2gpiogrpsleep {
 		fsl,pins = <
 			MX91_PAD_SD2_CD_B__GPIO3_IO0			0x51e
-		>;
-	};
-
-	pinctrl_usdhc2: usdhc2grp {
-		fsl,pins = <
-			MX91_PAD_SD2_CLK__USDHC2_CLK			0x1582
-			MX91_PAD_SD2_CMD__USDHC2_CMD			0x1382
-			MX91_PAD_SD2_DATA0__USDHC2_DATA0		0x1382
-			MX91_PAD_SD2_DATA1__USDHC2_DATA1		0x1382
-			MX91_PAD_SD2_DATA2__USDHC2_DATA2		0x1382
-			MX91_PAD_SD2_DATA3__USDHC2_DATA3		0x1382
-			MX91_PAD_SD2_VSELECT__USDHC2_VSELECT	0x51e
 		>;
 	};
 
@@ -499,6 +498,12 @@
 		>;
 	};
 
+	pinctrl_usdhc3_wlan: usdhc3wlangrp {
+		fsl,pins = <
+			MX91_PAD_GPIO_IO27__GPIO2_IO27			0x31e
+		>;
+	};
+
 	pinctrl_usdhc3_100mhz: usdhc3-100mhzgrp {
 		fsl,pins = <
 			MX91_PAD_SD3_CLK__USDHC3_CLK			0x158e
@@ -529,12 +534,6 @@
 			MX91_PAD_SD3_DATA1__GPIO3_IO23			0x31e
 			MX91_PAD_SD3_DATA2__GPIO3_IO24			0x31e
 			MX91_PAD_SD3_DATA3__GPIO3_IO25			0x31e
-		>;
-	};
-
-	pinctrl_usdhc3_wlan: usdhc3wlangrp {
-		fsl,pins = <
-			MX91_PAD_GPIO_IO27__GPIO2_IO27			0x31e
 		>;
 	};
 
