@@ -39,6 +39,21 @@
 			no-map;									//Prevent normal kernel mapping
 		};
 	};
+
+	lte {
+		compatible = "telit,me910g1";
+		status = "okay";
+		serial = <&lpuart3>;
+		shutdown-gpios = <&pca9555_21 9 GPIO_ACTIVE_LOW>;			//IO_Exp(P1_1) = LTE_ON_OFF_1V8
+		reset-gpios = <&pca9555_21 10 GPIO_ACTIVE_LOW>;				//IO_Exp(P1_2) = LTE_nSHTD_1V8
+		//gnss-lna-gpios = <&pca9555_21 8 GPIO_ACTIVE_HIGH>;			//Opcional: IO_Exp(P1_0) = GNSS LNA controled by SW
+		lte_wake_ready {
+			compatible = "nxp,lte_wake_ready";
+			interrupt-parent = <&gpio2>;
+			interrupts = <12 IRQ_TYPE_LEVEL_LOW>;					//CPU(GPIO2_12) = LTE_SW_RDY_1V8 (Has to be an interruption?)
+			interrupt-names = "lte-ready";
+		};
+	};
 };
 
 &mu1 {
