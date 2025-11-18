@@ -2,7 +2,11 @@ SUMMARY = "sdc-tests"
 DESCRIPTION = "SDC test files"
 LICENSE = "CLOSED"
 
-SRC_URI = "file://test.sh"
+
+SRC_URI = " \
+    file://test-imx91.sh \
+    file://test-imx93.sh \
+"
 
 do_install() {
     if [ "${MACHINE}" = "viridi-imx91" ]; then
