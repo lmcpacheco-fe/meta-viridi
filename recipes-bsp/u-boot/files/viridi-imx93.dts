@@ -85,17 +85,17 @@
 		gpio = <&gpio3 7 GPIO_ACTIVE_HIGH>;
 		off-on-delay-us = <12000>;
 		enable-active-high;
-	};
+	 };
 
-	reg_usdhc3_vmmc: regulator-usdhc3 {
-		compatible = "regulator-fixed";
-		regulator-name = "WLAN_EN";
-		regulator-min-microvolt = <1800000>;
-		regulator-max-microvolt = <1800000>;
-		//gpio = <&gpio2 13 GPIO_ACTIVE_LOW>;				//CPU(GPIO2_13) = WF_nPD_1V8
-		gpio = <&pca9555_21 5 GPIO_ACTIVE_LOW>;			//IO_Exp(P0_5) = WF_nEN_1V8
-		enable-active-low;
-	};
+	// reg_usdhc3_vmmc: regulator-usdhc3 {
+	// 	compatible = "regulator-fixed";
+	// 	regulator-name = "WLAN_EN";
+	// 	regulator-min-microvolt = <1800000>;
+	// 	regulator-max-microvolt = <1800000>;
+	// 	//gpio = <&gpio2 13 GPIO_ACTIVE_LOW>;				//CPU(GPIO2_13) = WF_nPD_1V8
+	// 	gpio = <&pca9555_21 5 GPIO_ACTIVE_LOW>;			//IO_Exp(P0_5) = WF_nEN_1V8
+	// 	enable-active-low;
+	// };
 
 	usdhc3_pwrseq: usdhc3_pwrseq {
 		compatible = "mmc-pwrseq-simple";
@@ -488,27 +488,27 @@
 	no-mmc;
 };
 
-&usdhc3 {
-	pinctrl-names = "default", "state_100mhz", "state_200mhz", "sleep";
-	pinctrl-0 = <&pinctrl_usdhc3>, <&pinctrl_usdhc3_wlan>;
-	pinctrl-1 = <&pinctrl_usdhc3_100mhz>, <&pinctrl_usdhc3_wlan>;
-	pinctrl-2 = <&pinctrl_usdhc3_200mhz>, <&pinctrl_usdhc3_wlan>;
-	pinctrl-3 = <&pinctrl_usdhc3_sleep>, <&pinctrl_usdhc3_wlan>;
-	mmc-pwrseq = <&usdhc3_pwrseq>;
-	vmmc-supply = <&reg_usdhc3_vmmc>;
-	bus-width = <4>;
-	keep-power-in-suspend;
-	non-removable;
-	wakeup-source;
-	status = "okay";
-	/*wifi-dev-wake-gpios= <&gpio2 25 GPIO_ACTIVE_HIGH>;		CPU(GPIO2_25) = WF_DEV_WAKE_1V8*/
-	wifi_wake_host {
-		compatible = "nxp,wifi-wake-host";
-		interrupt-parent = <&gpio2>;
-		interrupts = <27 IRQ_TYPE_LEVEL_LOW>;				//CPU(GPIO2_27) = WF_WAKE_HOST_1V8
-		interrupt-names = "host-wake";
-	};
-};
+// &usdhc3 {
+// 	pinctrl-names = "default", "state_100mhz", "state_200mhz", "sleep";
+// 	pinctrl-0 = <&pinctrl_usdhc3>, <&pinctrl_usdhc3_wlan>;
+// 	pinctrl-1 = <&pinctrl_usdhc3_100mhz>, <&pinctrl_usdhc3_wlan>;
+// 	pinctrl-2 = <&pinctrl_usdhc3_200mhz>, <&pinctrl_usdhc3_wlan>;
+// 	pinctrl-3 = <&pinctrl_usdhc3_sleep>, <&pinctrl_usdhc3_wlan>;
+// 	mmc-pwrseq = <&usdhc3_pwrseq>;
+// 	vmmc-supply = <&reg_usdhc3_vmmc>;
+// 	bus-width = <4>;
+// 	keep-power-in-suspend;
+// 	non-removable;
+// 	wakeup-source;
+// 	status = "okay";
+// 	/*wifi-dev-wake-gpios= <&gpio2 25 GPIO_ACTIVE_HIGH>;		CPU(GPIO2_25) = WF_DEV_WAKE_1V8*/
+// 	wifi_wake_host {
+// 		compatible = "nxp,wifi-wake-host";
+// 		interrupt-parent = <&gpio2>;
+// 		interrupts = <27 IRQ_TYPE_LEVEL_LOW>;				//CPU(GPIO2_27) = WF_WAKE_HOST_1V8
+// 		interrupt-names = "host-wake";
+// 	};
+// };
 
 &wdog3 {
 	status = "okay";
@@ -801,54 +801,54 @@
 		>;
 	};
 
-	pinctrl_usdhc3: usdhc3grp {
-		fsl,pins = <
-			MX93_PAD_SD3_CLK__USDHC3_CLK			0x1582
-			MX93_PAD_SD3_CMD__USDHC3_CMD			0x40001382
-			MX93_PAD_SD3_DATA0__USDHC3_DATA0		0x40001382
-			MX93_PAD_SD3_DATA1__USDHC3_DATA1		0x40001382
-			MX93_PAD_SD3_DATA2__USDHC3_DATA2		0x40001382
-			MX93_PAD_SD3_DATA3__USDHC3_DATA3		0x40001382
-		>;
-	};
+	// pinctrl_usdhc3: usdhc3grp {
+	// 	fsl,pins = <
+	// 		MX93_PAD_SD3_CLK__USDHC3_CLK			0x1582
+	// 		MX93_PAD_SD3_CMD__USDHC3_CMD			0x40001382
+	// 		MX93_PAD_SD3_DATA0__USDHC3_DATA0		0x40001382
+	// 		MX93_PAD_SD3_DATA1__USDHC3_DATA1		0x40001382
+	// 		MX93_PAD_SD3_DATA2__USDHC3_DATA2		0x40001382
+	// 		MX93_PAD_SD3_DATA3__USDHC3_DATA3		0x40001382
+	// 	>;
+	// };
 
-	pinctrl_usdhc3_wlan: usdhc3wlangrp {
-		fsl,pins = <
-			MX93_PAD_GPIO_IO27__GPIO2_IO27			0x31e
-		>;
-	};
+	// pinctrl_usdhc3_wlan: usdhc3wlangrp {
+	// 	fsl,pins = <
+	// 		MX93_PAD_GPIO_IO27__GPIO2_IO27			0x31e
+	// 	>;
+	// };
 
-	pinctrl_usdhc3_100mhz: usdhc3-100mhzgrp {
-		fsl,pins = <
-			MX93_PAD_SD3_CLK__USDHC3_CLK			0x15be
-			MX93_PAD_SD3_CMD__USDHC3_CMD			0x400013be
-			MX93_PAD_SD3_DATA0__USDHC3_DATA0		0x400013be
-			MX93_PAD_SD3_DATA1__USDHC3_DATA1		0x400013be
-			MX93_PAD_SD3_DATA2__USDHC3_DATA2		0x400013be
-			MX93_PAD_SD3_DATA3__USDHC3_DATA3		0x400013be
-		>;
-	};
+	// pinctrl_usdhc3_100mhz: usdhc3-100mhzgrp {
+	// 	fsl,pins = <
+	// 		MX93_PAD_SD3_CLK__USDHC3_CLK			0x15be
+	// 		MX93_PAD_SD3_CMD__USDHC3_CMD			0x400013be
+	// 		MX93_PAD_SD3_DATA0__USDHC3_DATA0		0x400013be
+	// 		MX93_PAD_SD3_DATA1__USDHC3_DATA1		0x400013be
+	// 		MX93_PAD_SD3_DATA2__USDHC3_DATA2		0x400013be
+	// 		MX93_PAD_SD3_DATA3__USDHC3_DATA3		0x400013be
+	// 	>;
+	// };
 
-	pinctrl_usdhc3_200mhz: usdhc3-200mhzgrp {
-		fsl,pins = <
-			MX93_PAD_SD3_CLK__USDHC3_CLK			0x15fe
-			MX93_PAD_SD3_CMD__USDHC3_CMD			0x400013fe
-			MX93_PAD_SD3_DATA0__USDHC3_DATA0		0x400013fe
-			MX93_PAD_SD3_DATA1__USDHC3_DATA1		0x400013fe
-			MX93_PAD_SD3_DATA2__USDHC3_DATA2		0x400013fe
-			MX93_PAD_SD3_DATA3__USDHC3_DATA3		0x400013fe
-		>;
-	};
+	// pinctrl_usdhc3_200mhz: usdhc3-200mhzgrp {
+	// 	fsl,pins = <
+	// 		MX93_PAD_SD3_CLK__USDHC3_CLK			0x15fe
+	// 		MX93_PAD_SD3_CMD__USDHC3_CMD			0x400013fe
+	// 		MX93_PAD_SD3_DATA0__USDHC3_DATA0		0x400013fe
+	// 		MX93_PAD_SD3_DATA1__USDHC3_DATA1		0x400013fe
+	// 		MX93_PAD_SD3_DATA2__USDHC3_DATA2		0x400013fe
+	// 		MX93_PAD_SD3_DATA3__USDHC3_DATA3		0x400013fe
+	// 	>;
+	// };
 
-	pinctrl_usdhc3_sleep: usdhc3grpsleep {
-		fsl,pins = <
-			MX93_PAD_SD3_CLK__GPIO3_IO20			0x31e
-			MX93_PAD_SD3_CMD__GPIO3_IO21			0x31e
-			MX93_PAD_SD3_DATA0__GPIO3_IO22			0x31e
-			MX93_PAD_SD3_DATA1__GPIO3_IO23			0x31e
-			MX93_PAD_SD3_DATA2__GPIO3_IO24			0x31e
-			MX93_PAD_SD3_DATA3__GPIO3_IO25			0x31e
-		>;
-	};
+	// pinctrl_usdhc3_sleep: usdhc3grpsleep {
+	// 	fsl,pins = <
+	// 		MX93_PAD_SD3_CLK__GPIO3_IO20			0x31e
+	// 		MX93_PAD_SD3_CMD__GPIO3_IO21			0x31e
+	// 		MX93_PAD_SD3_DATA0__GPIO3_IO22			0x31e
+	// 		MX93_PAD_SD3_DATA1__GPIO3_IO23			0x31e
+	// 		MX93_PAD_SD3_DATA2__GPIO3_IO24			0x31e
+	// 		MX93_PAD_SD3_DATA3__GPIO3_IO25			0x31e
+	// 	>;
+	// };
 
 };
