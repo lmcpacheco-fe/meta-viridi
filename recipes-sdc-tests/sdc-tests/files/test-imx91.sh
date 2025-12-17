@@ -207,7 +207,7 @@ if ! command -v i2cdetect &> /dev/null; then
     EEPROM_TEST_RESULT="n"
     check_test "I2C EEPROM" $EEPROM_TEST_RESULT
     rm -f $TMP_WRITE $TMP_READ
-    return
+    # return
 fi
 
 # Convert addresses to lowercase hex for grep matching
@@ -222,7 +222,7 @@ if [ $? -ne 0 ]; then
     EEPROM_TEST_RESULT="n"
     check_test "I2C EEPROM" $EEPROM_TEST_RESULT
     rm -f $TMP_WRITE $TMP_READ
-    return
+    # return
 fi
 
 i2cdetect -y $I2C_BUS | grep -q "$WP_HEX"
@@ -231,7 +231,7 @@ if [ $? -ne 0 ]; then
     EEPROM_TEST_RESULT="n"
     check_test "I2C EEPROM" $EEPROM_TEST_RESULT
     rm -f $TMP_WRITE $TMP_READ
-    return
+    # return
 fi
 
 pretty_print "EEPROM found at 0x$(printf '%X' $EEPROM_ADDR)"
@@ -245,7 +245,7 @@ if [ $? -ne 0 ]; then
     EEPROM_TEST_RESULT="n"
     check_test "I2C EEPROM" $EEPROM_TEST_RESULT
     rm -f $TMP_WRITE $TMP_READ
-    return
+    # return
 fi
 
 # Write random data byte by byte
@@ -475,7 +475,7 @@ if ! command -v i2cset >/dev/null 2>&1; then
     pretty_print "ERROR: i2c-tools not installed (i2cset missing). Skipping test."
     IO_EXPANDER_TEST_RESULT="n"
     check_test "LED Sequential" LED_TEST_RESULT
-    return 1
+    # return 1
 fi
 
 if ! i2cdetect -y $I2C_BUS | grep -q "$I2C_ADDR"; then
