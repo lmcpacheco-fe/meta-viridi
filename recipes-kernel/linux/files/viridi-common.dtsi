@@ -239,11 +239,11 @@
 	pinctrl-0 = <&pinctrl_lpspi4>;
 	cs-gpios = <&gpio2 18 GPIO_ACTIVE_LOW>;
 	status = "okay";
-	spidev0: spi@0 {
-		reg = <0>;								// CS0
-		compatible = "spidev";					// Generic driver for testing
-		spi-max-frequency = <1000000>;			// 1 MHz, adjust according to peripheral
-	};
+	// spidev0: spi@0 {
+	// 	reg = <0>;								// CS0
+	// 	compatible = "spidev";					// Generic driver for testing
+	// 	spi-max-frequency = <1000000>;			// 1 MHz, adjust according to peripheral
+	// };
 };
 
 &flexcan1 {
