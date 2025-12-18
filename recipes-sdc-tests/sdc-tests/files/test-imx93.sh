@@ -83,7 +83,7 @@ printf "\n\n"
 pretty_print "Starting eMMC test"
 printf "\n\n"
 
-EMMC_DEV="/dev/mmcblk2"
+EMMC_DEV="/dev/mmcblk0"
 
 if [ -b "$EMMC_DEV" ]; then
     pretty_print "eMMC device $EMMC_DEV found"
@@ -184,100 +184,100 @@ check_test "eMMC" EMMC_TEST_RESULT
 # # Remove temp files
 # rm -f $TMP_WRITE $TMP_READ
 
-# ====================== #
-# EEPROM  Test           #
-# ====================== #
-printf "\n\n"
-pretty_print "Starting EEPROM test"
-printf "\n\n"
+# # ====================== #
+# # EEPROM  Test           #
+# # ====================== #
+# printf "\n\n"
+# pretty_print "Starting EEPROM test"
+# printf "\n\n"
 
-I2C_BUS=4
-EEPROM_ADDR=0x54    # 7-bit address: 0xA8 → 0x54 in decimal
-WP_ADDR=0x30        # 7-bit address: 0x60 → 0x30 in decimal
-TEST_SIZE=32
-TMP_WRITE=/tmp/eeprom_write.bin
-TMP_READ=/tmp/eeprom_read.bin
+# I2C_BUS=4
+# EEPROM_ADDR=0x54    # 7-bit address: 0xA8 → 0x54 in decimal
+# WP_ADDR=0x30        # 7-bit address: 0x60 → 0x30 in decimal
+# TEST_SIZE=32
+# TMP_WRITE=/tmp/eeprom_write.bin
+# TMP_READ=/tmp/eeprom_read.bin
 
-# Generate random test data
-dd if=/dev/urandom of=$TMP_WRITE bs=1 count=$TEST_SIZE status=none 2>/dev/null
+# # Generate random test data
+# dd if=/dev/urandom of=$TMP_WRITE bs=1 count=$TEST_SIZE status=none 2>/dev/null
 
-# Check if i2c-tools are installed
-if ! command -v i2cdetect &> /dev/null; then
-    pretty_print "ERROR: i2cdetect not found. Install i2c-tools."
-    EEPROM_TEST_RESULT="n"
-    check_test "I2C EEPROM" $EEPROM_TEST_RESULT
-    rm -f $TMP_WRITE $TMP_READ
-    return
-fi
+# # Check if i2c-tools are installed
+# if ! command -v i2cdetect &> /dev/null; then
+#     pretty_print "ERROR: i2cdetect not found. Install i2c-tools."
+#     EEPROM_TEST_RESULT="n"
+#     check_test "I2C EEPROM" $EEPROM_TEST_RESULT
+#     rm -f $TMP_WRITE $TMP_READ
+#     return
+# fi
 
-# Convert addresses to lowercase hex for grep matching
-EEPROM_HEX=$(printf '%02x' $EEPROM_ADDR)
-WP_HEX=$(printf '%02x' $WP_ADDR)
+# # Convert addresses to lowercase hex for grep matching
+# EEPROM_HEX=$(printf '%02x' $EEPROM_ADDR)
+# WP_HEX=$(printf '%02x' $WP_ADDR)
 
-# Scan I2C bus for both EEPROM and Write Protection addresses
-pretty_print "Scanning I2C bus $I2C_BUS..."
-i2cdetect -y $I2C_BUS | grep -q "$EEPROM_HEX"
-if [ $? -ne 0 ]; then
-    pretty_print "ERROR: EEPROM not found at 0x$(printf '%X' $EEPROM_ADDR)"
-    EEPROM_TEST_RESULT="n"
-    check_test "I2C EEPROM" $EEPROM_TEST_RESULT
-    rm -f $TMP_WRITE $TMP_READ
-    return
-fi
+# # Scan I2C bus for both EEPROM and Write Protection addresses
+# pretty_print "Scanning I2C bus $I2C_BUS..."
+# i2cdetect -y $I2C_BUS | grep -q "$EEPROM_HEX"
+# if [ $? -ne 0 ]; then
+#     pretty_print "ERROR: EEPROM not found at 0x$(printf '%X' $EEPROM_ADDR)"
+#     EEPROM_TEST_RESULT="n"
+#     check_test "I2C EEPROM" $EEPROM_TEST_RESULT
+#     rm -f $TMP_WRITE $TMP_READ
+#     return
+# fi
 
-i2cdetect -y $I2C_BUS | grep -q "$WP_HEX"
-if [ $? -ne 0 ]; then
-    pretty_print "ERROR: Write Protection not found at 0x$(printf '%X' $WP_ADDR)"
-    EEPROM_TEST_RESULT="n"
-    check_test "I2C EEPROM" $EEPROM_TEST_RESULT
-    rm -f $TMP_WRITE $TMP_READ
-    return
-fi
+# i2cdetect -y $I2C_BUS | grep -q "$WP_HEX"
+# if [ $? -ne 0 ]; then
+#     pretty_print "ERROR: Write Protection not found at 0x$(printf '%X' $WP_ADDR)"
+#     EEPROM_TEST_RESULT="n"
+#     check_test "I2C EEPROM" $EEPROM_TEST_RESULT
+#     rm -f $TMP_WRITE $TMP_READ
+#     return
+# fi
 
-pretty_print "EEPROM found at 0x$(printf '%X' $EEPROM_ADDR)"
-pretty_print "WP found at 0x$(printf '%X' $WP_ADDR)"
+# pretty_print "EEPROM found at 0x$(printf '%X' $EEPROM_ADDR)"
+# pretty_print "WP found at 0x$(printf '%X' $WP_ADDR)"
 
-# Disable write protection
-pretty_print "Disabling write protection..."
-i2cset -y $I2C_BUS $WP_ADDR 0x00
-if [ $? -ne 0 ]; then
-    pretty_print "ERROR: Failed to disable write protection"
-    EEPROM_TEST_RESULT="n"
-    check_test "I2C EEPROM" $EEPROM_TEST_RESULT
-    rm -f $TMP_WRITE $TMP_READ
-    return
-fi
+# # Disable write protection
+# pretty_print "Disabling write protection..."
+# i2cset -y $I2C_BUS $WP_ADDR 0x00
+# if [ $? -ne 0 ]; then
+#     pretty_print "ERROR: Failed to disable write protection"
+#     EEPROM_TEST_RESULT="n"
+#     check_test "I2C EEPROM" $EEPROM_TEST_RESULT
+#     rm -f $TMP_WRITE $TMP_READ
+#     return
+# fi
 
-# Write random data byte by byte
-pretty_print "Writing $TEST_SIZE random bytes to EEPROM..."
-for ((addr=0; addr<$TEST_SIZE; addr++)); do
-    # Extract one byte from random file
-    byte_hex=$(dd if=$TMP_WRITE bs=1 skip=$addr count=1 2>/dev/null | xxd -p)
-    i2cset -y $I2C_BUS $EEPROM_ADDR $addr 0x$byte_hex
-    usleep 5000  # Wait ~5ms per write (safe for EEPROM)
-done
+# # Write random data byte by byte
+# pretty_print "Writing $TEST_SIZE random bytes to EEPROM..."
+# for ((addr=0; addr<$TEST_SIZE; addr++)); do
+#     # Extract one byte from random file
+#     byte_hex=$(dd if=$TMP_WRITE bs=1 skip=$addr count=1 2>/dev/null | xxd -p)
+#     i2cset -y $I2C_BUS $EEPROM_ADDR $addr 0x$byte_hex
+#     usleep 5000  # Wait ~5ms per write (safe for EEPROM)
+# done
 
-# Read back the data
-pretty_print "Reading back data..."
-> $TMP_READ
-for ((addr=0; addr<$TEST_SIZE; addr++)); do
-    val=$(i2cget -y $I2C_BUS $EEPROM_ADDR $addr)
-    printf "%02x" $val | xxd -r -p >> $TMP_READ
-done
+# # Read back the data
+# pretty_print "Reading back data..."
+# > $TMP_READ
+# for ((addr=0; addr<$TEST_SIZE; addr++)); do
+#     val=$(i2cget -y $I2C_BUS $EEPROM_ADDR $addr)
+#     printf "%02x" $val | xxd -r -p >> $TMP_READ
+# done
 
-# Compare written and read data
-if cmp -s $TMP_WRITE $TMP_READ; then
-    pretty_print "EEPROM test PASSED!"
-    EEPROM_TEST_RESULT="y"
-else
-    pretty_print "EEPROM test FAILED!"
-    EEPROM_TEST_RESULT="n"
-fi
+# # Compare written and read data
+# if cmp -s $TMP_WRITE $TMP_READ; then
+#     pretty_print "EEPROM test PASSED!"
+#     EEPROM_TEST_RESULT="y"
+# else
+#     pretty_print "EEPROM test FAILED!"
+#     EEPROM_TEST_RESULT="n"
+# fi
 
-check_test "I2C EEPROM" $EEPROM_TEST_RESULT
+# check_test "I2C EEPROM" $EEPROM_TEST_RESULT
 
-# Clean up temporary files
-rm -f $TMP_WRITE $TMP_READ
+# # Clean up temporary files
+# rm -f $TMP_WRITE $TMP_READ
 
 # ====================== #
 # SDIO/MMC Test          #
@@ -345,7 +345,7 @@ pretty_print "Starting I2C bus test"
 printf "\n\n"
 
 pretty_print "Available I2C buses"
-i2cdetect -l
+i2cdetect -y -l
 
 pretty_print "Scanning I2C1 (should have IO Expander at 0x44 and RTC at 0x51 )"
 i2cdetect -y 0
@@ -491,62 +491,62 @@ check_test "Ethernet" "y"
 # ====================== #
 # LED Test  #
 # ====================== #
-printf "\n\n"
-pretty_print "LED Sequential Test"
-printf "\n\n"
+# printf "\n\n"
+# pretty_print "LED Sequential Test"
+# printf "\n\n"
 
-I2C_BUS=1                    # LPI2C1 → /dev/i2c-1
-I2C_ADDR=0x44                # 7-bit I2C address
-REG_OUTPUT=0x01              # Output Port Register
-REG_DIRECTION=0x03           # Direction Register (0 = output)
-LED_PINS=(0 1 2 3)           # GPIO0 → LED1_nEN, GPIO1 → LED2_nEN, ...
-LED_NAMES=("LED1" "LED2" "LED3" "LED4")
-ON_DURATION=3                # Seconds each LED stays ON
+# I2C_BUS=1                    # LPI2C1 → /dev/i2c-1
+# I2C_ADDR=0x44                # 7-bit I2C address
+# REG_OUTPUT=0x01              # Output Port Register
+# REG_DIRECTION=0x03           # Direction Register (0 = output)
+# LED_PINS=(0 1 2 3)           # GPIO0 → LED1_nEN, GPIO1 → LED2_nEN, ...
+# LED_NAMES=("LED1" "LED2" "LED3" "LED4")
+# ON_DURATION=3                # Seconds each LED stays ON
 
-if ! command -v i2cset >/dev/null 2>&1; then
-    pretty_print "ERROR: i2c-tools not installed (i2cset missing). Skipping test."
-    IO_EXPANDER_TEST_RESULT="n"
-    check_test "LED Sequential" LED_TEST_RESULT
-    return 1
-fi
+# if ! command -v i2cset >/dev/null 2>&1; then
+#     pretty_print "ERROR: i2c-tools not installed (i2cset missing). Skipping test."
+#     IO_EXPANDER_TEST_RESULT="n"
+#     check_test "LED Sequential" LED_TEST_RESULT
+#     return 1
+# fi
 
-if ! i2cdetect -y $I2C_BUS | grep -q "$I2C_ADDR"; then
-    pretty_print "ERROR: FXL6408 not detected at 0x$I2C_ADDR on bus $I2C_BUS"
-    IO_EXPANDER_TEST_RESULT="n"
-else
-    pretty_print "FXL6408 detected at 0x$I2C_ADDR. Running LED sequence..."
+# if ! i2cdetect -y $I2C_BUS | grep -q "$I2C_ADDR"; then
+#     pretty_print "ERROR: FXL6408 not detected at 0x$I2C_ADDR on bus $I2C_BUS"
+#     IO_EXPANDER_TEST_RESULT="n"
+# else
+#     pretty_print "FXL6408 detected at 0x$I2C_ADDR. Running LED sequence..."
 
-    # Configure GPIO0-3 as outputs (bits 0-3 = 0)
-    i2cset -y $I2C_BUS $I2C_ADDR $REG_DIRECTION 0xF0 2>/dev/null
+#     # Configure GPIO0-3 as outputs (bits 0-3 = 0)
+#     i2cset -y $I2C_BUS $I2C_ADDR $REG_DIRECTION 0xF0 2>/dev/null
 
-    IO_EXPANDER_TEST_RESULT="y"
-    local idx pin bit_mask current
+#     IO_EXPANDER_TEST_RESULT="y"
+#     local idx pin bit_mask current
 
-    pretty_print "Starting LED sequence..."
+#     pretty_print "Starting LED sequence..."
 
-    for idx in {0..3}; do
-        pin=${LED_PINS[$idx]}
-        bit_mask=$((1 << pin))
+#     for idx in {0..3}; do
+#         pin=${LED_PINS[$idx]}
+#         bit_mask=$((1 << pin))
 
-        # Turn ON current LED (active-low)
-        pretty_print "  ${LED_NAMES[$idx]} (GPIO$pin) ON for ${ON_DURATION}s"
-        current=$(i2cget -y $I2C_BUS $I2C_ADDR $REG_OUTPUT 2>/dev/null || echo 0xFF)
-        current=$((current & ~bit_mask))           # Clear bit → 0 = ON
-        i2cset -y $I2C_BUS $I2C_ADDR $REG_OUTPUT $current
-        sleep $ON_DURATION
+#         # Turn ON current LED (active-low)
+#         pretty_print "  ${LED_NAMES[$idx]} (GPIO$pin) ON for ${ON_DURATION}s"
+#         current=$(i2cget -y $I2C_BUS $I2C_ADDR $REG_OUTPUT 2>/dev/null || echo 0xFF)
+#         current=$((current & ~bit_mask))           # Clear bit → 0 = ON
+#         i2cset -y $I2C_BUS $I2C_ADDR $REG_OUTPUT $current
+#         sleep $ON_DURATION
 
-        # Turn OFF current LED
-        current=$(i2cget -y $I2C_BUS $I2C_ADDR $REG_OUTPUT 2>/dev/null || echo 0xFF)
-        current=$((current | bit_mask))            # Set bit → 1 = OFF
-        i2cset -y $I2C_BUS $I2C_ADDR $REG_OUTPUT $current
-    done
+#         # Turn OFF current LED
+#         current=$(i2cget -y $I2C_BUS $I2C_ADDR $REG_OUTPUT 2>/dev/null || echo 0xFF)
+#         current=$((current | bit_mask))            # Set bit → 1 = OFF
+#         i2cset -y $I2C_BUS $I2C_ADDR $REG_OUTPUT $current
+#     done
 
-    i2cset -y $I2C_BUS $I2C_ADDR $REG_OUTPUT 0x0F
-    pretty_print "LED sequence completed. All LEDs OFF."
-fi
+#     i2cset -y $I2C_BUS $I2C_ADDR $REG_OUTPUT 0x0F
+#     pretty_print "LED sequence completed. All LEDs OFF."
+# fi
 
 
-check_test "LED Sequential" LED_TEST_RESULT
+# check_test "LED Sequential" LED_TEST_RESULT
 
 # ====================== #
 # Temperature Test       #

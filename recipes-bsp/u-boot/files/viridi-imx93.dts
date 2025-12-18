@@ -150,20 +150,20 @@
 };
 
 &eqos {
-	pinctrl-names = "default", "sleep";
+	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_eqos>;
-	pinctrl-1 = <&pinctrl_eqos_sleep>;
-	phy-mode = "rgmii";
+	//pinctrl-1 = <&pinctrl_eqos_sleep>;
+	phy-mode = "rmii";
 	phy-handle = <&ethphy1>;
 	status = "okay";
 	mdio {
 		compatible = "snps,dwmac-mdio";
 		#address-cells = <1>;
 		#size-cells = <0>;
-		/*clock-frequency = <5000000>;						No need for 'clock-frequency'; PHY provides 50 MHz REF_CLK to SoC via RMII*/
-		ethphy1: ethernet-phy@1 {
-			compatible = "microchip,ksz8081";
-			reg = <1>;										//Strapping 15 --> PHYAD[0] pull-down
+		//clock-frequency = <5000000>;					//No need for 'clock-frequency'; PHY provides 50 MHz REF_CLK to SoC via RMII*/
+		ethphy1: ethernet-phy@0 {
+			compatible = "microchip,ksz8081", "ethernet-phy-ieee802.3-c22";
+			reg = <0>;						
 			reset-gpios = <&gpio4 12 GPIO_ACTIVE_LOW>;		//Reset controlled by SoC GPIO4_IO12
 			reset-assert-us = <10000>;
 			reset-deassert-us = <80000>;
@@ -172,20 +172,21 @@
 };
 
 &fec {
-	pinctrl-names = "default", "sleep";
+	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_fec>;
-	pinctrl-1 = <&pinctrl_fec_sleep>;
-	phy-mode = "rgmii-id";
+	//pinctrl-1 = <&pinctrl_fec_sleep>;
+	phy-mode = "rmii";
 	phy-handle = <&ethphy2>;
 	fsl,magic-packet;
 	status = "okay";
 	mdio {
+		compatible = "snps,dwmac-mdio";
 		#address-cells = <1>;
 		#size-cells = <0>;
-		/*clock-frequency = <5000000>;						// No need for 'clock-frequency'; PHY provides 50 MHz REF_CLK to SoC via RMII*/
-		ethphy2: ethernet-phy@2 {
-		compatible = "microchip,ksz8081";
-			reg = <2>;										//Strapping 15 --> PHYAD[0] pull-up
+		//clock-frequency = <5000000>;					// No need for 'clock-frequency'; PHY provides 50 MHz REF_CLK to SoC via RMII*/
+		ethphy2: ethernet-phy@3 {
+			compatible = "microchip,ksz8081", "ethernet-phy-ieee802.3-c22";
+			reg = <3>;						
 			reset-gpios = <&gpio4 26 GPIO_ACTIVE_LOW>;		//Reset controlled by SoC GPIO4_IO26
 			reset-assert-us = <10000>;
 			reset-deassert-us = <80000>;
@@ -526,6 +527,7 @@
 			MX93_PAD_ENET1_TD0__ENET_QOS_RGMII_TD0			0x57e
 			MX93_PAD_ENET1_TD1__ENET_QOS_RGMII_TD1			0x57e
 			MX93_PAD_ENET1_TX_CTL__ENET_QOS_RGMII_TX_CTL		0x57e
+			MX93_PAD_ENET1_TD2__CCM_ENET_QOS_CLOCK_GENERATE_REF_CLK	0x4000057e
 		>;
 	};
 
@@ -554,6 +556,7 @@
 			MX93_PAD_ENET2_TD0__ENET1_RGMII_TD0		0x57e
 			MX93_PAD_ENET2_TD1__ENET1_RGMII_TD1		0x57e
 			MX93_PAD_ENET2_TX_CTL__ENET1_RGMII_TX_CTL	0x57e
+			MX93_PAD_ENET2_TD2__ENET1_TX_CLK 		0x4000057e
 		>;
 	};
 

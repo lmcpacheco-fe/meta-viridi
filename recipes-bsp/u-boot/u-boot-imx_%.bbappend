@@ -18,7 +18,7 @@ SRC_URI += " \
 # Copy the files to their destinations within the U-Boot source tree
 do_override_files() {
     if [ "${MACHINE}" = "viridi-imx91" ]; then
-//        install -Dm 0644 ${WORKDIR}/sources-unpack/lpddr4_timing.c ${S}/board/freescale/imx91_evk/lpddr4_timing.c
+#        install -Dm 0644 ${WORKDIR}/sources-unpack/lpddr4_timing.c ${S}/board/freescale/imx91_evk/lpddr4_timing.c
         install -Dm 0644 ${WORKDIR}/sources-unpack/spl-91.c ${S}/board/freescale/imx91_evk/spl.c
         install -Dm 0644 ${WORKDIR}/sources-unpack/viridi-imx91_defconfig ${S}/configs/viridi-imx91_defconfig
         install -Dm 0644 ${WORKDIR}/sources-unpack/viridi-imx91.dts ${S}/dts/upstream/src/arm64/viridi-imx91.dts

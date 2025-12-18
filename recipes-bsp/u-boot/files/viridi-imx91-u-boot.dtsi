@@ -158,13 +158,13 @@
 	bootph-pre-ram;
 	bootph-some-ram;
 
-	pcf2131: rtc@53 {
-		compatible = "nxp,pcf2131";
-		reg = <0x53>;
-		interrupt-parent = <&pcal6524>;
-		interrupts = <1 IRQ_TYPE_LEVEL_LOW>;
-		status = "okay";
-	};
+	// pcf2131: rtc@53 {
+	// 	compatible = "nxp,pcf2131";
+	// 	reg = <0x53>;
+	// 	interrupt-parent = <&pcal6524>;
+	// 	interrupts = <1 IRQ_TYPE_LEVEL_LOW>;
+	// 	status = "okay";
+	// };
 };
 
 &{/soc@0/bus@44000000/i2c@44350000/pmic@25} {
