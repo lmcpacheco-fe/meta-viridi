@@ -50,18 +50,20 @@
 
 	reg_usdhc3_vmmc: regulator-usdhc3 {
 		compatible = "regulator-fixed";
-		regulator-max-microvolt = <3300000>;
-		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <1800000>;	
+		regulator-min-microvolt = <1800000>;
 		regulator-name = "WLAN_EN";
 		/*gpio = <&gpio2 13 GPIO_ACTIVE_LOW>;			CPU(GPIO2_13) = WF_nPD_1V8*/
 		gpio = <&pca9555_21 5 GPIO_ACTIVE_LOW>;
-		enable-active-low;
+		regulator-boot-on;
+		regulator-always-on;
 		startup-delay-us = <20000>;
 	};
 
 	usdhc3_pwrseq: usdhc3_pwrseq {
 		compatible = "mmc-pwrseq-simple";
-		reset-gpios = <&pca9555_21 6 GPIO_ACTIVE_LOW>;
+		reset-gpios = <&pca9555_21 6 GPIO_ACTIVE_HIGH>;
+		post-power-on-delay-ms = <200>;
 	};
 
 	reserved-memory {

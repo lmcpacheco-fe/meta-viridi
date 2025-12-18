@@ -126,6 +126,7 @@
 	pinctrl-0 = <&pinctrl_uart6>;
 	pinctrl-names = "default";
 	status = "okay";
+	/*RS485*/
 	fsl,uart-has-rtscts;
 	linux,rs485-enabled-at-boot-time;
 	// rts-gpios = <&gpio2 7 GPIO_ACTIVE_HIGH>;
@@ -225,6 +226,14 @@
 	// 	compatible = "spidev";					// Generic driver for testing
 	// 	spi-max-frequency = <1000000>;			// 1 MHz, adjust according to peripheral
 	// };
+};
+
+&flexcan1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_flexcan1>;
+	status = "okay";
+	//standby-gpios = <&gpio1 14 GPIO_ACTIVE_HIGH>;		//CAN1_STBY
+	//eol-gpios = <&gpio1 11 GPIO_ACTIVE_HIGH>;			//CAN1_EOL
 };
 
 &gpio1 {

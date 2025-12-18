@@ -191,7 +191,7 @@ printf "\n\n"
 pretty_print "Starting EEPROM test"
 printf "\n\n"
 
-I2C_BUS=4
+I2C_BUS=2
 EEPROM_ADDR=0x54    # 7-bit address: 0xA8 → 0x54 in decimal
 WP_ADDR=0x30        # 7-bit address: 0x60 → 0x30 in decimal
 TEST_SIZE=32
@@ -463,8 +463,9 @@ printf "\n\n"
 pretty_print "LED Sequential Test"
 printf "\n\n"
 
-I2C_BUS=1                    # LPI2C1 → /dev/i2c-1
+I2C_BUS=0                    # LPI2C1 → /dev/i2c-1
 I2C_ADDR=0x44                # 7-bit I2C address
+I2C_ADDR_HEX="44"
 REG_OUTPUT=0x01              # Output Port Register
 REG_DIRECTION=0x03           # Direction Register (0 = output)
 LED_PINS=(0 1 2 3)           # GPIO0 → LED1_nEN, GPIO1 → LED2_nEN, ...
@@ -478,7 +479,7 @@ if ! command -v i2cset >/dev/null 2>&1; then
     # return 1
 fi
 
-if ! i2cdetect -y $I2C_BUS | grep -q "$I2C_ADDR"; then
+if ! i2cdetect -y $I2C_BUS | grep -q "$I2C_ADDR_HEX"; then
     pretty_print "ERROR: FXL6408 not detected at 0x$I2C_ADDR on bus $I2C_BUS"
     IO_EXPANDER_TEST_RESULT="n"
 else
