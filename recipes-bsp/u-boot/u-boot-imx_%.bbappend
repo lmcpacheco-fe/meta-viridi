@@ -7,6 +7,7 @@ SRC_URI += " \
     file://lpddr4x_timing_1866mts.c \
     file://spl-91.c \
     file://spl-93.c \
+    file://imx93_evk.c \
     file://viridi-imx91.dts \
     file://viridi-imx93.dts \
     file://viridi-imx91_defconfig \
@@ -29,6 +30,7 @@ do_override_files() {
         install -Dm 0644 ${WORKDIR}/sources-unpack/lpddr4x_timing_3733mts.c ${S}/board/freescale/imx93_evk/lpddr4x_timing.c
         install -Dm 0644 ${WORKDIR}/sources-unpack/lpddr4x_timing_1866mts.c ${S}/board/freescale/imx93_evk/lpddr4x_timing_1866mts.c      
         install -Dm 0644 ${WORKDIR}/sources-unpack/spl-93.c ${S}/board/freescale/imx93_evk/spl.c
+        install -Dm 0644 ${WORKDIR}/sources-unpack/imx93_evk.c ${S}/board/freescale/imx93_evk/imx93_evk.c
         install -Dm 0644 ${WORKDIR}/sources-unpack/viridi-imx93_defconfig ${S}/configs/viridi-imx93_defconfig
         install -Dm 0644 ${WORKDIR}/sources-unpack/viridi-imx93.dts ${S}/dts/upstream/src/arm64/freescale/viridi-imx93.dts
         install -Dm 0644 ${WORKDIR}/sources-unpack/viridi-imx93-u-boot.dtsi ${S}/arch/arm/dts/viridi-imx93-u-boot.dtsi
