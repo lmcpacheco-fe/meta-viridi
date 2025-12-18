@@ -29,12 +29,13 @@
 			regulator-max-microvolt = <1800000>;
 			//gpio = <&gpio2 13 GPIO_ACTIVE_LOW>;			//CPU(GPIO2_13) = WF_nPD_1V8
 			gpio = <&pca9555_21 5 GPIO_ACTIVE_LOW>;		//IO_Exp(P0_5) = WF_nEN_1V8
-			enable-active-low;
+			regulator-boot-on;
+			regulator-always-on;
 		};
 
 		usdhc3_pwrseq: usdhc3_pwrseq {
 			compatible = "mmc-pwrseq-simple";
-			reset-gpios = <&pca9555_21 6 GPIO_ACTIVE_LOW>;		//IO_Exp(P0_6) = WF_nRST_1V8
+			reset-gpios = <&pca9555_21 6 GPIO_ACTIVE_HIGH>;		//IO_Exp(P0_6) = WF_nRST_1V8
 		};
 
 		// TODO: assign more descriptive labels and node names instead of wakeupX
