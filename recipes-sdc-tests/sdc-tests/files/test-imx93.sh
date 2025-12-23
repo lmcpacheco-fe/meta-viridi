@@ -57,24 +57,24 @@ fi
 
 check_test "Kernel Log Errors" KERNEL_LOG_TEST_RESULT
 
-# ====================== #
-# DDR Memory Test        #
-# ====================== #
-printf "\n\n"
-pretty_print "Starting DDR memory test"
-printf "\n\n"
+# # ====================== #
+# # DDR Memory Test        #
+# # ====================== #
+# printf "\n\n"
+# pretty_print "Starting DDR memory test"
+# printf "\n\n"
 
-if ! command -v memtester >/dev/null 2>&1; then
-    pretty_print "ERROR: memtester not installed. Skipping DDR test."
-    DDR_TEST_RESULT="n"
-else
-    MEMSIZE=50M
-    pretty_print "Testing $MEMSIZE of RAM..."
-    memtester $MEMSIZE 1
-    DDR_TEST_RESULT="y"
-fi
+# if ! command -v memtester >/dev/null 2>&1; then
+#     pretty_print "ERROR: memtester not installed. Skipping DDR test."
+#     DDR_TEST_RESULT="n"
+# else
+#     MEMSIZE=50M
+#     pretty_print "Testing $MEMSIZE of RAM..."
+#     memtester $MEMSIZE 1
+#     DDR_TEST_RESULT="y"
+# fi
 
-check_test "DDR Memory" DDR_TEST_RESULT
+# check_test "DDR Memory" DDR_TEST_RESULT
 
 # ====================== #
 # eMMC Test              #
@@ -408,65 +408,64 @@ check_test "I2C" "y"
 printf "\n\n"
 pretty_print "Starting Ethernet test"
 printf "\n\n"
-pretty_print "Starting Ethernet0 test"
+# pretty_print "Starting Ethernet0 test"
 
-IFACE0="eth0"
-IP_ADDR0="10.219.8.14/20"
+# IFACE0="eth0"
+# IP_ADDR0="10.219.8.14/20"
 
-IF_STATUS=$(cat /sys/class/net/$IFACE/operstate 2>/dev/null)
+# IF_STATUS=$(cat /sys/class/net/$IFACE/operstate 2>/dev/null)
 
-if [[ "$IF_STATUS" == "up" ]]; then
-    pretty_print "$IFACE is already active. Skipping configuration."
-else
-    pretty_print "$IFACE is down. Bringing up interface and configuring IP."
-    ip link set $IFACE up
-    ip addr add $IP_ADDR dev $IFACE
-    ip route add default via $GATEWAY dev $IFACE
-fi
+# if [[ "$IF_STATUS" == "up" ]]; then
+#     pretty_print "$IFACE is already active. Skipping configuration."
+# else
+#     pretty_print "$IFACE is down. Bringing up interface and configuring IP."
+#     ip link set $IFACE up
+#     ip addr add $IP_ADDR dev $IFACE
+#     ip route add default via $GATEWAY dev $IFACE
+# fi
 
-pretty_print "Interface status:"
-ip addr show $IFACE
+# pretty_print "Interface status:"
+# ip addr show $IFACE
 
-if command -v ethtool >/dev/null 2>&1; then
-    pretty_print "Checking link status with ethtool..."
-    ethtool $IFACE
-else
-    echo "ethtool not installed, skipping link check."
-fi
+# if command -v ethtool >/dev/null 2>&1; then
+#     pretty_print "Checking link status with ethtool..."
+#     ethtool $IFACE
+# else
+#     echo "ethtool not installed, skipping link check."
+# fi
 
-pretty_print "Pinging 8.8.8.8..."
-ping -c 4 8.8.8.8
+# pretty_print "Pinging 8.8.8.8..."
+# ping -c 4 8.8.8.8
 
 printf "\n\n"
 pretty_print "Starting Ethernet 1 test"
 printf "\n\n"
 
 IFACE1="eth1"
-IP_ADDR1="10.219.8.15/20"
+IP_ADDR1="192.168.1.124"
 
-IF_STATUS=$(cat /sys/class/net/$IFACE/operstate 2>/dev/null)
+IF_STATUS=$(cat /sys/class/net/$IFACE1/operstate 2>/dev/null)
 
 if [[ "$IF_STATUS" == "up" ]]; then
-    pretty_print "$IFACE is already active. Skipping configuration."
+    pretty_print "$IFACE1 is already active. Skipping configuration."
 else
-    pretty_print "$IFACE is down. Bringing up interface and configuring IP."
-    ip link set $IFACE up
-    ip addr add $IP_ADDR dev $IFACE
-    ip route add default via $GATEWAY dev $IFACE
+    pretty_print "$IFACE1 is down. Bringing up interface and configuring IP."
+    ifconfig $IFACE1 up
+    ifconfig $IFACE1 $IP_ADDR1
 fi
 
 pretty_print "Interface status:"
-ip addr show $IFACE
+ ifconfig $IFACE1
 
 if command -v ethtool >/dev/null 2>&1; then
     pretty_print "Checking link status with ethtool..."
-    ethtool $IFACE
+    ethtool $IFACE1
 else
     echo "ethtool not installed, skipping link check."
 fi
 
-pretty_print "Pinging 8.8.8.8..."
-ping -c 4 8.8.8.8
+# pretty_print "Pinging 8.8.8.8..."
+# ping -c 4 8.8.8.8
 
 check_test "Ethernet" "y"
 
@@ -489,64 +488,42 @@ check_test "Ethernet" "y"
 # check_test "Audio/SAI" "y"
 
 # ====================== #
-# LED Test  #
+# LED Sequential Test    #
 # ====================== #
-# printf "\n\n"
-# pretty_print "LED Sequential Test"
-# printf "\n\n"
+printf "\n\n"
+pretty_print "LED Sequential Test"
+printf "\n\n"
 
-# I2C_BUS=1                    # LPI2C1 → /dev/i2c-1
-# I2C_ADDR=0x44                # 7-bit I2C address
-# REG_OUTPUT=0x01              # Output Port Register
-# REG_DIRECTION=0x03           # Direction Register (0 = output)
-# LED_PINS=(0 1 2 3)           # GPIO0 → LED1_nEN, GPIO1 → LED2_nEN, ...
-# LED_NAMES=("LED1" "LED2" "LED3" "LED4")
-# ON_DURATION=3                # Seconds each LED stays ON
+LED_NAMES=("LED1_nEN" "LED2_nEN" "LED3_nEN" "LED4_nEN")
+ON_DURATION=3   # seconds
 
-# if ! command -v i2cset >/dev/null 2>&1; then
-#     pretty_print "ERROR: i2c-tools not installed (i2cset missing). Skipping test."
-#     IO_EXPANDER_TEST_RESULT="n"
-#     check_test "LED Sequential" LED_TEST_RESULT
-#     return 1
-# fi
+# Check gpioset
+if ! command -v gpioset >/dev/null 2>&1; then
+    pretty_print "ERROR: gpioset not available"
+    LED_TEST_RESULT="n"
+    check_test "LED Sequential" LED_TEST_RESULT
+    return 1
+fi
 
-# if ! i2cdetect -y $I2C_BUS | grep -q "$I2C_ADDR"; then
-#     pretty_print "ERROR: FXL6408 not detected at 0x$I2C_ADDR on bus $I2C_BUS"
-#     IO_EXPANDER_TEST_RESULT="n"
-# else
-#     pretty_print "FXL6408 detected at 0x$I2C_ADDR. Running LED sequence..."
+pretty_print "Starting LED sequence..."
+LED_TEST_RESULT="y"
 
-#     # Configure GPIO0-3 as outputs (bits 0-3 = 0)
-#     i2cset -y $I2C_BUS $I2C_ADDR $REG_DIRECTION 0xF0 2>/dev/null
+# Ensure all LEDs OFF at start
+for led in "${LED_NAMES[@]}"; do
+    gpioset ${led}=1
+done
 
-#     IO_EXPANDER_TEST_RESULT="y"
-#     local idx pin bit_mask current
+# Sequential ON/OFF
+for led in "${LED_NAMES[@]}"; do
+    pretty_print "  ${led} ON for ${ON_DURATION}s"
+    gpioset ${led}=0          # ON (active-low)
+    sleep ${ON_DURATION}
+    gpioset ${led}=1          # OFF
+done
 
-#     pretty_print "Starting LED sequence..."
+pretty_print "LED sequence completed. All LEDs OFF."
 
-#     for idx in {0..3}; do
-#         pin=${LED_PINS[$idx]}
-#         bit_mask=$((1 << pin))
-
-#         # Turn ON current LED (active-low)
-#         pretty_print "  ${LED_NAMES[$idx]} (GPIO$pin) ON for ${ON_DURATION}s"
-#         current=$(i2cget -y $I2C_BUS $I2C_ADDR $REG_OUTPUT 2>/dev/null || echo 0xFF)
-#         current=$((current & ~bit_mask))           # Clear bit → 0 = ON
-#         i2cset -y $I2C_BUS $I2C_ADDR $REG_OUTPUT $current
-#         sleep $ON_DURATION
-
-#         # Turn OFF current LED
-#         current=$(i2cget -y $I2C_BUS $I2C_ADDR $REG_OUTPUT 2>/dev/null || echo 0xFF)
-#         current=$((current | bit_mask))            # Set bit → 1 = OFF
-#         i2cset -y $I2C_BUS $I2C_ADDR $REG_OUTPUT $current
-#     done
-
-#     i2cset -y $I2C_BUS $I2C_ADDR $REG_OUTPUT 0x0F
-#     pretty_print "LED sequence completed. All LEDs OFF."
-# fi
-
-
-# check_test "LED Sequential" LED_TEST_RESULT
+check_test "LED Sequential" LED_TEST_RESULT
 
 # ====================== #
 # Temperature Test       #

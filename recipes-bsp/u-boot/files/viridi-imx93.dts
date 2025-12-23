@@ -229,16 +229,12 @@
 		interrupts = <7 IRQ_TYPE_EDGE_FALLING>;	//GPIO3_IO07 --> CP
 	};
 
-	/*Io Expander --> FXL6408UMX*/
-	fxl6408: io-expander@44 {
-		compatible = "nxp,fxl6408";
-		reg = <0x44>;							//I2C Address (7bit) 0x44 expander
-		vdd-supply = <&buck4>;					//buck4 --> 3v3
-		#gpio-cells = <2>;
+	// /*Io Expander --> FXL6408UMX*/
+	fxl6408: gpio-expander@43 {
+		compatible = "fcs,fxl6408";
+		reg = <0x43>;
 		gpio-controller;
-		ngpios = <8>;							//PCA9555 have 8 GPIOs
-		gpio-reserved-ranges = <5 1>;			//Reserv DSP_CTRL_3V3 always
-		#pwm-cells = <3>;
+		#gpio-cells = <2>;
 		gpio-line-names = "LED1_nEN", "LED2_nEN", "LED3_nEN", "LED4_nEN",
 			"DSP_EN_3V3", "DSP_CTRL_3V3", "NC", "NC";
 	};

@@ -1,5 +1,15 @@
 /*
- * Copyright 2025 Future Electronics
+ * Common Device Tree Include for Viridi Platforms
+ *
+ * @TYPE: Common Device Tree Include
+ * @NAME: viridi-common
+ * @SOC: NXP i.MX9x Family
+ * @DESCRIPTION:
+ *   Shared device tree definitions for Viridi platforms based on NXP
+ *   i.MX9x SoCs. This include provides common peripherals, GPIO expanders,
+ *   regulators, and reusable hardware blocks shared across multiple boards.
+ *
+ * @MAINTAINER: Aitor Carrizosa <aitor.carrizosa@futureelectronics.com>
  */
 
 / {
@@ -22,19 +32,34 @@
 			enable-active-high;
 		};
 
-		reg_usdhc3_vmmc: regulator-usdhc3 {
+		reg_wifi_en: regulator-wifi-en {
 			compatible = "regulator-fixed";
-			regulator-name = "WLAN_EN";
+			regulator-name = "WF_nEN_1V8";
 			regulator-min-microvolt = <1800000>;
 			regulator-max-microvolt = <1800000>;
-			//gpio = <&gpio2 13 GPIO_ACTIVE_LOW>;			//CPU(GPIO2_13) = WF_nPD_1V8
-			gpio = <&pca9555_21 5 GPIO_ACTIVE_LOW>;		//IO_Exp(P0_5) = WF_nEN_1V8
-			enable-active-low;
+			gpio = <&pca9555_21 5 GPIO_ACTIVE_LOW>;		//IO_Exp(P0_5) = WF_nEN_1V8 (active low)
+			// enable-active-low;
+			// regulator-always-on;
+			regulator-boot-on;
+			startup-delay-us = <5000>;		//opcional, si el rail tarda en estabilizar
+		};
+
+		reg_wifi_pd: regulator-wifi-pd {
+			compatible = "regulator-fixed";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_reg_wifi>;
+			regulator-name = "WF_nPD_1V8";
+			regulator-min-microvolt = <1800000>;
+			regulator-max-microvolt = <1800000>;
+			gpio = <&gpio2 13 GPIO_ACTIVE_HIGH>;
+			enable-active-high;
+			regulator-always-on;
 		};
 
 		usdhc3_pwrseq: usdhc3_pwrseq {
 			compatible = "mmc-pwrseq-simple";
-			reset-gpios = <&pca9555_21 6 GPIO_ACTIVE_LOW>;		//IO_Exp(P0_6) = WF_nRST_1V8
+			reset-gpios = <&pca9555_21 6 GPIO_ACTIVE_LOW>;		//IO_Exp(P0_6) = WF_nRST_1V8 (active low)
+			post-power-on-delay-ms = <20>;		//típico 10–50ms, ajustable
 		};
 
 		// TODO: assign more descriptive labels and node names instead of wakeupX
@@ -145,18 +170,18 @@
 
 &usdhc3 {
 	pinctrl-names = "default", "state_100mhz", "state_200mhz", "sleep";
-	pinctrl-0 = <&pinctrl_usdhc3>, <&pinctrl_usdhc3_wlan>;
-	pinctrl-1 = <&pinctrl_usdhc3_100mhz>, <&pinctrl_usdhc3_wlan>;
-	pinctrl-2 = <&pinctrl_usdhc3_200mhz>, <&pinctrl_usdhc3_wlan>;
-	pinctrl-3 = <&pinctrl_usdhc3_sleep>, <&pinctrl_usdhc3_wlan>;
+	pinctrl-0 = <&pinctrl_usdhc3>, <&pinctrl_usdhc3_wlan>, <&pinctrl_wifi>;
+	pinctrl-1 = <&pinctrl_usdhc3_100mhz>, <&pinctrl_usdhc3_wlan>, <&pinctrl_wifi>;
+	pinctrl-2 = <&pinctrl_usdhc3_200mhz>, <&pinctrl_usdhc3_wlan>, <&pinctrl_wifi>;
+	pinctrl-3 = <&pinctrl_usdhc3_sleep>, <&pinctrl_usdhc3_wlan>, <&pinctrl_wifi>;
 	mmc-pwrseq = <&usdhc3_pwrseq>;
-	vmmc-supply = <&reg_usdhc3_vmmc>;
 	bus-width = <4>;
 	keep-power-in-suspend;
 	non-removable;
 	wakeup-source;
 	status = "okay";
 	//wifi-dev-wake-gpios= <&gpio2 25 GPIO_ACTIVE_HIGH>;		//CPU(GPIO2_25) = WF_DEV_WAKE_1V8
+	vqmmc-supply = <&reg_wifi_en>;
 	wifi_wake_host {
 		compatible = "nxp,wifi-wake-host";
 		interrupt-parent = <&gpio2>;
