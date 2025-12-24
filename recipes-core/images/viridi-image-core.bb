@@ -4,11 +4,13 @@ LICENSE = "MIT"
 require recipes-core/images/core-image-minimal.bb
 
 IMAGE_INSTALL:append = "\
+	iw \
 	dtc \
 	tmux \
 	ethtool \
 	openssh \
 	phytool \
+	devmem2 \
 	libgpiod \
 	net-tools \
 	memtester \
@@ -19,6 +21,6 @@ IMAGE_INSTALL:append = "\
 	util-linux-lsblk \
 	openssh-sftp-server \
 	kernel-module-nxp-wlan \
+	wireless-regdb-static \
 	linux-firmware-nxpiw416-sdio \
-	devmem2 \
 "
