@@ -36,7 +36,7 @@
 		regulator-name = "WF_nEN_1V8";
 		regulator-min-microvolt = <1800000>;
 		regulator-max-microvolt = <1800000>;
-		gpio = <&pca9555_21 5 GPIO_ACTIVE_LOW>;		//IO_Exp(P0_5) = WF_nEN_1V8 (active low)
+		gpio = <&pca9555_21 5 GPIO_ACTIVE_LOW>;		// IO_Exp(P0_5) = WF_nEN_1V8 (active low)
 		regulator-always-on;
 		startup-delay-us = <5000>;
 	};
@@ -46,14 +46,14 @@
 	// 	regulator-name = "BT_nRST_1V8";
 	// 	regulator-min-microvolt = <1800000>;
 	// 	regulator-max-microvolt = <1800000>;
-	// 	gpio = <&pca9555_21 7 GPIO_ACTIVE_LOW>;		//IO_Exp(P0_7) = BT_nRST_1V8 (active low)
+	// 	gpio = <&pca9555_21 7 GPIO_ACTIVE_LOW>;		// IO_Exp(P0_7) = BT_nRST_1V8 (active low)
 	// 	regulator-always-on;
-	// 	startup-delay-us = <20000>;
+	// 	startup-delay-us = <5000>;
 	// };
 
 	usdhc3_pwrseq: usdhc3_pwrseq {
 		compatible = "mmc-pwrseq-simple";
-		reset-gpios = <&pca9555_21 6 GPIO_ACTIVE_LOW>;		//IO_Exp(P0_6) = WF_nRST_1V8 (active low)
+		reset-gpios = <&pca9555_21 6 GPIO_ACTIVE_LOW>;		// IO_Exp(P0_6) = WF_nRST_1V8 (active low)
 		post-power-on-delay-ms = <20>;
 	};
 
@@ -176,12 +176,12 @@
 	pinctrl-2 = <&pinctrl_usdhc3_200mhz>;
 	pinctrl-3 = <&pinctrl_usdhc3_sleep>;
 	mmc-pwrseq = <&usdhc3_pwrseq>;
+	vqmmc-supply = <&reg_wifi_en>;
 	bus-width = <4>;
 	non-removable;
 	keep-power-in-suspend;
 	wakeup-source;
 	status = "okay";
-	vqmmc-supply = <&reg_wifi_en>;
 	wifi-dev-wake-gpios = <&gpio2 25 GPIO_ACTIVE_HIGH>;		//GPIO2_25 = WF_DEV_WAKE_1V8
 	wifi_wake_host {
 		compatible = "nxp,wifi-wake-host";
