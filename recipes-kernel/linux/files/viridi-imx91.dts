@@ -232,7 +232,7 @@
 		interrupts = <9 IRQ_TYPE_LEVEL_LOW>;	//Io Expander INT on GPIO1_IO09
 		gpio-line-names = "EXP_IO1", "EXP_IO2",
 			"EXP_IO3", "EXP_IO4", "EXP_PWR_EN",
-			"WF_nEN_1V8", "WF_nRST_1V8", "BT_nRST_1V8",
+			"WF_nEN_1V8", "WF_nRST_1V8", "BT_nRST_1",
 			"GNSS_LNA_EN1", "LTE_ON_OFF_1V8",
 			"NC", "NC", "NC", "NC", "NC", "NC";
 	};

@@ -32,15 +32,15 @@
 		startup-delay-us = <5000>;
 	};
 
-	reg_bt_nrst: regulator-bt-nrst {
-		compatible = "regulator-fixed";
-		regulator-name = "BT_nRST_1V8";
-		regulator-min-microvolt = <1800000>;
-		regulator-max-microvolt = <1800000>;
-		gpio = <&pca9555_21 7 GPIO_ACTIVE_LOW>;		// IO_Exp(P0_7) = BT_nRST_1V8 (active low)
-		regulator-always-on;
-		startup-delay-us = <5000>;
-	};
+	// reg_bt_nrst: regulator-bt-nrst {
+	// 	compatible = "regulator-fixed";
+	// 	regulator-name = "BT_nRST_1V8";
+	// 	regulator-min-microvolt = <1800000>;
+	// 	regulator-max-microvolt = <1800000>;
+	// 	gpio = <&pca9555_21 7 GPIO_ACTIVE_LOW>;		// IO_Exp(P0_7) = BT_nRST_1V8 (active low)
+	// 	regulator-always-on;
+	// 	startup-delay-us = <5000>;
+	// };
 
 	usdhc3_pwrseq: usdhc3_pwrseq {
 		compatible = "mmc-pwrseq-simple";
@@ -104,10 +104,16 @@
 	pinctrl-0 = <&pinctrl_uart5>;
 	status = "okay";
 	fsl,uart-has-rtscts;
+	pinctrl-assert-gpios = <&pca9555_21 7 GPIO_ACTIVE_HIGH>;
 	bluetooth {
-		compatible = "bluetooth-serial";
-		host-wakeup-gpios = <&gpio2 26 GPIO_ACTIVE_HIGH>;		// GPIO2_26 = BT_WAKE_HOST_1V8
-		device-wakeup-gpios = <&gpio2 24 GPIO_ACTIVE_HIGH>;		// GPIO2_24 = BT_DEV_WAKE_1V8
+		// compatible = "bluetooth-serial";
+		compatible = "nxp,88w8987-bt";
+		// compatible = "nxp,bt-hci-uart-88w8987";
+		// max-speed = <3000000>;
+		// fw-init-baudrate = <1500000>;
+		// reset-gpios = <&pca9555_21 7 GPIO_ACTIVE_LOW>;
+		// host-wakeup-gpios = <&gpio2 26 GPIO_ACTIVE_HIGH>;
+		// device-wakeup-gpios = <&gpio2 24 GPIO_ACTIVE_HIGH>;
 	};
 };
 
@@ -164,7 +170,7 @@
 	pinctrl-2 = <&pinctrl_usdhc3_200mhz>;
 	pinctrl-3 = <&pinctrl_usdhc3_sleep>;
 	mmc-pwrseq = <&usdhc3_pwrseq>;
-	vmmc-supply = <&reg_wifi_en>;
+	vqmmc-supply = <&reg_wifi_en>;
 	bus-width = <4>;
 	non-removable;
 	keep-power-in-suspend;

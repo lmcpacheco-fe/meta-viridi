@@ -7,8 +7,6 @@ SRC_URI:append = " \
     file://viridi-imx91.dts \
     file://viridi-imx93.dts \
     file://Makefile \
-    file://viridi.cfg \
-    file://wifi-enable.cfg \
 "
 
 # Copy the files to their destinations within the U-Boot source tree
