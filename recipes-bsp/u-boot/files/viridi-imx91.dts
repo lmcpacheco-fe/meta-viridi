@@ -62,8 +62,8 @@
 
 	usdhc3_pwrseq: usdhc3_pwrseq {
 		compatible = "mmc-pwrseq-simple";
-		reset-gpios = <&pca9555_21 6 GPIO_ACTIVE_HIGH>;
-		post-power-on-delay-ms = <200>;
+		reset-gpios = <&pca9555_21 6 GPIO_ACTIVE_LOW>;
+		post-power-on-delay-ms = <20>;
 	};
 
 	reserved-memory {
@@ -110,15 +110,11 @@
 	};
 
 	/*Io Expander --> FXL6408UMX*/
-	fxl6408: io-expander@44 {
-		compatible = "nxp,fxl6408";
+	fxl6408: gpio-expander@44 {
+		compatible = "fcs,fxl6408";
 		reg = <0x44>;
-		vdd-supply = <&buck4>;
-		#gpio-cells = <2>;
 		gpio-controller;
-		ngpios = <8>;
-		gpio-reserved-ranges = <5 1>;
-		#pwm-cells = <3>;
+		#gpio-cells = <2>;
 		gpio-line-names = "LED1_nEN", "LED2_nEN", "LED3_nEN", "LED4_nEN",
 			"CAN1_EOL", "DSP_CTRL_3V3", "NC", "NC";
 	};
@@ -320,7 +316,6 @@
 	hnp-disable;
 	srp-disable;
 	adp-disable;
-	/*usb-role-switch;		No Type-C controller used*/
 	disable-over-current;	
 	samsung,picophy-dc-vol-level-adjust = <7>;
 	samsung,picophy-pre-emp-curr-control = <3>;
@@ -332,7 +327,6 @@
 	hnp-disable;
 	srp-disable;
 	adp-disable;
-	/*usb-role-switch;		No Type-C controller used*/
 	disable-over-current;
 	samsung,picophy-pre-emp-curr-control = <3>;
 	samsung,picophy-dc-vol-level-adjust = <7>;
@@ -389,15 +383,14 @@
 
 &usdhc3 {
 	pinctrl-names = "default", "state_100mhz", "state_200mhz", "sleep";
-	pinctrl-0 = <&pinctrl_usdhc3>, <&pinctrl_usdhc3_wlan>;
-	pinctrl-1 = <&pinctrl_usdhc3_100mhz>, <&pinctrl_usdhc3_wlan>;
-	pinctrl-2 = <&pinctrl_usdhc3_200mhz>, <&pinctrl_usdhc3_wlan>;
-	pinctrl-3 = <&pinctrl_usdhc3_sleep>, <&pinctrl_usdhc3_wlan>;
+	pinctrl-0 = <&pinctrl_usdhc3>;
+	pinctrl-1 = <&pinctrl_usdhc3_100mhz>;
+	pinctrl-2 = <&pinctrl_usdhc3_200mhz>;
+	pinctrl-3 = <&pinctrl_usdhc3_sleep>;
 	mmc-pwrseq = <&usdhc3_pwrseq>;
-	vmmc-supply = <&reg_usdhc3_vmmc>;
 	bus-width = <4>;
-	keep-power-in-suspend;
 	non-removable;
+	keep-power-in-suspend;
 	wakeup-source;
 	status = "okay";
 	/*wifi-dev-wake-gpios= <&gpio2 25 GPIO_ACTIVE_HIGH>;		CPU(GPIO2_25) = WF_DEV_WAKE_1V8*/
@@ -687,9 +680,4 @@
 		>;
 	};
 
-	pinctrl_usdhc3_wlan: usdhc3wlangrp {
-		fsl,pins = <
-			MX91_PAD_CCM_CLKO1__GPIO3_IO26		0x31e
-		>;
-	};
 };

@@ -21,6 +21,7 @@ IMAGE_INSTALL:append = "\
 	sdc-tests \
 	bluez5-obex \
 	libgpiod-tools \
+	net-tools \
 	wpa-supplicant \
 	util-linux-lsblk \
 	openssh-sftp-server \
@@ -28,3 +29,4 @@ IMAGE_INSTALL:append = "\
 	wireless-regdb-static \
 	linux-firmware-nxpiw416-sdio \
 "
+
