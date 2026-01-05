@@ -3,70 +3,80 @@
  */
 
 / {
-		reg_vref_1v8: regulator-adc-vref {
-			compatible = "regulator-fixed";
-			regulator-name = "vref_1v8";
-			regulator-min-microvolt = <1800000>;
-			regulator-max-microvolt = <1800000>;
-		};
+	reg_vref_1v8: regulator-adc-vref {
+		compatible = "regulator-fixed";
+		regulator-name = "vref_1v8";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+	};
 
-		reg_usdhc2_vmmc: regulator-usdhc2 {
-			compatible = "regulator-fixed";
-			pinctrl-names = "default";
-			pinctrl-0 = <&pinctrl_reg_usdhc2_vmmc>;
-			regulator-name = "VSD_3V3";
-			regulator-min-microvolt = <3300000>;
-			regulator-max-microvolt = <3300000>;
-			gpio = <&gpio3 7 GPIO_ACTIVE_HIGH>;
-			off-on-delay-us = <12000>;
-			enable-active-high;
-		};
+	reg_usdhc2_vmmc: regulator-usdhc2 {
+		compatible = "regulator-fixed";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_reg_usdhc2_vmmc>;
+		regulator-name = "VSD_3V3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&gpio3 7 GPIO_ACTIVE_HIGH>;
+		off-on-delay-us = <12000>;
+		enable-active-high;
+	};
 
-		reg_usdhc3_vmmc: regulator-usdhc3 {
-			compatible = "regulator-fixed";
-			regulator-name = "WLAN_EN";
-			regulator-min-microvolt = <1800000>;
-			regulator-max-microvolt = <1800000>;
-			//gpio = <&gpio2 13 GPIO_ACTIVE_LOW>;			//CPU(GPIO2_13) = WF_nPD_1V8
-			gpio = <&pca9555_21 5 GPIO_ACTIVE_LOW>;		//IO_Exp(P0_5) = WF_nEN_1V8
-			regulator-boot-on;
-			regulator-always-on;
-		};
+	reg_wifi_en: regulator-wifi-en {
+		compatible = "regulator-fixed";
+		regulator-name = "WF_nEN_1V8";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		gpio = <&pca9555_21 5 GPIO_ACTIVE_LOW>;		// IO_Exp(P0_5) = WF_nEN_1V8 (active low)
+		regulator-always-on;
+		startup-delay-us = <5000>;
+	};
 
-		usdhc3_pwrseq: usdhc3_pwrseq {
-			compatible = "mmc-pwrseq-simple";
-			reset-gpios = <&pca9555_21 6 GPIO_ACTIVE_HIGH>;		//IO_Exp(P0_6) = WF_nRST_1V8
-		};
+	reg_bt_nrst: regulator-bt-nrst {
+		compatible = "regulator-fixed";
+		regulator-name = "BT_nRST_1V8";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		gpio = <&pca9555_21 7 GPIO_ACTIVE_LOW>;		// IO_Exp(P0_7) = BT_nRST_1V8 (active low)
+		regulator-always-on;
+		startup-delay-us = <5000>;
+	};
 
-		// TODO: assign more descriptive labels and node names instead of wakeupX
-		gpio-keys {
-			compatible = "gpio-keys";
-			pinctrl-0 = <&pinctrl_wakeup>;
-			pinctrl-names = "default";
-		};
+	usdhc3_pwrseq: usdhc3_pwrseq {
+		compatible = "mmc-pwrseq-simple";
+		reset-gpios = <&pca9555_21 6 GPIO_ACTIVE_LOW>;		// IO_Exp(P0_6) = WF_nRST_1V8 (active low)
+		post-power-on-delay-ms = <20>;
+	};
 
-		wakeup1 {
-			label = "WAKEUP1";
-			gpios = <&gpio4 2 GPIO_ACTIVE_LOW>;
-			linux,code = <KEY_WAKEUP>;
-			wakeup-source;
-		};
-		
-		wakeup2 {
-			label = "WAKEUP2";
-			gpios = <&gpio4 7 GPIO_ACTIVE_LOW>;
-			linux,code = <KEY_WAKEUP>;
-			wakeup-source;
-		};
-		
-		// This acts as a wakeup while suspended, and as a suspend when running
-		// So it toggles between the two states
-		wakeup3 {
-			label = "WAKEUP3";
-			gpios = <&gpio4 16 GPIO_ACTIVE_LOW>;
-			linux,code = <KEY_SUSPEND>;
-			wakeup-source;
-		};
+	// TODO: assign more descriptive labels and node names instead of wakeupX
+	gpio-keys {
+		compatible = "gpio-keys";
+		pinctrl-0 = <&pinctrl_wakeup>;
+		pinctrl-names = "default";
+	};
+
+	wakeup1 {
+		label = "WAKEUP1";
+		gpios = <&gpio4 2 GPIO_ACTIVE_LOW>;
+		linux,code = <KEY_WAKEUP>;
+		wakeup-source;
+	};
+	
+	wakeup2 {
+		label = "WAKEUP2";
+		gpios = <&gpio4 7 GPIO_ACTIVE_LOW>;
+		linux,code = <KEY_WAKEUP>;
+		wakeup-source;
+	};
+	
+	// This acts as a wakeup while suspended, and as a suspend when running
+	// So it toggles between the two states
+	wakeup3 {
+		label = "WAKEUP3";
+		gpios = <&gpio4 16 GPIO_ACTIVE_LOW>;
+		linux,code = <KEY_SUSPEND>;
+		wakeup-source;
+	};
 };
 
 &adc1 {
@@ -93,8 +103,11 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart5>;
 	status = "okay";
+	fsl,uart-has-rtscts;
 	bluetooth {
-		compatible = "nxp,88w8987-bt";
+		compatible = "bluetooth-serial";
+		host-wakeup-gpios = <&gpio2 26 GPIO_ACTIVE_HIGH>;		// GPIO2_26 = BT_WAKE_HOST_1V8
+		device-wakeup-gpios = <&gpio2 24 GPIO_ACTIVE_HIGH>;		// GPIO2_24 = BT_DEV_WAKE_1V8
 	};
 };
 
@@ -146,22 +159,22 @@
 
 &usdhc3 {
 	pinctrl-names = "default", "state_100mhz", "state_200mhz", "sleep";
-	pinctrl-0 = <&pinctrl_usdhc3>, <&pinctrl_usdhc3_wlan>;
-	pinctrl-1 = <&pinctrl_usdhc3_100mhz>, <&pinctrl_usdhc3_wlan>;
-	pinctrl-2 = <&pinctrl_usdhc3_200mhz>, <&pinctrl_usdhc3_wlan>;
-	pinctrl-3 = <&pinctrl_usdhc3_sleep>, <&pinctrl_usdhc3_wlan>;
+	pinctrl-0 = <&pinctrl_usdhc3>;
+	pinctrl-1 = <&pinctrl_usdhc3_100mhz>;
+	pinctrl-2 = <&pinctrl_usdhc3_200mhz>;
+	pinctrl-3 = <&pinctrl_usdhc3_sleep>;
 	mmc-pwrseq = <&usdhc3_pwrseq>;
-	vmmc-supply = <&reg_usdhc3_vmmc>;
+	vmmc-supply = <&reg_wifi_en>;
 	bus-width = <4>;
-	keep-power-in-suspend;
 	non-removable;
+	keep-power-in-suspend;
 	wakeup-source;
 	status = "okay";
-	//wifi-dev-wake-gpios= <&gpio2 25 GPIO_ACTIVE_HIGH>;		//CPU(GPIO2_25) = WF_DEV_WAKE_1V8
+	wifi-dev-wake-gpios = <&gpio2 25 GPIO_ACTIVE_HIGH>;		//GPIO2_25 = WF_DEV_WAKE_1V8
 	wifi_wake_host {
 		compatible = "nxp,wifi-wake-host";
 		interrupt-parent = <&gpio2>;
-		interrupts = <27 IRQ_TYPE_LEVEL_LOW>;				//CPU(GPIO2_27) = WF_WAKE_HOST_1V8
+		interrupts = <27 IRQ_TYPE_LEVEL_LOW>;				//GPIO2_27 = WF_WAKE_HOST_1V8
 		interrupt-names = "host-wake";
 	};
 };
@@ -236,11 +249,32 @@
 		"gpio2-00", "gpio2-01", "gpio2-02", "gpio2-03",
 		"gpio2-04", "gpio2-05", "gpio2-06", "gpio2-07",
 		"gpio2-08", "gpio2-09", "gpio2-10", "gpio2-11",
-		"gpio2-12", "gpio2-13", "gpio2-14", "gpio2-15",
+		"gpio2-12", "WF_nPD_1V8", "gpio2-14", "gpio2-15",
 		"gpio2-16", "gpio2-17", "gpio2-18", "gpio2-19",
 		"gpio2-20", "gpio2-21", "gpio2-22", "gpio2-23",
-		"gpio2-24", "gpio2-25", "gpio2-26", "gpio2-27",
+		"BT_DEV_WAKE_1V8", "WF_DEV_WAKE_1V8", "BT_WAKE_HOST_1V8", "WF_WAKE_HOST_1V8",
 		"gpio2-28", "gpio2-29", "gpio2-30", "gpio2-31";
+
+	wifi_pdn_hog: wifi-pdn-hog {
+		gpio-hog;
+		gpios = <13 GPIO_ACTIVE_HIGH>;		// GPIO2_13 (PDn=1) = WF_nPD_1V8
+		output-high;
+		line-name = "WF_nPD_1V8";
+	};
+
+	wf_devwake_hog: wf-devwake-hog {
+		gpio-hog;
+		gpios = <25 GPIO_ACTIVE_HIGH>;		// GPIO2_25 = WF_DEV_WAKE_1V8
+		output-high;
+		line-name = "WF_DEV_WAKE_1V8";
+	};
+
+	bt_devwake_hog: bt-devwake-hog {
+		gpio-hog;
+		gpios = <24 GPIO_ACTIVE_HIGH>;		// GPIO2_24 = BT_DEV_WAKE_1V8
+		output-high;
+		line-name = "BT_DEV_WAKE_1V8";
+	};
 };
 
 &gpio3 {
