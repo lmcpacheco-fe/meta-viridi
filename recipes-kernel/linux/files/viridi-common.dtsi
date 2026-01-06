@@ -104,14 +104,10 @@
 	pinctrl-0 = <&pinctrl_uart5>;
 	status = "okay";
 	fsl,uart-has-rtscts;
-	pinctrl-assert-gpios = <&pca9555_21 7 GPIO_ACTIVE_HIGH>;
 	bluetooth {
-		// compatible = "bluetooth-serial";
 		compatible = "nxp,88w8987-bt";
-		// compatible = "nxp,bt-hci-uart-88w8987";
-		// max-speed = <3000000>;
-		// fw-init-baudrate = <1500000>;
-		// reset-gpios = <&pca9555_21 7 GPIO_ACTIVE_LOW>;
+		fw-init-baudrate = <3000000>;
+		reset-gpios = <&pca9555_21 7 GPIO_ACTIVE_HIGH>;
 		// host-wakeup-gpios = <&gpio2 26 GPIO_ACTIVE_HIGH>;
 		// device-wakeup-gpios = <&gpio2 24 GPIO_ACTIVE_HIGH>;
 	};
@@ -198,7 +194,7 @@
 };
 
 &usbotg2 {
-	dr_mode = "otg";
+	dr_mode = "peripheral";
 	hnp-disable;
 	srp-disable;
 	adp-disable;
