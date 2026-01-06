@@ -297,6 +297,7 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart5>;
 	status = "okay";
+	// fsl,uart-has-rtscts;
 	// bluetooth {
 	// 	compatible = "nxp,88w8987-bt";
 	// };
@@ -307,7 +308,7 @@
 	pinctrl-0 = <&pinctrl_uart6>;
 	pinctrl-names = "default";
 	status = "okay";
-	// /*RS485*/
+	/*RS485*/
 	// fsl,uart-has-rtscts;
 	// rs485-rts-gpio = <&gpio3 5 GPIO_ACTIVE_HIGH>;
 	// rs485-rts-active-high;
@@ -349,11 +350,11 @@
 	pinctrl-0 = <&pinctrl_lpspi4>;
 	cs-gpios = <&gpio2 18 GPIO_ACTIVE_LOW>;
 	status = "okay";
-	// spidev0: spi@0 {
-	// 	reg = <0>;
-	// 	compatible = "spidev";
-	// 	spi-max-frequency = <1000000>;
-	// };
+	spidev0: spi@0 {
+		reg = <0>;
+		compatible = "spidev";
+		spi-max-frequency = <1000000>;
+	};
 };
 
 &flexcan1 {
@@ -514,10 +515,10 @@
 
 	pinctrl_uart5: uart5grp {
 		fsl,pins = <
-			MX91_PAD_DAP_TDO_TRACESWO__LPUART5_TX		0x31e
-			MX91_PAD_DAP_TDI__LPUART5_RX			0x31e
-			MX91_PAD_DAP_TMS_SWDIO__LPUART5_RTS_B		0x31e
-			MX91_PAD_DAP_TCLK_SWCLK__LPUART5_CTS_B		0x31e
+			MX91_PAD_GPIO_IO00__LPUART5_TX		0x31e
+			MX91_PAD_GPIO_IO01__LPUART5_RX		0x31e
+			MX91_PAD_GPIO_IO03__LPUART5_RTS_B	0x31e
+			MX91_PAD_GPIO_IO02__LPUART5_CTS_B	0x31e
 		>;
 	};
 
@@ -680,14 +681,14 @@
 		>;
 	};
 
-	pinctrl_usdhc3_sleep: usdhc3sleepgrp {
+	pinctrl_usdhc3_sleep: usdhc3grpsleep {
 		fsl,pins = <
-			MX91_PAD_SD3_CLK__GPIO3_IO20		0x31e
-			MX91_PAD_SD3_CMD__GPIO3_IO21		0x31e
-			MX91_PAD_SD3_DATA0__GPIO3_IO22		0x31e
-			MX91_PAD_SD3_DATA1__GPIO3_IO23		0x31e
-			MX91_PAD_SD3_DATA2__GPIO3_IO24		0x31e
-			MX91_PAD_SD3_DATA3__GPIO3_IO25		0x31e
+			MX91_PAD_SD3_CLK__GPIO3_IO20			0x31e
+			MX91_PAD_SD3_CMD__GPIO3_IO21			0x31e
+			MX91_PAD_SD3_DATA0__GPIO3_IO22			0x31e
+			MX91_PAD_SD3_DATA1__GPIO3_IO23			0x31e
+			MX91_PAD_SD3_DATA2__GPIO3_IO24			0x31e
+			MX91_PAD_SD3_DATA3__GPIO3_IO25			0x31e
 		>;
 	};
 };
