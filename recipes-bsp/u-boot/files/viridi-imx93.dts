@@ -106,15 +106,15 @@
 		startup-delay-us = <5000>;
 	};
 
-	reg_bt_nrst: regulator-bt-nrst {
-		compatible = "regulator-fixed";
-		regulator-name = "BT_nRST_1V8";
-		regulator-min-microvolt = <1800000>;
-		regulator-max-microvolt = <1800000>;
-		gpio = <&pca9555_21 7 GPIO_ACTIVE_LOW>;		// IO_Exp(P0_7) = BT_nRST_1V8 (active low)
-		regulator-always-on;
-		startup-delay-us = <5000>;
-	};
+	// reg_bt_nrst: regulator-bt-nrst {
+	// 	compatible = "regulator-fixed";
+	// 	regulator-name = "BT_nRST_1V8";
+	// 	regulator-min-microvolt = <1800000>;
+	// 	regulator-max-microvolt = <1800000>;
+	// 	gpio = <&pca9555_21 7 GPIO_ACTIVE_LOW>;		// IO_Exp(P0_7) = BT_nRST_1V8 (active low)
+	// 	regulator-always-on;
+	// 	startup-delay-us = <20000>;
+	// };
 
 	usdhc3_pwrseq: usdhc3_pwrseq {
 		compatible = "mmc-pwrseq-simple";
@@ -218,16 +218,16 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexcan1>;
 	status = "okay";
-	/*standby-gpios = <&gpio1 14 GPIO_ACTIVE_HIGH>;		CAN1_STBY
-	eol-gpios = <&gpio1 11 GPIO_ACTIVE_HIGH>;			CAN1_EOL*/
+	// standby-gpios = <&gpio1 14 GPIO_ACTIVE_HIGH>;		CAN1_STBY
+	// eol-gpios = <&gpio1 11 GPIO_ACTIVE_HIGH>;			CAN1_EOL
 };
 
 &flexcan2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexcan2>;
 	status = "okay";
-	/*standby-gpios = <&gpio3 2 GPIO_ACTIVE_HIGH>;		CAN2_STBY
-	eol-gpios = <&gpio3 1 GPIO_ACTIVE_HIGH>;			CAN2_EOL*/
+	// standby-gpios = <&gpio3 2 GPIO_ACTIVE_HIGH>;		CAN2_STBY
+	// eol-gpios = <&gpio3 1 GPIO_ACTIVE_HIGH>;			CAN2_EOL
 };
 
 &lpi2c1 {
@@ -246,8 +246,10 @@
 	};
 
 	/*Io Expander --> FXL6408UMX*/
+	// fxl6408: gpio-expander@44 {		// By default ADDR = 44 but we change the pin 9 on the IO to GND so its ADDR 43 (Modification not needed)
 	fxl6408: gpio-expander@43 {
 		compatible = "fcs,fxl6408";
+		// reg = <0x44>;
 		reg = <0x43>;
 		gpio-controller;
 		#gpio-cells = <2>;
@@ -418,12 +420,10 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart5>;
 	status = "okay";
-	fsl,uart-has-rtscts;
-	bluetooth {
-		compatible = "bluetooth-serial";
-		host-wakeup-gpios = <&gpio2 26 GPIO_ACTIVE_HIGH>;		// GPIO2_26 = BT_WAKE_HOST_1V8
-		device-wakeup-gpios = <&gpio2 24 GPIO_ACTIVE_HIGH>;		// GPIO2_24 = BT_DEV_WAKE_1V8
-	};
+	// fsl,uart-has-rtscts;
+	// bluetooth {
+	// 	compatible = "nxp,88w8987-bt";
+	// };
 };
 
 &lpuart6 {
@@ -431,11 +431,11 @@
 	pinctrl-0 = <&pinctrl_uart6>;
 	pinctrl-names = "default";
 	status = "okay";
-	/*RS485*/
-	fsl,uart-has-rtscts;
-	rs485-rts-gpio = <&gpio3 5 GPIO_ACTIVE_HIGH>;
-	rs485-rts-active-high;
-	rs485-delay = <1 1>;
+	// /*RS485*/
+	// fsl,uart-has-rtscts;
+	// rs485-rts-gpio = <&gpio3 5 GPIO_ACTIVE_HIGH>;
+	// rs485-rts-active-high;
+	// rs485-delay = <1 1>;
 };
 
 &lpuart7 {
@@ -474,11 +474,11 @@
 	pinctrl-0 = <&pinctrl_lpspi4>;
 	cs-gpios = <&gpio2 18 GPIO_ACTIVE_LOW>;
 	status = "okay";
-	spidev0: spi@0 {
-		reg = <0>;								// CS0
-		compatible = "spidev";					// Generic driver for testing
-		spi-max-frequency = <1000000>;			// 1 MHz, adjust according to peripheral
-	};
+	// spidev0: spi@0 {
+	// 	reg = <0>;								// CS0
+	// 	compatible = "spidev";					// Generic driver for testing
+	// 	spi-max-frequency = <1000000>;			// 1 MHz, adjust according to peripheral
+	// };
 };
 
 &usdhc1 {
@@ -626,10 +626,10 @@
 
 	pinctrl_uart5: uart5grp {
 		fsl,pins = <
-			MX93_PAD_DAP_TDO_TRACESWO__LPUART5_TX		0x31e
-			MX93_PAD_DAP_TDI__LPUART5_RX			0x31e
-			MX93_PAD_DAP_TMS_SWDIO__LPUART5_RTS_B		0x31e
-			MX93_PAD_DAP_TCLK_SWCLK__LPUART5_CTS_B		0x31e
+			MX93_PAD_GPIO_IO00__LPUART5_TX		0x31e
+			MX93_PAD_GPIO_IO01__LPUART5_RX			0x31e
+			MX93_PAD_GPIO_IO03__LPUART5_RTS_B		0x31e
+			MX93_PAD_GPIO_IO02__LPUART5_CTS_B		0x31e
 		>;
 	};
 

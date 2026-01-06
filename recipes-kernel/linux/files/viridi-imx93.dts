@@ -184,8 +184,10 @@
 	};
 
 	/*Io Expander --> FXL6408UMX*/
+	// fxl6408: gpio-expander@44 {		// By default ADDR = 44 but we change the pin 9 on the IO to GND so its ADDR 43 (Modification not needed)
 	fxl6408: gpio-expander@43 {
 		compatible = "fcs,fxl6408";
+		// reg = <0x44>;
 		reg = <0x43>;
 		gpio-controller;
 		#gpio-cells = <2>;
@@ -556,10 +558,10 @@
 
 	pinctrl_uart5: uart5grp {
 		fsl,pins = <
-			MX93_PAD_DAP_TDO_TRACESWO__LPUART5_TX		0x31e
-			MX93_PAD_DAP_TDI__LPUART5_RX			0x31e
-			MX93_PAD_DAP_TMS_SWDIO__LPUART5_RTS_B		0x31e
-			MX93_PAD_DAP_TCLK_SWCLK__LPUART5_CTS_B		0x31e
+			MX93_PAD_GPIO_IO00__LPUART5_TX		0x31e
+			MX93_PAD_GPIO_IO01__LPUART5_RX			0x31e
+			MX93_PAD_GPIO_IO03__LPUART5_RTS_B		0x31e
+			MX93_PAD_GPIO_IO02__LPUART5_CTS_B		0x31e
 		>;
 	};
 

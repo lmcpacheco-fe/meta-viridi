@@ -7,6 +7,7 @@ IMAGE_INSTALL:append = "\
 	iw \
 	dtc \
 	tmux \
+	bluez5 \
 	ethtool \
 	openssh \
 	phytool \
@@ -16,6 +17,7 @@ IMAGE_INSTALL:append = "\
 	memtester \
 	i2c-tools \
 	sdc-tests \
+	bluez5-obex \
 	libgpiod-tools \
 	wpa-supplicant \
 	util-linux-lsblk \

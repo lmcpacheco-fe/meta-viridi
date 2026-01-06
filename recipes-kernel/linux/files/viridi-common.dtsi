@@ -42,15 +42,15 @@
 		startup-delay-us = <5000>;
 	};
 
-	reg_bt_nrst: regulator-bt-nrst {
-		compatible = "regulator-fixed";
-		regulator-name = "BT_nRST_1V8";
-		regulator-min-microvolt = <1800000>;
-		regulator-max-microvolt = <1800000>;
-		gpio = <&pca9555_21 7 GPIO_ACTIVE_LOW>;		// IO_Exp(P0_7) = BT_nRST_1V8 (active low)
-		regulator-always-on;
-		startup-delay-us = <5000>;
-	};
+	// reg_bt_nrst: regulator-bt-nrst {
+	// 	compatible = "regulator-fixed";
+	// 	regulator-name = "BT_nRST_1V8";
+	// 	regulator-min-microvolt = <1800000>;
+	// 	regulator-max-microvolt = <1800000>;
+	// 	gpio = <&pca9555_21 7 GPIO_ACTIVE_LOW>;		// IO_Exp(P0_7) = BT_nRST_1V8 (active low)
+	// 	regulator-always-on;
+	// 	startup-delay-us = <20000>;
+	// };
 
 	usdhc3_pwrseq: usdhc3_pwrseq {
 		compatible = "mmc-pwrseq-simple";
@@ -115,9 +115,11 @@
 	status = "okay";
 	fsl,uart-has-rtscts;
 	bluetooth {
-		compatible = "bluetooth-serial";
-		host-wakeup-gpios = <&gpio2 26 GPIO_ACTIVE_HIGH>;		// GPIO2_26 = BT_WAKE_HOST_1V8
-		device-wakeup-gpios = <&gpio2 24 GPIO_ACTIVE_HIGH>;		// GPIO2_24 = BT_DEV_WAKE_1V8
+		compatible = "nxp,88w8987-bt";
+		fw-init-baudrate = <3000000>;
+		reset-gpios = <&pca9555_21 7 GPIO_ACTIVE_HIGH>;
+		// host-wakeup-gpios = <&gpio2 26 GPIO_ACTIVE_HIGH>;
+		// device-wakeup-gpios = <&gpio2 24 GPIO_ACTIVE_HIGH>;
 	};
 };
 
@@ -202,7 +204,7 @@
 };
 
 &usbotg2 {
-	dr_mode = "otg";
+	dr_mode = "peripheral";
 	hnp-disable;
 	srp-disable;
 	adp-disable;
