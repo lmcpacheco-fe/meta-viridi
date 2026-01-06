@@ -197,16 +197,16 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexcan1>;
 	status = "okay";
-	/*standby-gpios = <&gpio1 14 GPIO_ACTIVE_HIGH>;		CAN1_STBY
-	eol-gpios = <&gpio1 11 GPIO_ACTIVE_HIGH>;			CAN1_EOL*/
+	standby-gpios = <&gpio1 14 GPIO_ACTIVE_HIGH>;	/* CAN1_STBY */
+	eol-gpios = <&fxl6408  4 GPIO_ACTIVE_HIGH>;		/* CAN1_EOL */
 };
 
 &flexcan2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexcan2>;
 	status = "okay";
-	/*standby-gpios = <&gpio3 2 GPIO_ACTIVE_HIGH>;		CAN2_STBY
-	eol-gpios = <&gpio3 1 GPIO_ACTIVE_HIGH>;			CAN2_EOL*/
+	standby-gpios = <&gpio3 2 GPIO_ACTIVE_HIGH>;	/* CAN2_STBY */
+	eol-gpios = <&gpio3 1 GPIO_ACTIVE_HIGH>;		/* CAN2_EOL */
 };
 
 &lpi2c1 {
@@ -576,7 +576,7 @@
 			MX93_PAD_SAI1_TXD0__CAN1_TX				0x139e
 			MX93_PAD_SAI1_TXC__CAN1_RX				0x139e
 			MX93_PAD_SAI1_RXD0__GPIO1_IO14			0x139e		//CAN1_STBY
-			MX93_PAD_SAI1_TXFS__GPIO1_IO11			0x139e		//CAN1_EOL
+			/* CAN1_EOL moved to FXL6408 GPIO4 - no pinctrl needed */
 		>;
 	};
 
