@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
  * Device Tree for the Viridi i.MX93 Board
  *
@@ -217,17 +218,16 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexcan1>;
 	status = "okay";
-	standby-gpios = <&gpio1 14 GPIO_ACTIVE_HIGH>;		//CAN1_STBY
-	// eol-gpios = <&gpio1 11 GPIO_ACTIVE_HIGH>;		//CAN1_EOL
-	eol-gpios = <&fxl6408 4 GPIO_ACTIVE_HIGH>;		//CAN1_EOL
+	standby-gpios = <&gpio1 14 GPIO_ACTIVE_HIGH>;	/* CAN1_STBY */
+	eol-gpios = <&fxl6408  4 GPIO_ACTIVE_HIGH>;		/* CAN1_EOL */
 };
 
 &flexcan2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexcan2>;
 	status = "okay";
-	standby-gpios = <&gpio3 2 GPIO_ACTIVE_HIGH>;		//CAN1_STBY
-	eol-gpios = <&gpio3 1 GPIO_ACTIVE_HIGH>;		//CAN1_EOL
+	standby-gpios = <&gpio3 2 GPIO_ACTIVE_HIGH>;	/* CAN2_STBY */
+	eol-gpios = <&gpio3 1 GPIO_ACTIVE_HIGH>;		/* CAN2_EOL */
 };
 
 &lpi2c1 {
@@ -430,6 +430,7 @@
 	pinctrl-0 = <&pinctrl_uart6>;
 	pinctrl-names = "default";
 	status = "okay";
+	/*RS485*/
 	fsl,uart-has-rtscts;
 	linux,rs485-enabled-at-boot-time;
 	// rts-gpios = <&gpio2 7 GPIO_ACTIVE_HIGH>;
@@ -639,7 +640,6 @@
 			MX93_PAD_GPIO_IO05__LPUART6_RX			0x31e
 			MX93_PAD_GPIO_IO06__LPUART6_CTS_B		0x31e
 			MX93_PAD_GPIO_IO07__LPUART6_RTS_B		0x31e
-			// MX93_PAD_GPIO_IO07__GPIO2_IO07		0x31e
 		>;
 	};
 
@@ -654,15 +654,15 @@
 
 	pinctrl_lpi2c1: lpi2c1grp {
 		fsl,pins = <
-			MX93_PAD_I2C1_SCL__LPI2C1_SCL		0x40000b9e
-			MX93_PAD_I2C1_SDA__LPI2C1_SDA		0x40000b9e
+			MX93_PAD_I2C1_SCL__LPI2C1_SCL			0x40000b9e
+			MX93_PAD_I2C1_SDA__LPI2C1_SDA			0x40000b9e
 		>;
 	};
 
 	pinctrl_lpi2c2: lpi2c2grp {
 		fsl,pins = <
-			MX93_PAD_I2C2_SCL__LPI2C2_SCL		0x40000b9e
-			MX93_PAD_I2C2_SDA__LPI2C2_SDA		0x40000b9e
+			MX93_PAD_I2C2_SCL__LPI2C2_SCL			0x40000b9e
+			MX93_PAD_I2C2_SDA__LPI2C2_SDA			0x40000b9e
 		>;
 	};
 
@@ -674,21 +674,21 @@
 
 	pinctrl_lpi2c3: lpi2c3grp {
 		fsl,pins = <
-			MX93_PAD_GPIO_IO28__LPI2C3_SDA		0x40000b9e
-			MX93_PAD_GPIO_IO29__LPI2C3_SCL		0x40000b9e
+			MX93_PAD_GPIO_IO28__LPI2C3_SDA			0x40000b9e
+			MX93_PAD_GPIO_IO29__LPI2C3_SCL			0x40000b9e
 		>;
 	};
 
 	pinctrl_lpi2c5: lpi2c5grp {
 		fsl,pins = <
-			MX93_PAD_GPIO_IO22__LPI2C5_SDA		0x40000b9e
-			MX93_PAD_GPIO_IO23__LPI2C5_SCL		0x40000b9e
+			MX93_PAD_GPIO_IO22__LPI2C5_SDA			0x40000b9e
+			MX93_PAD_GPIO_IO23__LPI2C5_SCL			0x40000b9e
 		>;
 	};
 
 	pinctrl_pca9555_20: pca9555_20grp {
 		fsl,pins = <
-			MX93_PAD_PDM_CLK__GPIO1_IO08		0x31e
+			MX93_PAD_PDM_CLK__GPIO1_IO08			0x31e
 		>;
 	};
 

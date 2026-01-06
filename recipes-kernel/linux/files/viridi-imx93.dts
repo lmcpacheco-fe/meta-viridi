@@ -190,19 +190,6 @@
 		#gpio-cells = <2>;
 		gpio-line-names = "LED1_nEN", "LED2_nEN", "LED3_nEN", "LED4_nEN",
 			"CAN1_EOL", "DSP_CTRL_3V3", "RS485_TX_EOL_3V3", "NC";
-		can1_eol_hog {
-			gpio-hog;
-			gpios = <4 GPIO_ACTIVE_HIGH>;		//Pin 4 = RS485_TX_EOL_3V3
-			output-low;
-			line-name = "CAN1_EOL";
-		};
-
-		rs485_tx_eol_hog {
-			gpio-hog;
-			gpios = <6 GPIO_ACTIVE_HIGH>;		//Pin 6 = RS485_TX_EOL_3V3
-			output-low;
-			line-name = "RS485_TX_EOL_3V3";
-		};
 	};
 
 	/*MIPI --> DSI*/
@@ -368,7 +355,7 @@
 
 	m34e04-protect@60 {
 		compatible = "st,m34e04-protect";
-		reg = <0x60>;		//Protection --> 0x60 (7 bits)
+		reg = <0x60>;		// Protection --> 0x60 (7 bits)
 	};
 };
 
@@ -392,40 +379,6 @@
 			"RSTRAN_SEL_1V8", "RSTRAN_DUP_1V8", "CONA_EN", "CONB_EN", "NC",
 			"DIGITAL_IN0", "DIGITAL_IN1","DIGITAL_IN2", "DIGITAL_IN3",
 			"OUT0_EN", "OUT1_EN", "OUT2_EN", "OUT3_EN";
-		rs485_nre_hog {
-			gpio-hog;
-			gpios = <0 GPIO_ACTIVE_HIGH>;   //IO_Exp(P0_0) = RS485_nRE_1V8
-			output-low;                     //RE asserted (active-low)
-			line-name = "RS485_nRE_1V8";
-		};
-
-		rstran_nshdn_hog {
-			gpio-hog;
-			gpios = <4 GPIO_ACTIVE_HIGH>;   //IO_Exp(P0_4) = RSTRAN_nSHDN_1V8
-			output-high;                    //Not shutdown
-			line-name = "RSTRAN_nSHDN_1V8";
-		};
-
-		rstran_ctrl_hog {
-			gpio-hog;
-			gpios = <3 GPIO_ACTIVE_HIGH>;   //IO_Exp(P0_3) = RSTRAN_CTRL_1V8
-			output-high;                    //SLEW = fast
-			line-name = "RSTRAN_CTRL_1V8";
-		};
-
-		rstran_sel_hog {
-			gpio-hog;
-			gpios = <1 GPIO_ACTIVE_HIGH>;   //IO_Exp(P0_1) = RSTRAN_SEL_1V8
-			output-high;                    //RS-485 mode
-			line-name = "RSTRAN_SEL_1V8";
-		};
-
-		rstran_dup_hog {
-			gpio-hog;
-			gpios = <2 GPIO_ACTIVE_HIGH>;   //IO_Exp(P0_2) = RSTRAN_DUP_1V8
-			output-low;                     //FULL duplex
-			line-name = "RSTRAN_DUP_1V8";
-		};
 	};
 
 	/*Io Expander --> PCA9555AHF,128*/
@@ -551,9 +504,7 @@
 			MX93_PAD_ENET1_RX_CTL__GPIO4_IO08		0x31e
 			MX93_PAD_ENET1_TD0__GPIO4_IO05			0x31e
 			MX93_PAD_ENET1_TD1__GPIO4_IO04			0x31e
-			MX93_PAD_ENET1_TD2__GPIO4_IO03			0x31e
 			MX93_PAD_ENET1_TX_CTL__GPIO4_IO06		0x31e
-			MX93_PAD_ENET1_RD2__GPIO4_IO12			0x31e
 		>;
 	};
 
@@ -584,8 +535,6 @@
 			MX93_PAD_ENET2_TD0__GPIO4_IO19			0x51e
 			MX93_PAD_ENET2_TD1__GPIO4_IO18			0x51e
 			MX93_PAD_ENET2_TX_CTL__GPIO4_IO20		0x51e
-			MX93_PAD_ENET2_TD2__GPIO4_IO17			0x51e
-			MX93_PAD_ENET2_RD2__GPIO4_IO26			0x57e
 		>;
 	};
 
@@ -694,7 +643,6 @@
 			MX93_PAD_GPIO_IO05__LPUART6_RX			0x31e
 			MX93_PAD_GPIO_IO06__LPUART6_CTS_B		0x31e
 			MX93_PAD_GPIO_IO07__LPUART6_RTS_B		0x31e
-			// MX93_PAD_GPIO_IO07__GPIO2_IO07		0x31e
 		>;
 	};
 
