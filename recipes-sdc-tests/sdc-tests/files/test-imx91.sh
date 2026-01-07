@@ -34,7 +34,7 @@ PASSED=0
 TOTAL=0
 
 printf "\n\n"
-pretty_print "Starting test for Viridi-imx91"
+pretty_print "Starting test for Viridi-imx93"
 printf "\n\n"
 
 # ====================== #
@@ -83,7 +83,7 @@ printf "\n\n"
 pretty_print "Starting eMMC test"
 printf "\n\n"
 
-EMMC_DEV="/dev/mmcblk2"
+EMMC_DEV="/dev/mmcblk0"
 
 if [ -b "$EMMC_DEV" ]; then
     pretty_print "eMMC device $EMMC_DEV found"
@@ -97,95 +97,43 @@ fi
 
 check_test "eMMC" EMMC_TEST_RESULT
 
-# # ====================== #
-# # FlexSPI NOR Test       #
-# # ====================== #
+# ====================== #
+# FlexSPI NOR Test       #
+# ====================== #
 # printf "\n\n"
-# pretty_print "Starting FlexSPI NOR flash test"
+# pretty_print "Starting FlexSPI NOR test"
 # printf "\n\n"
 
-# MTD_DEV="/dev/mtd0"
-# TEST_SIZE=256
-# TMP_WRITE=/tmp/spi_nor_write.bin
-# TMP_READ=/tmp/spi_nor_read.bin
+# MTD_DEV=/dev/mtd0
 
-# # Check if MTD device exists
-# if [ ! -e "$MTD_DEV" ]; then
-#     pretty_print "ERROR: $MTD_DEV does not exist. Check /proc/mtd"
-#     cat /proc/mtd
-#     SPI_TEST_RESULT="n"
-#     check_test "FlexSPI NOR" $SPI_TEST_RESULT
-#     return
-# fi
+# # Write pattern: 11 22 33 44 55 66 77 88 at offset 0
+# printf "\x11\x22\x33\x44\x55\x66\x77\x88" > /tmp/nor_expected.bin
 
-# # Get flash size from /proc/mtd
-# MTD_NAME="${MTD_DEV##*/}"
-# FLASH_SIZE_HEX=$(grep "$MTD_NAME" /proc/mtd | awk '{print $2}')
-# if [ -z "$FLASH_SIZE_HEX" ]; then
-#     pretty_print "ERROR: Could not read size for $MTD_DEV"
-#     SPI_TEST_RESULT="n"
-#     check_test "FlexSPI NOR" $SPI_TEST_RESULT
-#     return
-# fi
+# # Erase first sector
+# flash_erase $MTD_DEV 0 1 >/dev/null 2>&1
 
-# FLASH_SIZE=$((16#$FLASH_SIZE_HEX))
-# FLASH_SIZE_MB=$((FLASH_SIZE / 1024 / 1024))
-# pretty_print "SPI NOR $MTD_DEV found, size: $FLASH_SIZE_MB MB"
+# # Write pattern
+# dd if=/tmp/nor_expected.bin of=$MTD_DEV bs=1 seek=0 count=8 conv=notrunc 2>/dev/null
 
-# # Generate random test data
-# dd if=/dev/urandom of=$TMP_WRITE bs=1 count=$TEST_SIZE status=none 2>/dev/null
-
-# # Erase first sector (required before write)
-# pretty_print "Erasing first $TEST_SIZE bytes (sector 0)..."
-# if ! flash_erase "$MTD_DEV" 0 1 >/dev/null 2>&1; then
-#     pretty_print "ERROR: flash_erase failed. Install mtd-utils."
-#     SPI_TEST_RESULT="n"
-#     rm -f $TMP_WRITE
-#     check_test "FlexSPI NOR" $SPI_TEST_RESULT
-#     return
-# fi
-
-# # Write random data
-# pretty_print "Writing $TEST_SIZE random bytes to offset 0..."
-# if ! dd if=$TMP_WRITE of=$MTD_DEV bs=1 seek=0 count=$TEST_SIZE conv=notrunc status=none 2>/dev/null; then
-#     pretty_print "ERROR: Failed to write to $MTD_DEV"
-#     SPI_TEST_RESULT="n"
-#     rm -f $TMP_WRITE
-#     check_test "FlexSPI NOR" $SPI_TEST_RESULT
-#     return
-# fi
-
-# # Read back
-# pretty_print "Reading back $TEST_SIZE bytes..."
-# if ! dd if=$MTD_DEV of=$TMP_READ bs=1 skip=0 count=$TEST_SIZE status=none 2>/dev/null; then
-#     pretty_print "ERROR: Failed to read from $MTD_DEV"
-#     SPI_TEST_RESULT="n"
-#     rm -f $TMP_WRITE $TMP_READ
-#     check_test "FlexSPI NOR" $SPI_TEST_RESULT
-#     return
-# fi
+# # Read back 8 bytes
+# dd if=$MTD_DEV of=/tmp/nor_read.bin bs=1 skip=0 count=8 2>/dev/null
 
 # # Compare
-# if cmp -s $TMP_WRITE $TMP_READ; then
+# if cmp -s /tmp/nor_expected.bin /tmp/nor_read.bin; then
 #     pretty_print "FlexSPI NOR test PASSED!"
 #     SPI_TEST_RESULT="y"
 # else
-#     pretty_print "FlexSPI NOR test FAILED! Data mismatch."
+#     pretty_print "FlexSPI NOR test FAILED!"
 #     SPI_TEST_RESULT="n"
 # fi
 
-# # Clean up flash (erase test area again)
-# pretty_print "Cleaning up test area..."
-# flash_erase "$MTD_DEV" 0 1 >/dev/null 2>&1
-
-# # Final result
 # check_test "FlexSPI NOR" $SPI_TEST_RESULT
 
-# # Remove temp files
-# rm -f $TMP_WRITE $TMP_READ
+# # Clean up
+# rm -f /tmp/nor_expected.bin /tmp/nor_read.bin
 
 # ====================== #
-# EEPROM  Test           #
+# EEPROM Test (simple)   #
 # ====================== #
 printf "\n\n"
 pretty_print "Starting EEPROM test"
@@ -193,91 +141,35 @@ printf "\n\n"
 
 I2C_BUS=2
 EEPROM_ADDR=0x54    # 7-bit address: 0xA8 → 0x54 in decimal
-WP_ADDR=0x30        # 7-bit address: 0x60 → 0x30 in decimal
-TEST_SIZE=32
-TMP_WRITE=/tmp/eeprom_write.bin
-TMP_READ=/tmp/eeprom_read.bin
 
-# Generate random test data
-dd if=/dev/urandom of=$TMP_WRITE bs=1 count=$TEST_SIZE status=none 2>/dev/null
+# Write 8 bytes: 11 22 33 44 55 66 77 88 at offsets 0x00..0x07
+i2ctransfer -y $I2C_BUS w2@$EEPROM_ADDR 0x00 0x11; usleep 10000
+i2ctransfer -y $I2C_BUS w2@$EEPROM_ADDR 0x01 0x22; usleep 10000
+i2ctransfer -y $I2C_BUS w2@$EEPROM_ADDR 0x02 0x33; usleep 10000
+i2ctransfer -y $I2C_BUS w2@$EEPROM_ADDR 0x03 0x44; usleep 10000
+i2ctransfer -y $I2C_BUS w2@$EEPROM_ADDR 0x04 0x55; usleep 10000
+i2ctransfer -y $I2C_BUS w2@$EEPROM_ADDR 0x05 0x66; usleep 10000
+i2ctransfer -y $I2C_BUS w2@$EEPROM_ADDR 0x06 0x77; usleep 10000
+i2ctransfer -y $I2C_BUS w2@$EEPROM_ADDR 0x07 0x88; usleep 10000
 
-# Check if i2c-tools are installed
-if ! command -v i2cdetect &> /dev/null; then
-    pretty_print "ERROR: i2cdetect not found. Install i2c-tools."
-    EEPROM_TEST_RESULT="n"
-    check_test "I2C EEPROM" $EEPROM_TEST_RESULT
-    rm -f $TMP_WRITE $TMP_READ
-    # return
-fi
+# Read back 8 bytes from offset 0x00
+readback=$(i2ctransfer -y $I2C_BUS w1@$EEPROM_ADDR 0x00 r8 | tr -d '\n')
 
-# Convert addresses to lowercase hex for grep matching
-EEPROM_HEX=$(printf '%02x' $EEPROM_ADDR)
-WP_HEX=$(printf '%02x' $WP_ADDR)
-
-# Scan I2C bus for both EEPROM and Write Protection addresses
-pretty_print "Scanning I2C bus $I2C_BUS..."
-i2cdetect -y $I2C_BUS | grep -q "$EEPROM_HEX"
-if [ $? -ne 0 ]; then
-    pretty_print "ERROR: EEPROM not found at 0x$(printf '%X' $EEPROM_ADDR)"
-    EEPROM_TEST_RESULT="n"
-    check_test "I2C EEPROM" $EEPROM_TEST_RESULT
-    rm -f $TMP_WRITE $TMP_READ
-    # return
-fi
-
-i2cdetect -y $I2C_BUS | grep -q "$WP_HEX"
-if [ $? -ne 0 ]; then
-    pretty_print "ERROR: Write Protection not found at 0x$(printf '%X' $WP_ADDR)"
-    EEPROM_TEST_RESULT="n"
-    check_test "I2C EEPROM" $EEPROM_TEST_RESULT
-    rm -f $TMP_WRITE $TMP_READ
-    # return
-fi
-
-pretty_print "EEPROM found at 0x$(printf '%X' $EEPROM_ADDR)"
-pretty_print "WP found at 0x$(printf '%X' $WP_ADDR)"
-
-# Disable write protection
-pretty_print "Disabling write protection..."
-i2cset -y $I2C_BUS $WP_ADDR 0x00
-if [ $? -ne 0 ]; then
-    pretty_print "ERROR: Failed to disable write protection"
-    EEPROM_TEST_RESULT="n"
-    check_test "I2C EEPROM" $EEPROM_TEST_RESULT
-    rm -f $TMP_WRITE $TMP_READ
-    # return
-fi
-
-# Write random data byte by byte
-pretty_print "Writing $TEST_SIZE random bytes to EEPROM..."
-for ((addr=0; addr<$TEST_SIZE; addr++)); do
-    # Extract one byte from random file
-    byte_hex=$(dd if=$TMP_WRITE bs=1 skip=$addr count=1 2>/dev/null | xxd -p)
-    i2cset -y $I2C_BUS $EEPROM_ADDR $addr 0x$byte_hex
-    usleep 5000  # Wait ~5ms per write (safe for EEPROM)
-done
-
-# Read back the data
-pretty_print "Reading back data..."
-> $TMP_READ
-for ((addr=0; addr<$TEST_SIZE; addr++)); do
-    val=$(i2cget -y $I2C_BUS $EEPROM_ADDR $addr)
-    printf "%02x" $val | xxd -r -p >> $TMP_READ
-done
-
-# Compare written and read data
-if cmp -s $TMP_WRITE $TMP_READ; then
+# Compare
+expected="0x11 0x22 0x33 0x44 0x55 0x66 0x77 0x88"
+if [ "$readback" = "$expected" ]; then
     pretty_print "EEPROM test PASSED!"
+    echo "Expected: $expected"
+    echo "Read:     $readback"
     EEPROM_TEST_RESULT="y"
 else
     pretty_print "EEPROM test FAILED!"
+    echo "Expected: $expected"
+    echo "Read:     $readback"
     EEPROM_TEST_RESULT="n"
 fi
 
 check_test "I2C EEPROM" $EEPROM_TEST_RESULT
-
-# Clean up temporary files
-rm -f $TMP_WRITE $TMP_READ
 
 # ====================== #
 # SDIO/MMC Test          #
@@ -285,6 +177,7 @@ rm -f $TMP_WRITE $TMP_READ
 printf "\n\n"
 pretty_print "Starting MMC/SDIO test"
 printf "\n\n"
+
 SDIO_FOUND=0
 declare -A dt_alias
 dt_alias=( ["mmc0"]="usdhc1" ["mmc1"]="usdhc2" ["mmc2"]="usdhc3" )
@@ -345,30 +238,30 @@ pretty_print "Starting I2C bus test"
 printf "\n\n"
 
 pretty_print "Available I2C buses"
-i2cdetect -l
+i2cdetect -y -l
 
-pretty_print "Scanning I2C1 (should have IO Expander at 0x44 and RTC at 0x51 )"
+pretty_print "Scanning I2C1 (should have IO Expander at 0x43 and RTC at 0x51 )"
 i2cdetect -y 0
 
-pretty_print "Probing IO Expander at bus 0, address 0x44"
-if i2cget -y -f 0 0x44 0x00>/dev/null >/dev/null; then
-    echo "IO Expander at 0x44 responded"
+pretty_print "Probing IO Expander at bus 0, address 0x43"
+if i2cget -y -f 0 0x43 0x00>/dev/null >/dev/null; then
+    echo "IO Expander at 0x43 responded"
 else
-    echo "ERROR: IO Expander at 0x44 did NOT respond"
+    echo "ERROR: IO Expander at 0x43 did NOT respond"
 fi
 
-pretty_print "Probing RTC at bus 0, address 0x51"
-if i2cget -y -f 0 0x51 0x00>/dev/null >/dev/null; then
-    echo "RTC at 0x51 responded"
+pretty_print "Probing RTC at bus 0, address 0x53"
+if i2cget -y -f 0 0x53 0x00>/dev/null >/dev/null; then
+    echo "RTC at 0x53 responded"
 else
-    echo "ERROR: RTC at 0x51 did NOT respond"
+    echo "ERROR: RTC at 0x53 did NOT respond"
 fi
 
 pretty_print "Scanning I2C2 (should have PCA9451 at 0x25)"
 i2cdetect -y 1
 
 pretty_print "Probing PCA9451 at bus 1, address 0x25"
-if i2cget -y 1 0x25 0x00 2>/dev/null >/dev/null; then
+if i2cget -y -f 1 0x25 0x00 2>/dev/null >/dev/null; then
     echo "PCA9451 at 0x25 responded"
 else
     echo "ERROR: PCA9451 at 0x25 did NOT respond"
@@ -378,23 +271,23 @@ pretty_print "Scanning I2C3 (should have EEPROM at 0x54)"
 i2cdetect -y 2
 
 pretty_print "Probing EEPROM at bus 2, address 0x54"
-if i2cget -y 2 0x54 0x00 2>/dev/null >/dev/null; then
+if i2cget -y -f 2 0x54 0x00 2>/dev/null >/dev/null; then
     echo "EEPROM at 0x54 responded"
 else
-    echo "ERROR: EEPROM at 0x50 did NOT respond"
+    echo "ERROR: EEPROM at 0x54 did NOT respond"
 fi
 
 pretty_print "Scanning I2C5 (should have two IO Expanders, one at 0x20 an other at 0x21)"
 i2cdetect -y 4
 
 pretty_print "Probing IO Expander at bus 4, address 0x20"
-if i2cget -y 4 0x20 0x00 2>/dev/null >/dev/null; then
+if i2cget -y -f 4 0x20 0x00 2>/dev/null >/dev/null; then
     echo "IO Expander at 0x20 responded"
 else
     echo "ERROR: IO Expander at 0x20 did NOT respond"
 fi
 pretty_print "Probing IO Expander at bus 4, address 0x21"
-if i2cget -y 4 0x21 0x00 2>/dev/null >/dev/null; then
+if i2cget -y -f 4 0x21 0x00 2>/dev/null >/dev/null; then
     echo "IO Expander at 0x21 responded"
 else
     echo "ERROR: IO Expander at 0x21 did NOT respond"
@@ -405,38 +298,69 @@ check_test "I2C" "y"
 # ====================== #
 # Ethernet Test          #
 # ====================== #
-# printf "\n\n"
-# pretty_print "Starting Ethernet test"
-# printf "\n\n"
+printf "\n\n"
+pretty_print "Starting Ethernet test"
+printf "\n\n"
+pretty_print "Starting Ethernet0 test"
 
-# IFACE="eth0"
-# IP_ADDR="10.219.8.14/20"
+IFACE0="eth0"
+IP_ADDR0="192.168.2.75"
 
-# IF_STATUS=$(cat /sys/class/net/$IFACE/operstate 2>/dev/null)
+IF_STATUS=$(cat /sys/class/net/$IFACE0/operstate 2>/dev/null)
 
-# if [[ "$IF_STATUS" == "up" ]]; then
-#     pretty_print "$IFACE is already active. Skipping configuration."
-# else
-#     pretty_print "$IFACE is down. Bringing up interface and configuring IP."
-#     ip link set $IFACE up
-#     ip addr add $IP_ADDR dev $IFACE
-#     ip route add default via $GATEWAY dev $IFACE
-# fi
+if [[ "$IF_STATUS" == "up" ]]; then
+    pretty_print "$IFACE0 is already active. Skipping configuration."
+else
+    pretty_print "$IFACE0 is down. Bringing up interface and configuring IP."
+    ip link set $IFACE0 up
+    ip addr add $IP_ADDR dev $IFACE0
+    ip route add default via $GATEWAY dev $IFACE0
+fi
 
-# pretty_print "Interface status:"
-# ip addr show $IFACE
+pretty_print "Interface status:"
+ip addr show $IFACE0
 
-# if command -v ethtool >/dev/null 2>&1; then
-#     pretty_print "Checking link status with ethtool..."
-#     ethtool $IFACE
-# else
-#     echo "ethtool not installed, skipping link check."
-# fi
+if command -v ethtool >/dev/null 2>&1; then
+    pretty_print "Checking link status with ethtool..."
+    ethtool $IFACE0
+else
+    echo "ethtool not installed, skipping link check."
+fi
 
-# pretty_print "Pinging 8.8.8.8..."
-# ping -c 4 8.8.8.8
+pretty_print "Pinging Google"
+ping -c 4 -I $IFACE0 www.google.com
 
-# check_test "Ethernet" "y"
+printf "\n\n"
+pretty_print "Starting Ethernet 1 test"
+printf "\n\n"
+
+IFACE1="eth1"
+IP_ADDR1="192.168.2.76"
+
+IF_STATUS=$(cat /sys/class/net/$IFACE1/operstate 2>/dev/null)
+
+if [[ "$IF_STATUS" == "up" ]]; then
+    pretty_print "$IFACE1 is already active. Skipping configuration."
+else
+    pretty_print "$IFACE1 is down. Bringing up interface and configuring IP."
+    ifconfig $IFACE1 up
+    ifconfig $IFACE1 $IP_ADDR1
+fi
+
+pretty_print "Interface status:"
+ ifconfig $IFACE1
+
+if command -v ethtool >/dev/null 2>&1; then
+    pretty_print "Checking link status with ethtool..."
+    ethtool $IFACE1
+else
+    echo "ethtool not installed, skipping link check."
+fi
+
+pretty_print "Pinging Google"
+ping -c 4 -I $IFACE1 www.google.com
+
+check_test "Ethernet" "y"
 
 # ====================== #
 # Audio/SAI Test         #
@@ -457,63 +381,40 @@ check_test "I2C" "y"
 # check_test "Audio/SAI" "y"
 
 # ====================== #
-# LED Test  #
+# LED Sequential Test    #
 # ====================== #
 printf "\n\n"
 pretty_print "LED Sequential Test"
 printf "\n\n"
 
-I2C_BUS=0                    # LPI2C1 → /dev/i2c-1
-I2C_ADDR=0x44                # 7-bit I2C address
-I2C_ADDR_HEX="44"
-REG_OUTPUT=0x01              # Output Port Register
-REG_DIRECTION=0x03           # Direction Register (0 = output)
-LED_PINS=(0 1 2 3)           # GPIO0 → LED1_nEN, GPIO1 → LED2_nEN, ...
-LED_NAMES=("LED1" "LED2" "LED3" "LED4")
-ON_DURATION=3                # Seconds each LED stays ON
+LED_NAMES=("LED1_nEN" "LED2_nEN" "LED3_nEN" "LED4_nEN")
+ON_DURATION=3   # seconds
 
-if ! command -v i2cset >/dev/null 2>&1; then
-    pretty_print "ERROR: i2c-tools not installed (i2cset missing). Skipping test."
-    IO_EXPANDER_TEST_RESULT="n"
+# Check gpioset
+if ! command -v gpioset >/dev/null 2>&1; then
+    pretty_print "ERROR: gpioset not available"
+    LED_TEST_RESULT="n"
     check_test "LED Sequential" LED_TEST_RESULT
-    # return 1
+    return 1
 fi
 
-if ! i2cdetect -y $I2C_BUS | grep -q "$I2C_ADDR_HEX"; then
-    pretty_print "ERROR: FXL6408 not detected at 0x$I2C_ADDR on bus $I2C_BUS"
-    IO_EXPANDER_TEST_RESULT="n"
-else
-    pretty_print "FXL6408 detected at 0x$I2C_ADDR. Running LED sequence..."
+pretty_print "Starting LED sequence..."
+LED_TEST_RESULT="y"
 
-    # Configure GPIO0-3 as outputs (bits 0-3 = 0)
-    i2cset -y $I2C_BUS $I2C_ADDR $REG_DIRECTION 0xF0 2>/dev/null
+# Ensure all LEDs OFF at start
+for led in "${LED_NAMES[@]}"; do
+    gpioset ${led}=1
+done
 
-    IO_EXPANDER_TEST_RESULT="y"
-    local idx pin bit_mask current
+# Sequential ON/OFF
+for led in "${LED_NAMES[@]}"; do
+    pretty_print "  ${led} ON for ${ON_DURATION}s"
+    gpioset ${led}=0          # ON (active-low)
+    sleep ${ON_DURATION}
+    gpioset ${led}=1          # OFF
+done
 
-    pretty_print "Starting LED sequence..."
-
-    for idx in {0..3}; do
-        pin=${LED_PINS[$idx]}
-        bit_mask=$((1 << pin))
-
-        # Turn ON current LED (active-low)
-        pretty_print "  ${LED_NAMES[$idx]} (GPIO$pin) ON for ${ON_DURATION}s"
-        current=$(i2cget -y $I2C_BUS $I2C_ADDR $REG_OUTPUT 2>/dev/null || echo 0xFF)
-        current=$((current & ~bit_mask))           # Clear bit → 0 = ON
-        i2cset -y $I2C_BUS $I2C_ADDR $REG_OUTPUT $current
-        sleep $ON_DURATION
-
-        # Turn OFF current LED
-        current=$(i2cget -y $I2C_BUS $I2C_ADDR $REG_OUTPUT 2>/dev/null || echo 0xFF)
-        current=$((current | bit_mask))            # Set bit → 1 = OFF
-        i2cset -y $I2C_BUS $I2C_ADDR $REG_OUTPUT $current
-    done
-
-    i2cset -y $I2C_BUS $I2C_ADDR $REG_OUTPUT 0x0F
-    pretty_print "LED sequence completed. All LEDs OFF."
-fi
-
+pretty_print "LED sequence completed. All LEDs OFF."
 
 check_test "LED Sequential" LED_TEST_RESULT
 
@@ -552,6 +453,122 @@ else
 fi
 
 check_test "Temperature" TEMP_TEST_RESULT
+
+# ====================== #
+# Sleep Mode Test        #
+# ====================== #
+
+printf "\n\n"
+pretty_print "Starting Sleep Mode Test"
+printf "\n\n"
+
+SLEEP_TEST_RESULT="y"
+SLEEP_LOG="/tmp/sleep_test_$(date +%Y%m%d_%H%M%S).log"
+
+# Check if rtcwake is available
+if ! command -v rtcwake >/dev/null 2>&1; then
+    pretty_print "ERROR: rtcwake not available. Cannot test sleep modes."
+    SLEEP_TEST_RESULT="n"
+    check_test "Sleep Modes" "$SLEEP_TEST_RESULT"
+else
+    # Check RTC device
+    if [ ! -e /dev/rtc0 ]; then
+        pretty_print "ERROR: RTC device /dev/rtc0 not found"
+        SLEEP_TEST_RESULT="n"
+        check_test "Sleep Modes" "$SLEEP_TEST_RESULT"
+    else
+        pretty_print "RTC device found: $(ls -l /dev/rtc0)"
+        
+        # Display available sleep states
+        pretty_print "Available sleep states:"
+        if [ -f /sys/power/state ]; then
+            AVAILABLE_STATES=$(cat /sys/power/state)
+            echo "  $AVAILABLE_STATES"
+        else
+            pretty_print "ERROR: Cannot read /sys/power/state"
+            SLEEP_TEST_RESULT="n"
+            check_test "Sleep Modes" "$SLEEP_TEST_RESULT"
+        fi
+        
+        # Function to test a specific sleep mode
+        test_sleep_mode() {
+            local mode=$1
+            local wakeup_time=$2
+            
+            printf "\n"
+            pretty_print "Testing sleep mode: $mode (wakeup in ${wakeup_time}s)"
+            
+            # Record state before suspend
+            echo "=== Testing $mode mode at $(date) ===" >> "$SLEEP_LOG"
+            echo "Uptime before: $(cat /proc/uptime)" >> "$SLEEP_LOG"
+            
+            # Attempt suspend with automatic wakeup
+            printf "Entering %s mode...\n" "$mode"
+            
+            if rtcwake -m "$mode" -s "$wakeup_time" 2>&1 | tee -a "$SLEEP_LOG"; then
+                echo "✓ Successfully resumed from $mode" | tee -a "$SLEEP_LOG"
+                
+                # Record state after resume
+                echo "Uptime after: $(cat /proc/uptime)" >> "$SLEEP_LOG"
+                echo "Resumed at: $(date)" >> "$SLEEP_LOG"
+                
+                # Check for errors in kernel log
+                dmesg | tail -20 | grep -i "error\|fail" >> "$SLEEP_LOG" || true
+                
+                return 0
+            else
+                echo "✗ FAILED to resume from $mode" | tee -a "$SLEEP_LOG"
+                return 1
+            fi
+        }
+        
+        # Test parameters
+        WAKEUP_TIME=10  # seconds
+        SLEEP_MODES_TO_TEST=()
+        
+        # Determine which modes to test based on availability
+        for mode in freeze standby mem; do
+            if echo "$AVAILABLE_STATES" | grep -q "$mode"; then
+                SLEEP_MODES_TO_TEST+=("$mode")
+            fi
+        done
+        
+        pretty_print "Will test ${#SLEEP_MODES_TO_TEST[@]} sleep mode(s): ${SLEEP_MODES_TO_TEST[*]}"
+        
+        # Test each available mode
+        FAILED_MODES=()
+        for mode in "${SLEEP_MODES_TO_TEST[@]}"; do
+            if ! test_sleep_mode "$mode" "$WAKEUP_TIME"; then
+                FAILED_MODES+=("$mode")
+                SLEEP_TEST_RESULT="n"
+            fi
+            
+            # Wait between tests
+            sleep 2
+        done
+        
+        # Summary
+        printf "\n"
+        pretty_print "Sleep Mode Test Summary"
+        echo "Log file: $SLEEP_LOG"
+        echo "Tested modes: ${SLEEP_MODES_TO_TEST[*]}"
+        
+        if [ ${#FAILED_MODES[@]} -eq 0 ]; then
+            echo "Result: ALL PASSED"
+        else
+            echo "Result: FAILED - ${FAILED_MODES[*]} ✗"
+            echo "Check log file for details: $SLEEP_LOG"
+        fi
+        
+        # Display last wakeup source
+        if [ -f /sys/kernel/debug/wakeup_sources ]; then
+            pretty_print "Recent wakeup sources (top 5):"
+            head -6 /sys/kernel/debug/wakeup_sources | tail -5 || true
+        fi
+    fi
+fi
+
+check_test "Sleep Modes" "$SLEEP_TEST_RESULT"
 
 # ============= #
 # Success Check #

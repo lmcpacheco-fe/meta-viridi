@@ -306,7 +306,7 @@ pretty_print "Starting Ethernet0 test"
 IFACE0="eth0"
 IP_ADDR0="192.168.1.75"
 
-ip link set $IFACE0 up
+IF_STATUS=$(cat /sys/class/net/$IFACE0/operstate 2>/dev/null)
 
 if ip addr show $IFACE0 | grep -q "inet "; then
     pretty_print "$IFACE0 already has IP. Skipping IP configuration."
