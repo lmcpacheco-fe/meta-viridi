@@ -359,15 +359,6 @@
 		>;
 	};
 
-	pinctrl_flexcan2: flexcan2grp {
-		fsl,pins = <
-			MX91_PAD_SD2_DATA0__CAN2_TX				0x139e
-			MX91_PAD_SD2_DATA1__CAN2_RX				0x139e
-			MX91_PAD_SD2_CMD__GPIO3_IO2				0x139e		//CAN2_STBY
-			MX91_PAD_SD2_CLK__GPIO3_IO1				0x139e		//CAN2_EOL
-		>;
-	};
-
 	pinctrl_uart1: uart1grp {
 		fsl,pins = <
 			MX91_PAD_UART1_RXD__LPUART1_RX			0x31e

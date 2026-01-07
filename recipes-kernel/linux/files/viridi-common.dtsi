@@ -231,14 +231,6 @@
 	//eol-gpios = <&gpio1 11 GPIO_ACTIVE_HIGH>;			//CAN1_EOL
 };
 
-&flexcan2 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_flexcan2>;
-	status = "okay";
-	//standby-gpios = <&gpio3 2 GPIO_ACTIVE_HIGH>;		//CAN2_STBY
-	//eol-gpios = <&gpio3 1 GPIO_ACTIVE_HIGH>;			//CAN2_EOL
-};
-
 &gpio1 {
 	gpio-line-names =
 		"gpio1-00", "gpio1-01", "gpio1-02", "gpio1-03",

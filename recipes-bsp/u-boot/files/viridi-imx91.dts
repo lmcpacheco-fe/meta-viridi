@@ -109,7 +109,7 @@
 		gpio-controller;
 		#gpio-cells = <2>;
 		gpio-line-names = "LED1_nEN", "LED2_nEN", "LED3_nEN", "LED4_nEN",
-			"DSP_EN_3V3", "DSP_CTRL_3V3", "NC", "NC";
+			"CAN1_EOL", "DSP_CTRL_3V3", "NC", "NC";
 	};
 };
 
@@ -348,14 +348,6 @@
 	eol-gpios = <&fxl6408  4 GPIO_ACTIVE_HIGH>;		/* CAN1_EOL */
 };
 
-&flexcan2 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_flexcan2>;
-	status = "okay";
-	standby-gpios = <&gpio3 2 GPIO_ACTIVE_HIGH>;	/* CAN2_STBY */
-	eol-gpios = <&gpio3 1 GPIO_ACTIVE_HIGH>;		/* CAN2_EOL */
- };
- 
 &usdhc1 {
 	pinctrl-names = "default", "state_100mhz", "state_200mhz";
 	pinctrl-0 = <&pinctrl_usdhc1>;
@@ -404,15 +396,6 @@
 			MX91_PAD_SAI1_TXC__CAN1_RX		0x139e
 			MX91_PAD_SAI1_RXD0__GPIO1_IO14		0x139e
 			/* CAN1_EOL moved to FXL6408 GPIO4 - no pinctrl needed */
-		>;
-	};
-
-	pinctrl_flexcan2: flexcan2grp {
-		fsl,pins = <
-			MX91_PAD_SD2_DATA0__CAN2_TX		0x139e
-			MX91_PAD_SD2_DATA1__CAN2_RX		0x139e
-			MX91_PAD_SD2_CMD__GPIO3_IO2		0x139e
-			MX91_PAD_SD2_CLK__GPIO3_IO1		0x139e
 		>;
 	};
 
