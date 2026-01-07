@@ -19,7 +19,9 @@ do_override_files () {
     install -Dm 0644 ${WORKDIR}/sources-unpack/${KBUILD_DEFCONFIG} ${S}/arch/arm64/configs/${KBUILD_DEFCONFIG}
 }
 
-addtask override_files after do_kernel_configme before do_configure
+addtask override_files after do_patch before do_compile
 
-deltask kernel_localversion
-deltask merge_delta_config
+# Keep a stable kernel release string (avoids -dirty / git hash)
+KERNEL_LOCALVERSION = "-lts-next"
+KERNEL_LOCALVERSION_AUTO = "0"
+SCMVERSION = "n"
