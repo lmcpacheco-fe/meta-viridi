@@ -9,6 +9,7 @@
  *   Board-specific device tree describing the hardware configuration
  *   of the Viridi i.MX93 platform. This file defines SoC integration,
  *   pin multiplexing, peripheral enablement, and board-level resources.
+ *
  * @MAINTAINER: Aitor Carrizosa <aitor.carrizosa@futureelectronics.com>
  */
 
