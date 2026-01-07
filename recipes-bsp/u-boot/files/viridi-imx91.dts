@@ -13,8 +13,6 @@
 	model = "NXP i.MX91 11X11 EVK board";
 
 	aliases {
-		ethernet0 = &fec;
-		ethernet1 = &eqos;
 		rtc0 = &bbnsm_rtc;
 	};
 
@@ -77,52 +75,6 @@
 	status = "okay";
 };
 
-&eqos {
-	phy-handle = <&ethphy1>;
-	phy-mode = "rgmii-id";
-	pinctrl-0 = <&pinctrl_eqos>;
-	pinctrl-1 = <&pinctrl_eqos_sleep>;
-	pinctrl-names = "default", "sleep";
-	status = "okay";
-
-	mdio {
-		compatible = "snps,dwmac-mdio";
-		#address-cells = <1>;
-		#size-cells = <0>;
-		/*clock-frequency = <5000000>;					No need for 'clock-frequency'; PHY provides 50 MHz REF_CLK to SoC via RMII*/
-		ethphy1: ethernet-phy@1 {
-			compatible = "microchip,ksz8081";
-			reg = <1>;
-			reset-gpios = <&gpio4 12 GPIO_ACTIVE_LOW>;
-			reset-assert-us = <10000>;
-			reset-deassert-us = <80000>;
-		};
-	};
-};
-
-&fec {
-	phy-handle = <&ethphy2>;
-	phy-mode = "rgmii-id";
-	pinctrl-0 = <&pinctrl_fec>;
-	pinctrl-1 = <&pinctrl_fec_sleep>;
-	pinctrl-names = "default", "sleep";
-	fsl,magic-packet;
-	status = "okay";
-
-	mdio {
-		#address-cells = <1>;
-		#size-cells = <0>;
-		/*clock-frequency = <5000000>;					No need for 'clock-frequency'; PHY provides 50 MHz REF_CLK to SoC via RMII*/
-		ethphy2: ethernet-phy@2 {
-		compatible = "microchip,ksz8081";
-			reg = <2>;
-			reset-gpios = <&gpio4 26 GPIO_ACTIVE_LOW>;
-			reset-assert-us = <10000>;
-			reset-deassert-us = <80000>;
-		};
-	};
-};
-
 &lpi2c1 {
 	clock-frequency = <400000>;
 	pinctrl-0 = <&pinctrl_lpi2c1>;
@@ -149,7 +101,7 @@
 		gpio-reserved-ranges = <5 1>;
 		#pwm-cells = <3>;
 		gpio-line-names = "LED1_nEN", "LED2_nEN", "LED3_nEN", "LED4_nEN",
-			"DSP_EN_3V3", "DSP_CTRL_3V3", "NC", "NC";
+			"CAN1_EOL", "DSP_CTRL_3V3", "NC", "NC";
 	};
 };
 
@@ -320,9 +272,9 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart5>;
 	status = "okay";
-	bluetooth {
-		compatible = "nxp,88w8987-bt";
-	};
+	// bluetooth {
+	// 	compatible = "nxp,88w8987-bt";
+	// };
 };
 
 &lpuart6 {
@@ -330,11 +282,11 @@
 	pinctrl-0 = <&pinctrl_uart6>;
 	pinctrl-names = "default";
 	status = "okay";
-	/*RS485*/
-	fsl,uart-has-rtscts;
-	rs485-rts-gpio = <&gpio3 5 GPIO_ACTIVE_HIGH>;
-	rs485-rts-active-high;
-	rs485-delay = <1 1>;
+	// /*RS485*/
+	// fsl,uart-has-rtscts;
+	// rs485-rts-gpio = <&gpio3 5 GPIO_ACTIVE_HIGH>;
+	// rs485-rts-active-high;
+	// rs485-delay = <1 1>;
 };
 
 &lpuart7 {
@@ -357,7 +309,7 @@
 };
 
 &usbotg2 {
-	dr_mode = "otg";
+	dr_mode = "peripheral";
 	hnp-disable;
 	srp-disable;
 	adp-disable;
@@ -374,11 +326,11 @@
 	pinctrl-0 = <&pinctrl_lpspi4>;
 	cs-gpios = <&gpio2 18 GPIO_ACTIVE_LOW>;
 	status = "okay";
-	spidev0: spi@0 {
-		reg = <0>;
-		compatible = "spidev";
-		spi-max-frequency = <1000000>;
-	};
+	// spidev0: spi@0 {
+	// 	reg = <0>;
+	// 	compatible = "spidev";
+	// 	spi-max-frequency = <1000000>;
+	// };
 };
 
 &flexcan1 {
@@ -386,15 +338,8 @@
 	pinctrl-0 = <&pinctrl_flexcan1>;
 	status = "okay";
 	standby-gpios = <&gpio1 14 GPIO_ACTIVE_HIGH>;	/* CAN1_STBY */
+	//eol-gpios = <&gpio1 11 GPIO_ACTIVE_HIGH>;			//CAN1_EOL
 	eol-gpios = <&fxl6408  4 GPIO_ACTIVE_HIGH>;		/* CAN1_EOL */
-};
-
-&flexcan2 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_flexcan2>;
-	status = "okay";
-	/*standby-gpios = <&gpio3 2 GPIO_ACTIVE_HIGH>;		CAN2_STBY
-	eol-gpios = <&gpio3 1 GPIO_ACTIVE_HIGH>;		CAN2_EOL*/
 };
 
 &usdhc1 {
@@ -522,16 +467,8 @@
 			MX91_PAD_SAI1_TXD0__CAN1_TX		0x139e
 			MX91_PAD_SAI1_TXC__CAN1_RX		0x139e
 			MX91_PAD_SAI1_RXD0__GPIO1_IO14		0x139e
+			// MX91_PAD_SAI1_RXD0__GPIO1_IO14			0x139e		//CAN1_STBY
 			/* CAN1_EOL moved to FXL6408 GPIO4 - no pinctrl needed */
-		>;
-	};
-
-	pinctrl_flexcan2: flexcan2grp {
-		fsl,pins = <
-			MX91_PAD_SD2_DATA0__CAN2_TX		0x139e
-			MX91_PAD_SD2_DATA1__CAN2_RX		0x139e
-			MX91_PAD_SD2_CMD__GPIO3_IO2		0x139e
-			MX91_PAD_SD2_CLK__GPIO3_IO1		0x139e
 		>;
 	};
 

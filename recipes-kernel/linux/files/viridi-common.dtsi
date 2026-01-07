@@ -63,29 +63,29 @@
 		compatible = "gpio-keys";
 		pinctrl-0 = <&pinctrl_wakeup>;
 		pinctrl-names = "default";
-	};
 
-	wakeup1 {
-		label = "WAKEUP1";
-		gpios = <&gpio4 2 GPIO_ACTIVE_LOW>;
-		linux,code = <KEY_WAKEUP>;
-		wakeup-source;
-	};
-	
-	wakeup2 {
-		label = "WAKEUP2";
-		gpios = <&gpio4 7 GPIO_ACTIVE_LOW>;
-		linux,code = <KEY_WAKEUP>;
-		wakeup-source;
-	};
-	
-	// This acts as a wakeup while suspended, and as a suspend when running
-	// So it toggles between the two states
-	wakeup3 {
-		label = "WAKEUP3";
-		gpios = <&gpio4 16 GPIO_ACTIVE_LOW>;
-		linux,code = <KEY_SUSPEND>;
-		wakeup-source;
+		wakeup1 {
+			label = "WAKEUP1";
+			gpios = <&gpio4 2 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_WAKEUP>;
+			wakeup-source;
+		};
+
+		wakeup2 {
+			label = "WAKEUP2";
+			gpios = <&gpio4 7 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_WAKEUP>;
+			wakeup-source;
+		};
+
+		// This acts as a wakeup while suspended, and as a suspend when running
+		// So it toggles between the two states
+		wakeup3 {
+			label = "WAKEUP3";
+			gpios = <&gpio4 16 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_SUSPEND>;
+			wakeup-source;
+		};
 	};
 };
 
@@ -226,22 +226,6 @@
 	// 	compatible = "spidev";					// Generic driver for testing
 	// 	spi-max-frequency = <1000000>;			// 1 MHz, adjust according to peripheral
 	// };
-};
-
-&flexcan1 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_flexcan1>;
-	status = "okay";
-	//standby-gpios = <&gpio1 14 GPIO_ACTIVE_HIGH>;		//CAN1_STBY
-	//eol-gpios = <&gpio1 11 GPIO_ACTIVE_HIGH>;			//CAN1_EOL
-};
-
-&flexcan2 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_flexcan2>;
-	status = "okay";
-	//standby-gpios = <&gpio3 2 GPIO_ACTIVE_HIGH>;		//CAN2_STBY
-	//eol-gpios = <&gpio3 1 GPIO_ACTIVE_HIGH>;			//CAN2_EOL
 };
 
 &gpio1 {
