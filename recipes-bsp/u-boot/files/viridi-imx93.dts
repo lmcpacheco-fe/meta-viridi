@@ -8,7 +8,6 @@
  *   Board-specific device tree describing the hardware configuration
  *   of the Viridi i.MX93 platform. This file defines SoC integration,
  *   pin multiplexing, peripheral enablement, and board-level resources.
- *
  * @MAINTAINER: Aitor Carrizosa <aitor.carrizosa@futureelectronics.com>
  */
 
@@ -219,7 +218,6 @@
 	pinctrl-0 = <&pinctrl_flexcan1>;
 	status = "okay";
 	standby-gpios = <&gpio1 14 GPIO_ACTIVE_HIGH>;	//CAN1_STBY
-	// eol-gpios = <&gpio1 11 GPIO_ACTIVE_HIGH>;	//CAN1_EOL
 	eol-gpios = <&fxl6408 4 GPIO_ACTIVE_HIGH>;		//CAN1_EOL
 };
 
@@ -247,11 +245,9 @@
 	};
 
 	/*Io Expander --> FXL6408UMX*/
-	fxl6408: gpio-expander@44 {		// By default ADDR = 44 but we change the pin 9 on the IO to GND so its ADDR 43 (Modification not needed)
-	// fxl6408: gpio-expander@43 {
+	fxl6408: gpio-expander@44 {
 		compatible = "fcs,fxl6408";
 		reg = <0x44>;
-		// reg = <0x43>;
 		gpio-controller;
 		#gpio-cells = <2>;
 		gpio-line-names = "LED1_nEN", "LED2_nEN", "LED3_nEN", "LED4_nEN",
