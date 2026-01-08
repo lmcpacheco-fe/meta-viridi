@@ -25,6 +25,8 @@ IMAGE_INSTALL:append = "\
 	kernel-module-nxp-wlan \
 	wireless-regdb-static \
 	linux-firmware-nxpiw416-sdio \
+	iproute2 \
+	can-utils \
 "
 
 

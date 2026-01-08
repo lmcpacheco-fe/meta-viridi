@@ -227,8 +227,8 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexcan1>;
 	status = "okay";
-	//standby-gpios = <&gpio1 14 GPIO_ACTIVE_HIGH>;		//CAN1_STBY
-	//eol-gpios = <&gpio1 11 GPIO_ACTIVE_HIGH>;			//CAN1_EOL
+	standby-gpios = <&gpio1 14 GPIO_ACTIVE_HIGH>;	/* CAN1_STBY */
+	// eol-gpios = <&fxl6408  4 GPIO_ACTIVE_HIGH>;	/* CAN1_EOL */
 };
 
 &gpio1 {
