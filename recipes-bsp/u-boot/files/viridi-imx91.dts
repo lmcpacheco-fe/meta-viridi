@@ -392,28 +392,6 @@
 	no-mmc;
 };
 
-&usdhc3 {
-	pinctrl-names = "default", "state_100mhz", "state_200mhz", "sleep";
-	pinctrl-0 = <&pinctrl_usdhc3>;
-	pinctrl-1 = <&pinctrl_usdhc3_100mhz>;
-	pinctrl-2 = <&pinctrl_usdhc3_200mhz>;
-	pinctrl-3 = <&pinctrl_usdhc3_sleep>;
-	mmc-pwrseq = <&usdhc3_pwrseq>;
-	bus-width = <4>;
-	non-removable;
-	keep-power-in-suspend;
-	wakeup-source;
-	status = "okay";
-	vqmmc-supply = <&reg_wifi_en>;
-	wifi-dev-wake-gpios= <&gpio2 25 GPIO_ACTIVE_HIGH>;		//CPU(GPIO2_25) = WF_DEV_WAKE_1V8
-	wifi_wake_host {
-		compatible = "nxp,wifi-wake-host";
-		interrupt-parent = <&gpio2>;
-		interrupts = <27 IRQ_TYPE_LEVEL_LOW>;
-		interrupt-names = "host-wake";
-	};
-};
-
 &wdog3 {
 	fsl,ext-reset-output;
 	status = "okay";
