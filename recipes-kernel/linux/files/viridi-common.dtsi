@@ -129,10 +129,11 @@
 	/*RS485*/
 	fsl,uart-has-rtscts;
 	linux,rs485-enabled-at-boot-time;
+	rs485-rts-active-high;
 	// rts-gpios = <&gpio2 7 GPIO_ACTIVE_HIGH>;
 	rs485-rts-delay = <1 1>;
-	// rs485-rx-during-tx;
-	fsl,dte-mode;
+	rs485-rx-during-tx;
+	// fsl,dte-mode;
 };
 
 &lpuart7 {
@@ -196,7 +197,6 @@
 	hnp-disable;
 	srp-disable;
 	adp-disable;
-	// usb-role-switch;		//No Type-C controller used
 	disable-over-current;
 	samsung,picophy-pre-emp-curr-control = <3>;
 	samsung,picophy-dc-vol-level-adjust = <7>;
@@ -208,7 +208,6 @@
 	hnp-disable;
 	srp-disable;
 	adp-disable;
-	// usb-role-switch;		//No Type-C controller used
 	disable-over-current;
 	samsung,picophy-pre-emp-curr-control = <3>;
 	samsung,picophy-dc-vol-level-adjust = <7>;
