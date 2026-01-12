@@ -224,6 +224,36 @@
 			"RSTRAN_DUP_1V8", "CONA_EN", "CONB_EN", "NC",
 			"DIGITAL_IN0", "DIGITAL_IN1","DIGITAL_IN2", "DIGITAL_IN3",
 			"OUT0_EN", "OUT1_EN", "OUT2_EN", "OUT3_EN";
+		rs485_nre_hog {
+			gpio-hog;
+			gpios = <0 GPIO_ACTIVE_HIGH>;   /* RS485_nRE_1V8 */
+			output-low;                     /* RE asserted (active-low) */
+			line-name = "RS485_nRE_1V8";
+		};
+		rstran_nshdn_hog {
+			gpio-hog;
+			gpios = <4 GPIO_ACTIVE_HIGH>;   /* RSTRAN_nSHDN_1V8 */
+			output-high;                    /* not shutdown */
+			line-name = "RSTRAN_nSHDN_1V8";
+		};
+		rstran_ctrl_hog {
+			gpio-hog;
+			gpios = <3 GPIO_ACTIVE_HIGH>;   /* RSTRAN_CTRL_1V8 */
+			output-high;                    /* SLEW = fast */
+			line-name = "RSTRAN_CTRL_1V8";
+		};
+		rstran_sel_hog {
+			gpio-hog;
+			gpios = <1 GPIO_ACTIVE_HIGH>;   /* RSTRAN_SEL_1V8 */
+			output-high;                    /* RS-485 mode */
+			line-name = "RSTRAN_SEL_1V8";
+		};
+		rstran_dup_hog {
+			gpio-hog;
+			gpios = <2 GPIO_ACTIVE_HIGH>;   /* RSTRAN_DUP_1V8 */
+			output-low;                     /* FULL duplex */
+			line-name = "RSTRAN_DUP_1V8";
+		};
 	};
 
 	/*Io Expander --> PCA9555AHF,128*/
