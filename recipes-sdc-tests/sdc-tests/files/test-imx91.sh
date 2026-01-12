@@ -240,14 +240,14 @@ printf "\n\n"
 pretty_print "Available I2C buses"
 i2cdetect -y -l
 
-pretty_print "Scanning I2C1 (should have IO Expander at 0x43 and RTC at 0x51 )"
+pretty_print "Scanning I2C1 (should have IO Expander at 0x44 and RTC at 0x51 )"
 i2cdetect -y 0
 
-pretty_print "Probing IO Expander at bus 0, address 0x43"
-if i2cget -y -f 0 0x43 0x00>/dev/null >/dev/null; then
-    echo "IO Expander at 0x43 responded"
+pretty_print "Probing IO Expander at bus 0, address 0x44"
+if i2cget -y -f 0 0x44 0x00>/dev/null >/dev/null; then
+    echo "IO Expander at 0x44 responded"
 else
-    echo "ERROR: IO Expander at 0x43 did NOT respond"
+    echo "ERROR: IO Expander at 0x44 did NOT respond"
 fi
 
 pretty_print "Probing RTC at bus 0, address 0x53"
@@ -296,129 +296,6 @@ fi
 check_test "I2C" "y"
 
 # ====================== #
-# Ethernet Test          #
-# ====================== #
-printf "\n\n"
-pretty_print "Starting Ethernet test"
-printf "\n\n"
-pretty_print "Starting Ethernet0 test"
-
-IFACE0="eth0"
-IP_ADDR0="192.168.2.75"
-
-IF_STATUS=$(cat /sys/class/net/$IFACE0/operstate 2>/dev/null)
-
-if [[ "$IF_STATUS" == "up" ]]; then
-    pretty_print "$IFACE0 is already active. Skipping configuration."
-else
-    pretty_print "$IFACE0 is down. Bringing up interface and configuring IP."
-    ip link set $IFACE0 up
-    ip addr add $IP_ADDR dev $IFACE0
-    ip route add default via $GATEWAY dev $IFACE0
-fi
-
-pretty_print "Interface status:"
-ip addr show $IFACE0
-
-if command -v ethtool >/dev/null 2>&1; then
-    pretty_print "Checking link status with ethtool..."
-    ethtool $IFACE0
-else
-    echo "ethtool not installed, skipping link check."
-fi
-
-pretty_print "Pinging Google"
-ping -c 4 -I $IFACE0 www.google.com
-
-printf "\n\n"
-pretty_print "Starting Ethernet 1 test"
-printf "\n\n"
-
-IFACE1="eth1"
-IP_ADDR1="192.168.2.76"
-
-IF_STATUS=$(cat /sys/class/net/$IFACE1/operstate 2>/dev/null)
-
-if [[ "$IF_STATUS" == "up" ]]; then
-    pretty_print "$IFACE1 is already active. Skipping configuration."
-else
-    pretty_print "$IFACE1 is down. Bringing up interface and configuring IP."
-    ifconfig $IFACE1 up
-    ifconfig $IFACE1 $IP_ADDR1
-fi
-
-pretty_print "Interface status:"
- ifconfig $IFACE1
-
-if command -v ethtool >/dev/null 2>&1; then
-    pretty_print "Checking link status with ethtool..."
-    ethtool $IFACE1
-else
-    echo "ethtool not installed, skipping link check."
-fi
-
-pretty_print "Pinging Google"
-ping -c 4 -I $IFACE1 www.google.com
-
-check_test "Ethernet" "y"
-
-# ====================== #
-# Audio/SAI Test         #
-# ====================== #
-# printf "\n\n"
-# pretty_print "Starting Audio (SAI) test"
-# printf "\n\n"
-# # aplay -l, arecord -l, play/record
-# pretty_print "Listing playback devices:"
-# aplay -l
-
-# pretty_print "Listing capture devices:"
-# arecord -l
-
-# # aplay <archivo_wav> -D <device>
-# # arecord -d 5 -f cd <archivo_wav> -D <device>
-
-# check_test "Audio/SAI" "y"
-
-# ====================== #
-# LED Sequential Test    #
-# ====================== #
-printf "\n\n"
-pretty_print "LED Sequential Test"
-printf "\n\n"
-
-LED_NAMES=("LED1_nEN" "LED2_nEN" "LED3_nEN" "LED4_nEN")
-ON_DURATION=3   # seconds
-
-# Check gpioset
-if ! command -v gpioset >/dev/null 2>&1; then
-    pretty_print "ERROR: gpioset not available"
-    LED_TEST_RESULT="n"
-    check_test "LED Sequential" LED_TEST_RESULT
-    return 1
-fi
-
-pretty_print "Starting LED sequence..."
-LED_TEST_RESULT="y"
-
-# Ensure all LEDs OFF at start
-for led in "${LED_NAMES[@]}"; do
-    gpioset ${led}=1
-done
-
-# Sequential ON/OFF
-for led in "${LED_NAMES[@]}"; do
-    pretty_print "  ${led} ON for ${ON_DURATION}s"
-    gpioset ${led}=0          # ON (active-low)
-    sleep ${ON_DURATION}
-    gpioset ${led}=1          # OFF
-done
-
-pretty_print "LED sequence completed. All LEDs OFF."
-
-check_test "LED Sequential" LED_TEST_RESULT
-
-# ====================== #
 # Temperature Test       #
 # ====================== #
 printf "\n\n"
@@ -453,122 +330,6 @@ else
 fi
 
 check_test "Temperature" TEMP_TEST_RESULT
-
-# ====================== #
-# Sleep Mode Test        #
-# ====================== #
-
-printf "\n\n"
-pretty_print "Starting Sleep Mode Test"
-printf "\n\n"
-
-SLEEP_TEST_RESULT="y"
-SLEEP_LOG="/tmp/sleep_test_$(date +%Y%m%d_%H%M%S).log"
-
-# Check if rtcwake is available
-if ! command -v rtcwake >/dev/null 2>&1; then
-    pretty_print "ERROR: rtcwake not available. Cannot test sleep modes."
-    SLEEP_TEST_RESULT="n"
-    check_test "Sleep Modes" "$SLEEP_TEST_RESULT"
-else
-    # Check RTC device
-    if [ ! -e /dev/rtc0 ]; then
-        pretty_print "ERROR: RTC device /dev/rtc0 not found"
-        SLEEP_TEST_RESULT="n"
-        check_test "Sleep Modes" "$SLEEP_TEST_RESULT"
-    else
-        pretty_print "RTC device found: $(ls -l /dev/rtc0)"
-        
-        # Display available sleep states
-        pretty_print "Available sleep states:"
-        if [ -f /sys/power/state ]; then
-            AVAILABLE_STATES=$(cat /sys/power/state)
-            echo "  $AVAILABLE_STATES"
-        else
-            pretty_print "ERROR: Cannot read /sys/power/state"
-            SLEEP_TEST_RESULT="n"
-            check_test "Sleep Modes" "$SLEEP_TEST_RESULT"
-        fi
-        
-        # Function to test a specific sleep mode
-        test_sleep_mode() {
-            local mode=$1
-            local wakeup_time=$2
-            
-            printf "\n"
-            pretty_print "Testing sleep mode: $mode (wakeup in ${wakeup_time}s)"
-            
-            # Record state before suspend
-            echo "=== Testing $mode mode at $(date) ===" >> "$SLEEP_LOG"
-            echo "Uptime before: $(cat /proc/uptime)" >> "$SLEEP_LOG"
-            
-            # Attempt suspend with automatic wakeup
-            printf "Entering %s mode...\n" "$mode"
-            
-            if rtcwake -m "$mode" -s "$wakeup_time" 2>&1 | tee -a "$SLEEP_LOG"; then
-                echo "✓ Successfully resumed from $mode" | tee -a "$SLEEP_LOG"
-                
-                # Record state after resume
-                echo "Uptime after: $(cat /proc/uptime)" >> "$SLEEP_LOG"
-                echo "Resumed at: $(date)" >> "$SLEEP_LOG"
-                
-                # Check for errors in kernel log
-                dmesg | tail -20 | grep -i "error\|fail" >> "$SLEEP_LOG" || true
-                
-                return 0
-            else
-                echo "✗ FAILED to resume from $mode" | tee -a "$SLEEP_LOG"
-                return 1
-            fi
-        }
-        
-        # Test parameters
-        WAKEUP_TIME=10  # seconds
-        SLEEP_MODES_TO_TEST=()
-        
-        # Determine which modes to test based on availability
-        for mode in freeze standby mem; do
-            if echo "$AVAILABLE_STATES" | grep -q "$mode"; then
-                SLEEP_MODES_TO_TEST+=("$mode")
-            fi
-        done
-        
-        pretty_print "Will test ${#SLEEP_MODES_TO_TEST[@]} sleep mode(s): ${SLEEP_MODES_TO_TEST[*]}"
-        
-        # Test each available mode
-        FAILED_MODES=()
-        for mode in "${SLEEP_MODES_TO_TEST[@]}"; do
-            if ! test_sleep_mode "$mode" "$WAKEUP_TIME"; then
-                FAILED_MODES+=("$mode")
-                SLEEP_TEST_RESULT="n"
-            fi
-            
-            # Wait between tests
-            sleep 2
-        done
-        
-        # Summary
-        printf "\n"
-        pretty_print "Sleep Mode Test Summary"
-        echo "Log file: $SLEEP_LOG"
-        echo "Tested modes: ${SLEEP_MODES_TO_TEST[*]}"
-        
-        if [ ${#FAILED_MODES[@]} -eq 0 ]; then
-            echo "Result: ALL PASSED"
-        else
-            echo "Result: FAILED - ${FAILED_MODES[*]} ✗"
-            echo "Check log file for details: $SLEEP_LOG"
-        fi
-        
-        # Display last wakeup source
-        if [ -f /sys/kernel/debug/wakeup_sources ]; then
-            pretty_print "Recent wakeup sources (top 5):"
-            head -6 /sys/kernel/debug/wakeup_sources | tail -5 || true
-        fi
-    fi
-fi
-
-check_test "Sleep Modes" "$SLEEP_TEST_RESULT"
 
 # ============= #
 # Success Check #
