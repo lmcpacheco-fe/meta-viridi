@@ -13,6 +13,8 @@ IMAGE_INSTALL:append = "\
 	phytool \
 	devmem2 \
 	libgpiod \
+	iproute2 \
+	can-utils \
 	net-tools \
 	memtester \
 	i2c-tools \

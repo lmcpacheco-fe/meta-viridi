@@ -240,14 +240,14 @@ printf "\n\n"
 pretty_print "Available I2C buses"
 i2cdetect -y -l
 
-pretty_print "Scanning I2C1 (should have IO Expander at 0x43 and RTC at 0x51 )"
+pretty_print "Scanning I2C1 (should have IO Expander at 0x44 and RTC at 0x51 )"
 i2cdetect -y 0
 
-pretty_print "Probing IO Expander at bus 0, address 0x43"
-if i2cget -y -f 0 0x43 0x00>/dev/null >/dev/null; then
-    echo "IO Expander at 0x43 responded"
+pretty_print "Probing IO Expander at bus 0, address 0x44"
+if i2cget -y -f 0 0x44 0x00>/dev/null >/dev/null; then
+    echo "IO Expander at 0x44 responded"
 else
-    echo "ERROR: IO Expander at 0x43 did NOT respond"
+    echo "ERROR: IO Expander at 0x44 did NOT respond"
 fi
 
 pretty_print "Probing RTC at bus 0, address 0x53"
@@ -304,7 +304,7 @@ printf "\n\n"
 pretty_print "Starting Ethernet0 test"
 
 IFACE0="eth0"
-IP_ADDR0="192.168.2.75/24"
+IP_ADDR0="192.168.1.75"
 
 ip link set $IFACE0 up
 
@@ -333,7 +333,7 @@ pretty_print "Starting Ethernet 1 test"
 printf "\n\n"
 
 IFACE1="eth1"
-IP_ADDR1="192.168.2.76/24"
+IP_ADDR1="192.168.1.76"
 
 ip link set $IFACE1 up
 

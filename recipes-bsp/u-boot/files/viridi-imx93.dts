@@ -8,7 +8,6 @@
  *   Board-specific device tree describing the hardware configuration
  *   of the Viridi i.MX93 platform. This file defines SoC integration,
  *   pin multiplexing, peripheral enablement, and board-level resources.
- *
  * @MAINTAINER: Aitor Carrizosa <aitor.carrizosa@futureelectronics.com>
  */
 
@@ -253,7 +252,7 @@
 		gpio-controller;
 		#gpio-cells = <2>;
 		gpio-line-names = "LED1_nEN", "LED2_nEN", "LED3_nEN", "LED4_nEN",
-			"CAN1_EOL", "DSP_CTRL_3V3", "NC", "NC";
+			"CAN1_EOL", "DSP_CTRL_3V3", "RS485_TX_EOL_3V3", "NC";
 	};
 };
 
@@ -377,7 +376,8 @@
 		#gpio-cells = <2>;
 		interrupt-parent = <&gpio1>;
 		interrupts = <8 IRQ_TYPE_LEVEL_LOW>;	//Io Expander INT on GPIO1_IO08
-		gpio-line-names = "CONA_EN", "CONB_EN",
+		gpio-line-names = "RS485_nRE_1V8", "RSTRAN_nSHDN_1V8", "RSTRAN_CTRL_1V8",
+			"RSTRAN_SEL_1V8", "RSTRAN_DUP_1V8", "CONA_EN", "CONB_EN", "NC",
 			"DIGITAL_IN0", "DIGITAL_IN1","DIGITAL_IN2", "DIGITAL_IN3",
 			"OUT0_EN", "OUT1_EN", "OUT2_EN", "OUT3_EN";
 	};
@@ -430,11 +430,11 @@
 	pinctrl-0 = <&pinctrl_uart6>;
 	pinctrl-names = "default";
 	status = "okay";
-	// /*RS485*/
-	// fsl,uart-has-rtscts;
-	// rs485-rts-gpio = <&gpio3 5 GPIO_ACTIVE_HIGH>;
-	// rs485-rts-active-high;
-	// rs485-delay = <1 1>;
+	fsl,uart-has-rtscts;
+	linux,rs485-enabled-at-boot-time;
+	// rts-gpios = <&gpio2 7 GPIO_ACTIVE_HIGH>;
+	rs485-rts-delay = <1 1>;
+	fsl,dte-mode;
 };
 
 &lpuart7 {
@@ -639,6 +639,7 @@
 			MX93_PAD_GPIO_IO05__LPUART6_RX			0x31e
 			MX93_PAD_GPIO_IO06__LPUART6_CTS_B		0x31e
 			MX93_PAD_GPIO_IO07__LPUART6_RTS_B		0x31e
+			// MX93_PAD_GPIO_IO07__GPIO2_IO07		0x31e
 		>;
 	};
 

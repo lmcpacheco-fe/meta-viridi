@@ -1,5 +1,14 @@
 /*
- * Copyright 2025 Future Electronics
+ * Device Tree for the Viridi i.MX93 Board
+ *
+ * @TYPE: Board Device Tree
+ * @NAME: viridi-imx91
+ * @SOC: NXP i.MX91
+ * @DESCRIPTION:
+ *   Board-specific device tree describing the hardware configuration
+ *   of the Viridi i.MX91 platform. This file defines SoC integration,
+ *   pin multiplexing, peripheral enablement, and board-level resources.
+ * @MAINTAINER: Aitor Carrizosa <aitor.carrizosa@futureelectronics.com>
  */
 
 /dts-v1/;

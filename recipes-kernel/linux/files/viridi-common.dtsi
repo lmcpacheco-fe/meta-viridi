@@ -8,7 +8,6 @@
  *   Shared device tree definitions for Viridi platforms based on NXP
  *   i.MX9x SoCs. This include provides common peripherals, GPIO expanders,
  *   regulators, and reusable hardware blocks shared across multiple boards.
- *
  * @MAINTAINER: Aitor Carrizosa <aitor.carrizosa@futureelectronics.com>
  */
 
@@ -37,7 +36,7 @@
 		regulator-name = "WF_nEN_1V8";
 		regulator-min-microvolt = <1800000>;
 		regulator-max-microvolt = <1800000>;
-		gpio = <&pca9555_21 5 GPIO_ACTIVE_LOW>;		// IO_Exp(P0_5) = WF_nEN_1V8 (active low)
+		gpio = <&pca9555_21 5 GPIO_ACTIVE_LOW>;		//IO_Exp(P0_5) = WF_nEN_1V8 (active low)
 		regulator-always-on;
 		startup-delay-us = <5000>;
 	};
@@ -47,14 +46,14 @@
 	// 	regulator-name = "BT_nRST_1V8";
 	// 	regulator-min-microvolt = <1800000>;
 	// 	regulator-max-microvolt = <1800000>;
-	// 	gpio = <&pca9555_21 7 GPIO_ACTIVE_LOW>;		// IO_Exp(P0_7) = BT_nRST_1V8 (active low)
+	// 	gpio = <&pca9555_21 7 GPIO_ACTIVE_LOW>;		//IO_Exp(P0_7) = BT_nRST_1V8 (active low)
 	// 	regulator-always-on;
 	// 	startup-delay-us = <20000>;
 	// };
 
 	usdhc3_pwrseq: usdhc3_pwrseq {
 		compatible = "mmc-pwrseq-simple";
-		reset-gpios = <&pca9555_21 6 GPIO_ACTIVE_LOW>;		// IO_Exp(P0_6) = WF_nRST_1V8 (active low)
+		reset-gpios = <&pca9555_21 6 GPIO_ACTIVE_LOW>;		//IO_Exp(P0_6) = WF_nRST_1V8 (active low)
 		post-power-on-delay-ms = <20>;
 	};
 
@@ -63,7 +62,6 @@
 		compatible = "gpio-keys";
 		pinctrl-0 = <&pinctrl_wakeup>;
 		pinctrl-names = "default";
-
 		wakeup1 {
 			label = "WAKEUP1";
 			gpios = <&gpio4 2 GPIO_ACTIVE_LOW>;
@@ -128,11 +126,12 @@
 	pinctrl-0 = <&pinctrl_uart6>;
 	pinctrl-names = "default";
 	status = "okay";
-	/*RS485*/
 	fsl,uart-has-rtscts;
-	rs485-rts-gpio = <&gpio3 5 GPIO_ACTIVE_HIGH>;
-	rs485-rts-active-high;
-	rs485-delay = <1 1>;
+	linux,rs485-enabled-at-boot-time;
+	// rts-gpios = <&gpio2 7 GPIO_ACTIVE_HIGH>;
+	rs485-rts-delay = <1 1>;
+	// rs485-rx-during-tx;
+	fsl,dte-mode;
 };
 
 &lpuart7 {
@@ -165,7 +164,7 @@
 	bus-width = <4>;
 	fsl,tuning-step = <1>;
 	status = "okay";
-	//no-sdio;
+	// no-sdio;
 	no-mmc;
 };
 
@@ -196,7 +195,7 @@
 	hnp-disable;
 	srp-disable;
 	adp-disable;
-	//usb-role-switch;		//No Type-C controller used
+	// usb-role-switch;		//No Type-C controller used
 	disable-over-current;
 	samsung,picophy-pre-emp-curr-control = <3>;
 	samsung,picophy-dc-vol-level-adjust = <7>;
@@ -208,7 +207,7 @@
 	hnp-disable;
 	srp-disable;
 	adp-disable;
-	//usb-role-switch;		//No Type-C controller used
+	// usb-role-switch;		//No Type-C controller used
 	disable-over-current;
 	samsung,picophy-pre-emp-curr-control = <3>;
 	samsung,picophy-dc-vol-level-adjust = <7>;
@@ -250,24 +249,23 @@
 		"gpio2-20", "gpio2-21", "gpio2-22", "gpio2-23",
 		"BT_DEV_WAKE_1V8", "WF_DEV_WAKE_1V8", "BT_WAKE_HOST_1V8", "WF_WAKE_HOST_1V8",
 		"gpio2-28", "gpio2-29", "gpio2-30", "gpio2-31";
-
 	wifi_pdn_hog: wifi-pdn-hog {
 		gpio-hog;
-		gpios = <13 GPIO_ACTIVE_HIGH>;		// GPIO2_13 (PDn=1) = WF_nPD_1V8
+		gpios = <13 GPIO_ACTIVE_HIGH>;		//GPIO2_13 (PDn=1) = WF_nPD_1V8
 		output-high;
 		line-name = "WF_nPD_1V8";
 	};
 
 	wf_devwake_hog: wf-devwake-hog {
 		gpio-hog;
-		gpios = <25 GPIO_ACTIVE_HIGH>;		// GPIO2_25 = WF_DEV_WAKE_1V8
+		gpios = <25 GPIO_ACTIVE_HIGH>;		//GPIO2_25 = WF_DEV_WAKE_1V8
 		output-high;
 		line-name = "WF_DEV_WAKE_1V8";
 	};
 
 	bt_devwake_hog: bt-devwake-hog {
 		gpio-hog;
-		gpios = <24 GPIO_ACTIVE_HIGH>;		// GPIO2_24 = BT_DEV_WAKE_1V8
+		gpios = <24 GPIO_ACTIVE_HIGH>;		//GPIO2_24 = BT_DEV_WAKE_1V8
 		output-high;
 		line-name = "BT_DEV_WAKE_1V8";
 	};
@@ -283,7 +281,6 @@
 		"gpio3-20", "gpio3-21", "gpio3-22", "gpio3-23",
 		"gpio3-24", "gpio3-25", "gpio3-26", "gpio3-27",
 		"gpio3-28", "gpio3-29", "gpio3-30", "gpio3-31";
-
 };
 
 &gpio4 {
