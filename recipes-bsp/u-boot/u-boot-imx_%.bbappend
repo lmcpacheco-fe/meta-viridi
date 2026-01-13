@@ -1,3 +1,8 @@
+#@TYPE: U-Boot Recipe Append
+#@NAME: viridi-imx{91,93} linux-imx extension
+#@SOC: i.MX{91,93}
+#@DESCRIPTION: Adds Viridi i.MX{91,93} board support via DTS files and u-boot config fragments.
+
 # Add the files directory so that BitBake can find the files
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
