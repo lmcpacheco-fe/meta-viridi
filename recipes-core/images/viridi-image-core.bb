@@ -19,6 +19,8 @@ IMAGE_INSTALL:append = "\
 	memtester \
 	i2c-tools \
 	sdc-tests \
+	python3-spidev \
+	spidev-test \ 
 	bluez5-obex \
 	libgpiod-tools \
 	net-tools \
