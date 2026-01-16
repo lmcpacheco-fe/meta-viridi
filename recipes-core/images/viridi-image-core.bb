@@ -17,6 +17,7 @@ IMAGE_INSTALL:append = "\
 	can-utils \
 	net-tools \
 	memtester \
+	modemmanager \
 	i2c-tools \
 	sdc-tests \
 	bluez5-obex \
