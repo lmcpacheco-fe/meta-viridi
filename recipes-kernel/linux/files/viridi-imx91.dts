@@ -53,9 +53,9 @@
 		compatible = "telit,me910g1";
 		status = "okay";
 		serial = <&lpuart3>;
-		shutdown-gpios = <&pca9555_21 9 GPIO_ACTIVE_LOW>;			//IO_Exp(P1_1) = LTE_ON_OFF_1V8
-		reset-gpios = <&pca9555_21 10 GPIO_ACTIVE_LOW>;				//IO_Exp(P1_2) = LTE_nSHTD_1V8
-		//gnss-lna-gpios = <&pca9555_21 8 GPIO_ACTIVE_HIGH>;			//Opcional: IO_Exp(P1_0) = GNSS LNA controled by SW
+		reset-gpios = <&pca9555_21 9 GPIO_ACTIVE_LOW>;			//IO_Exp(P1_1) = LTE_ON_OFF_1V8
+		shutdown-gpios = <&pca9555_21 10 GPIO_ACTIVE_LOW>;				//IO_Exp(P1_2) = LTE_nSHTD_1V8
+		// gnss-lna-gpios = <&pca9555_21 8 GPIO_ACTIVE_HIGH>;			//Opcional: IO_Exp(P1_0) = GNSS LNA controled by SW
 		lte_wake_ready {
 			compatible = "nxp,lte_wake_ready";
 			interrupt-parent = <&gpio2>;
@@ -226,7 +226,37 @@
 		gpio-line-names = "RS485_nRE_1V8", "RSTRAN_nSHDN_1V8","RSTRAN_CTRL_1V8", "RSTRAN_SEL_1V8",
 			"RSTRAN_DUP_1V8", "CONA_EN", "CONB_EN", "NC",
 			"DIGITAL_IN0", "DIGITAL_IN1","DIGITAL_IN2", "DIGITAL_IN3",
-			"OUT0_EN", "OUT1_EN", "OUT2_EN", "OUT3_EN";
+			"OUT3_EN", "OUT2_EN", "OUT1_EN", "OUT0_EN";
+		rs485_nre_hog {
+			gpio-hog;
+			gpios = <0 GPIO_ACTIVE_HIGH>;   /* RS485_nRE_1V8 */
+			output-low;                     /* RE asserted (active-low) */
+			line-name = "RS485_nRE_1V8";
+		};
+		rstran_nshdn_hog {
+			gpio-hog;
+			gpios = <4 GPIO_ACTIVE_HIGH>;   /* RSTRAN_nSHDN_1V8 */
+			output-high;                    /* not shutdown */
+			line-name = "RSTRAN_nSHDN_1V8";
+		};
+		rstran_ctrl_hog {
+			gpio-hog;
+			gpios = <3 GPIO_ACTIVE_HIGH>;   /* RSTRAN_CTRL_1V8 */
+			output-high;                    /* SLEW = fast */
+			line-name = "RSTRAN_CTRL_1V8";
+		};
+		rstran_sel_hog {
+			gpio-hog;
+			gpios = <1 GPIO_ACTIVE_HIGH>;   /* RSTRAN_SEL_1V8 */
+			output-high;                    /* RS-485 mode */
+			line-name = "RSTRAN_SEL_1V8";
+		};
+		rstran_dup_hog {
+			gpio-hog;
+			gpios = <2 GPIO_ACTIVE_HIGH>;   /* RSTRAN_DUP_1V8 */
+			output-low;                     /* FULL duplex */
+			line-name = "RSTRAN_DUP_1V8";
+		};
 	};
 
 	/*Io Expander --> PCA9555AHF,128*/
@@ -243,7 +273,7 @@
 			"EXP_IO3", "EXP_IO4", "EXP_PWR_EN",
 			"WF_nEN_1V8", "WF_nRST_1V8", "BT_nRST_1V8",
 			"GNSS_LNA_EN1", "LTE_ON_OFF_1V8",
-			"NC", "NC", "NC", "NC", "NC", "NC";
+			"LTE_nSHTD_1V8", "NC", "NC", "NC", "NC", "NC";
 	};
 };
 
@@ -486,26 +516,6 @@
 			MX91_PAD_SD3_DATA1__USDHC3_DATA1		0x1382
 			MX91_PAD_SD3_DATA2__USDHC3_DATA2		0x1382
 			MX91_PAD_SD3_DATA3__USDHC3_DATA3		0x1382
-		>;
-	};
-
-	pinctrl_usdhc3_wlan: usdhc3wlangrp {
-		fsl,pins = <
-			MX91_PAD_GPIO_IO27__GPIO2_IO27			0x31e
-		>;
-	};
-
-	pinctrl_wifi: wifigrp {
-		fsl,pins = <
-			MX91_PAD_GPIO_IO27__GPIO2_IO27			0x31e
-		>;
-	};
-
-	pinctrl_reg_wifi: wifireggrp {
-		fsl,pins = <
-			MX91_PAD_GPIO_IO13__GPIO2_IO13 			0x31e
-			MX91_PAD_GPIO_IO26__GPIO2_IO26 			0x31e
-			MX91_PAD_GPIO_IO27__GPIO2_IO27 			0x31e
 		>;
 	};
 

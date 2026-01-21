@@ -11,6 +11,7 @@ IMAGE_INSTALL:append = "\
 	ethtool \
 	openssh \
 	phytool \
+	picocom \
 	devmem2 \
 	libgpiod \
 	iproute2 \

@@ -128,10 +128,11 @@
 	status = "okay";
 	fsl,uart-has-rtscts;
 	linux,rs485-enabled-at-boot-time;
+	rs485-rts-active-high;
 	// rts-gpios = <&gpio2 7 GPIO_ACTIVE_HIGH>;
 	rs485-rts-delay = <1 1>;
-	// rs485-rx-during-tx;
-	fsl,dte-mode;
+	rs485-rx-during-tx;
+	// fsl,dte-mode;
 };
 
 &lpuart7 {
@@ -220,11 +221,11 @@
 	pinctrl-0 = <&pinctrl_lpspi4>;
 	cs-gpios = <&gpio2 18 GPIO_ACTIVE_LOW>;
 	status = "okay";
-	// spidev0: spi@0 {
-	// 	reg = <0>;								// CS0
-	// 	compatible = "spidev";					// Generic driver for testing
-	// 	spi-max-frequency = <1000000>;			// 1 MHz, adjust according to peripheral
-	// };
+	spidev0: spi@0 {
+		reg = <0>;								// CS0
+		compatible = "spidev";					// Generic driver for testing
+		spi-max-frequency = <1000000>;			// 1 MHz, adjust according to peripheral
+	};
 };
 
 &gpio1 {
