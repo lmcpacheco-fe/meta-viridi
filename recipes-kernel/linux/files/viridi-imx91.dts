@@ -53,8 +53,8 @@
 		compatible = "telit,me910g1";
 		status = "okay";
 		serial = <&lpuart3>;
-		shutdown-gpios = <&pca9555_21 9 GPIO_ACTIVE_LOW>;			//IO_Exp(P1_1) = LTE_ON_OFF_1V8
-		reset-gpios = <&pca9555_21 10 GPIO_ACTIVE_LOW>;				//IO_Exp(P1_2) = LTE_nSHTD_1V8
+		reset-gpios = <&pca9555_21 9 GPIO_ACTIVE_LOW>;			//IO_Exp(P1_1) = LTE_ON_OFF_1V8
+		shutdown-gpios = <&pca9555_21 10 GPIO_ACTIVE_LOW>;				//IO_Exp(P1_2) = LTE_nSHTD_1V8
 		//gnss-lna-gpios = <&pca9555_21 8 GPIO_ACTIVE_HIGH>;			//Opcional: IO_Exp(P1_0) = GNSS LNA controled by SW
 		lte_wake_ready {
 			compatible = "nxp,lte_wake_ready";
@@ -279,7 +279,7 @@
 			"EXP_IO3", "EXP_IO4", "EXP_PWR_EN",
 			"WF_nEN_1V8", "WF_nRST_1V8", "BT_nRST_1",
 			"GNSS_LNA_EN1", "LTE_ON_OFF_1V8",
-			"NC", "NC", "NC", "NC", "NC", "NC";
+			"LTE_nSHTD_1V8", "NC", "NC", "NC", "NC", "NC";
 	};
 };
 
