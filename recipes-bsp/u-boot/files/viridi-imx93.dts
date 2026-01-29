@@ -376,10 +376,10 @@
 		#gpio-cells = <2>;
 		interrupt-parent = <&gpio1>;
 		interrupts = <8 IRQ_TYPE_LEVEL_LOW>;	//Io Expander INT on GPIO1_IO08
-		gpio-line-names = "RS485_nRE_1V8", "RSTRAN_nSHDN_1V8", "RSTRAN_CTRL_1V8",
-			"RSTRAN_SEL_1V8", "RSTRAN_DUP_1V8", "CONA_EN", "CONB_EN", "NC",
+		gpio-line-names = "RS485_nRE_1V8", "RSTRAN_SEL_1V8", "RSTRAN_DUP_1V8", "RSTRAN_CTRL_1V8",
+			"RSTRAN_nSHDN_1V8", "CONA_EN", "CONB_EN", "NC",
 			"DIGITAL_IN0", "DIGITAL_IN1","DIGITAL_IN2", "DIGITAL_IN3",
-			"OUT0_EN", "OUT1_EN", "OUT2_EN", "OUT3_EN";
+			"OUT3_EN", "OUT2_EN", "OUT1_EN", "OUT0_EN";
 	};
 
 	/*Io Expander --> PCA9555AHF,128*/

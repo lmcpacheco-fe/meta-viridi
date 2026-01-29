@@ -190,12 +190,12 @@
 		#gpio-cells = <2>;
 		gpio-line-names = "LED1_nEN", "LED2_nEN", "LED3_nEN", "LED4_nEN",
 			"CAN1_EOL", "DSP_CTRL_3V3", "RS485_TX_EOL_3V3", "NC";
-		can1_eol_hog {
-			gpio-hog;
-			gpios = <4 GPIO_ACTIVE_HIGH>;		//Pin 4 = RS485_TX_EOL_3V3
-			output-low;
-			line-name = "CAN1_EOL";
-		};
+		// can1_eol_hog {
+		// 	gpio-hog;
+		// 	gpios = <4 GPIO_ACTIVE_HIGH>;		//Pin 4 = RS485_TX_EOL_3V3
+		// 	output-low;
+		// 	line-name = "CAN1_EOL";
+		// };
 
 		rs485_tx_eol_hog {
 			gpio-hog;
@@ -344,8 +344,8 @@
 		#gpio-cells = <2>;
 		interrupt-parent = <&gpio1>;
 		interrupts = <8 IRQ_TYPE_LEVEL_LOW>;	//Io Expander INT on GPIO1_IO08
-		gpio-line-names = "RS485_nRE_1V8", "RSTRAN_nSHDN_1V8", "RSTRAN_CTRL_1V8",
-			"RSTRAN_SEL_1V8", "RSTRAN_DUP_1V8", "CONA_EN", "CONB_EN", "NC",
+		gpio-line-names = "RS485_nRE_1V8", "RSTRAN_SEL_1V8", "RSTRAN_DUP_1V8", "RSTRAN_CTRL_1V8",
+			"RSTRAN_nSHDN_1V8", "CONA_EN", "CONB_EN", "NC",
 			"DIGITAL_IN0", "DIGITAL_IN1","DIGITAL_IN2", "DIGITAL_IN3",
 			"OUT3_EN", "OUT2_EN", "OUT1_EN", "OUT0_EN";
 		rs485_nre_hog {
@@ -369,19 +369,19 @@
 			line-name = "RSTRAN_CTRL_1V8";
 		};
 
-		rstran_sel_hog {
-			gpio-hog;
-			gpios = <1 GPIO_ACTIVE_HIGH>;   //IO_Exp(P0_1) = RSTRAN_SEL_1V8
-			output-high;                    //RS-485 mode
-			line-name = "RSTRAN_SEL_1V8";
-		};
+		// rstran_sel_hog {
+		// 	gpio-hog;
+		// 	gpios = <1 GPIO_ACTIVE_HIGH>;   //IO_Exp(P0_1) = RSTRAN_SEL_1V8
+		// 	output-high;                    //RS-485 mode
+		// 	line-name = "RSTRAN_SEL_1V8";
+		// };
 
-		rstran_dup_hog {
-			gpio-hog;
-			gpios = <2 GPIO_ACTIVE_HIGH>;   //IO_Exp(P0_2) = RSTRAN_DUP_1V8
-			output-low;                     //FULL duplex
-			line-name = "RSTRAN_DUP_1V8";
-		};
+		// rstran_dup_hog {
+		// 	gpio-hog;
+		// 	gpios = <2 GPIO_ACTIVE_HIGH>;   //IO_Exp(P0_2) = RSTRAN_DUP_1V8
+		// 	output-low;                     //FULL duplex
+		// 	line-name = "RSTRAN_DUP_1V8";
+		// };
 	};
 
 	/*Io Expander --> PCA9555AHF,128*/
@@ -464,21 +464,21 @@
 	eol-gpios = <&gpio3 1 GPIO_ACTIVE_HIGH>;			//CAN2_EOL
 };
 
-&gpio3 {
-	gpio_can2_eol: gpio-can2-eol {
-		gpio-hog;
-		gpios = <1 GPIO_ACTIVE_HIGH>;		//GPIO3_IO01 = CAN2_EOL
-		output-low;
-		line-name = "CAN2_EOL";
-	};
+// &gpio3 {
+// 	gpio_can2_eol: gpio-can2-eol {
+// 		gpio-hog;
+// 		gpios = <1 GPIO_ACTIVE_HIGH>;		//GPIO3_IO01 = CAN2_EOL
+// 		output-low;
+// 		line-name = "CAN2_EOL";
+// 	};
 
-	gpio_rs485_rx_eol: gpio_rs485_rx_eol {
-		gpio-hog;
-		gpios = <6 GPIO_ACTIVE_HIGH>;		//GPIO3_IO06 = RS485_RX_EOL_3V3
-		output-low;
-		line-name = "RS485_RX_EOL_3V3";
-	};
-};
+// 	gpio_rs485_rx_eol: gpio_rs485_rx_eol {
+// 		gpio-hog;
+// 		gpios = <6 GPIO_ACTIVE_HIGH>;		//GPIO3_IO06 = RS485_RX_EOL_3V3
+// 		output-low;
+// 		line-name = "RS485_RX_EOL_3V3";
+// 	};
+// };
 
 &iomuxc {
 	pinctrl_eqos: eqosgrp {
