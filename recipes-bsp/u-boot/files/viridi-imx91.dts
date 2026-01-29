@@ -53,22 +53,11 @@
 		regulator-max-microvolt = <1800000>;	
 		regulator-min-microvolt = <1800000>;
 		regulator-name = "WLAN_EN";
-		/*gpio = <&gpio2 13 GPIO_ACTIVE_LOW>;			CPU(GPIO2_13) = WF_nPD_1V8*/
 		gpio = <&pca9555_21 5 GPIO_ACTIVE_LOW>;
 		regulator-boot-on;
 		regulator-always-on;
 		startup-delay-us = <20000>;
 	};
-
-	// reg_bt_nrst: regulator-bt-nrst {
-	// 	compatible = "regulator-fixed";
-	// 	regulator-name = "BT_nRST_1V8";
-	// 	regulator-min-microvolt = <1800000>;
-	// 	regulator-max-microvolt = <1800000>;
-	// 	gpio = <&pca9555_21 7 GPIO_ACTIVE_LOW>;		// IO_Exp(P0_7) = BT_nRST_1V8 (active low)
-	// 	regulator-always-on;
-	// 	startup-delay-us = <5000>;
-	// };
 
 	usdhc3_pwrseq: usdhc3_pwrseq {
 		compatible = "mmc-pwrseq-simple";
@@ -274,7 +263,7 @@
 			"EXP_IO3", "EXP_IO4", "EXP_PWR_EN",
 			"WF_nEN_1V8", "WF_nRST_1V8", "BT_nRST_1V8",
 			"GNSS_LNA_EN1", "LTE_ON_OFF_1V8",
-			"NC", "NC", "NC", "NC", "NC", "NC";
+			"LTE_nSHTD_1V8", "NC", "NC", "NC", "NC", "NC";
 	};
 };
 
@@ -297,10 +286,6 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart5>;
 	status = "okay";
-	// fsl,uart-has-rtscts;
-	// bluetooth {
-	// 	compatible = "nxp,88w8987-bt";
-	// };
 };
 
 &lpuart6 {
@@ -308,11 +293,6 @@
 	pinctrl-0 = <&pinctrl_uart6>;
 	pinctrl-names = "default";
 	status = "okay";
-	/*RS485*/
-	// fsl,uart-has-rtscts;
-	// rs485-rts-gpio = <&gpio3 5 GPIO_ACTIVE_HIGH>;
-	// rs485-rts-active-high;
-	// rs485-delay = <1 1>;
 };
 
 &lpuart7 {
@@ -622,50 +602,6 @@
 			MX91_PAD_SD2_DATA2__GPIO3_IO5		0x51e
 			MX91_PAD_SD2_DATA3__GPIO3_IO6		0x51e
 			MX91_PAD_SD2_VSELECT__GPIO3_IO19	0x51e
-		>;
-	};
-
-	pinctrl_usdhc3_100mhz: usdhc3-100mhzgrp {
-		fsl,pins = <
-			MX91_PAD_SD3_CLK__USDHC3_CLK		0x158e
-			MX91_PAD_SD3_CMD__USDHC3_CMD		0x138e
-			MX91_PAD_SD3_DATA0__USDHC3_DATA0	0x138e
-			MX91_PAD_SD3_DATA1__USDHC3_DATA1	0x138e
-			MX91_PAD_SD3_DATA2__USDHC3_DATA2	0x138e
-			MX91_PAD_SD3_DATA3__USDHC3_DATA3	0x138e
-		>;
-	};
-
-	pinctrl_usdhc3_200mhz: usdhc3-200mhzgrp {
-		fsl,pins = <
-			MX91_PAD_SD3_CLK__USDHC3_CLK		0x15fe
-			MX91_PAD_SD3_CMD__USDHC3_CMD		0x13fe
-			MX91_PAD_SD3_DATA0__USDHC3_DATA0	0x13fe
-			MX91_PAD_SD3_DATA1__USDHC3_DATA1	0x13fe
-			MX91_PAD_SD3_DATA2__USDHC3_DATA2	0x13fe
-			MX91_PAD_SD3_DATA3__USDHC3_DATA3	0x13fe
-		>;
-	};
-
-	pinctrl_usdhc3: usdhc3grp {
-		fsl,pins = <
-			MX91_PAD_SD3_CLK__USDHC3_CLK		0x1582
-			MX91_PAD_SD3_CMD__USDHC3_CMD		0x1382
-			MX91_PAD_SD3_DATA0__USDHC3_DATA0	0x1382
-			MX91_PAD_SD3_DATA1__USDHC3_DATA1	0x1382
-			MX91_PAD_SD3_DATA2__USDHC3_DATA2	0x1382
-			MX91_PAD_SD3_DATA3__USDHC3_DATA3	0x1382
-		>;
-	};
-
-	pinctrl_usdhc3_sleep: usdhc3grpsleep {
-		fsl,pins = <
-			MX91_PAD_SD3_CLK__GPIO3_IO20			0x31e
-			MX91_PAD_SD3_CMD__GPIO3_IO21			0x31e
-			MX91_PAD_SD3_DATA0__GPIO3_IO22			0x31e
-			MX91_PAD_SD3_DATA1__GPIO3_IO23			0x31e
-			MX91_PAD_SD3_DATA2__GPIO3_IO24			0x31e
-			MX91_PAD_SD3_DATA3__GPIO3_IO25			0x31e
 		>;
 	};
 };

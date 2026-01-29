@@ -19,6 +19,8 @@ IMAGE_INSTALL:append = "\
 	memtester \
 	i2c-tools \
 	sdc-tests \
+	python3-spidev \
+	spidev-test \ 
 	bluez5-obex \
 	libgpiod-tools \
 	net-tools \
@@ -28,7 +30,6 @@ IMAGE_INSTALL:append = "\
 	kernel-module-nxp-wlan \
 	wireless-regdb-static \
 	linux-firmware-nxpiw416-sdio \
-	iproute2 \
-	can-utils \
+	picocom \
 "
 
