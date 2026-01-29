@@ -100,12 +100,6 @@
 		#gpio-cells = <2>;
 		gpio-line-names = "LED1_nEN", "LED2_nEN", "LED3_nEN", "LED4_nEN",
 			"CAN1_EOL", "DSP_CTRL_3V3", "NC", "NC";
-		can1_eol_hog {
-			gpio-hog;
-			gpios = <4 GPIO_ACTIVE_HIGH>;
-			output-low;
-			line-name = "CAN1_EOL";
-		};
 	};
 };
 
@@ -250,18 +244,6 @@
 			gpios = <3 GPIO_ACTIVE_HIGH>;   /* RSTRAN_CTRL_1V8 */
 			output-high;                    /* SLEW = fast */
 			line-name = "RSTRAN_CTRL_1V8";
-		};
-		rstran_sel_hog {
-			gpio-hog;
-			gpios = <1 GPIO_ACTIVE_HIGH>;   /* RSTRAN_SEL_1V8 */
-			output-high;                    /* RS-485 mode */
-			line-name = "RSTRAN_SEL_1V8";
-		};
-		rstran_dup_hog {
-			gpio-hog;
-			gpios = <2 GPIO_ACTIVE_HIGH>;   /* RSTRAN_DUP_1V8 */
-			output-low;                     /* FULL duplex */
-			line-name = "RSTRAN_DUP_1V8";
 		};
 	};
 
