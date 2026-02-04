@@ -274,7 +274,7 @@
 
 &gpio3 {
 	gpio-line-names =
-		"gpio3-00", "gpio3-01", "gpio3-02", "gpio3-03",
+		"gpio3-00", "CAN2_EOL", "gpio3-02", "gpio3-03",
 		"gpio3-04", "gpio3-05", "gpio3-06", "gpio3-07",
 		"gpio3-08", "gpio3-09", "gpio3-10", "gpio3-11",
 		"gpio3-12", "gpio3-13", "gpio3-14", "gpio3-15",
