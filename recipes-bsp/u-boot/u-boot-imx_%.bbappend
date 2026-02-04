@@ -11,7 +11,8 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 SRC_URI += " \
     file://lpddr4x_timing_3733mts.c \
     file://lpddr4x_timing_1866mts.c \
-    file://lpddr4_timing_flex91.c \
+    file://lpddr4_timing_flex91_1600mts.c \
+    file://lpddr4_timing_flex91_2400mts.c \
     file://spl-91.c \
     file://spl-93.c \
     file://imx93_evk.c \
@@ -26,7 +27,8 @@ SRC_URI += " \
 # Copy the files to their destinations within the U-Boot source tree
 do_override_files() {
     if [ "${MACHINE}" = "viridi-imx91" ]; then
-        install -Dm 0644 ${WORKDIR}/sources-unpack/lpddr4_timing_flex91.c ${S}/board/freescale/imx91_evk/lpddr4_timing.c
+        install -Dm 0644 ${WORKDIR}/sources-unpack/lpddr4_timing_flex91_1600mts.c ${S}/board/freescale/imx91_evk/lpddr4_timing.c
+        install -Dm 0644 ${WORKDIR}/sources-unpack/lpddr4_timing_flex91_2400mts.c ${S}/board/freescale/imx91_evk/lpddr4_timing_2400mts.c
         install -Dm 0644 ${WORKDIR}/sources-unpack/spl-91.c ${S}/board/freescale/imx91_evk/spl.c
         install -Dm 0644 ${WORKDIR}/sources-unpack/viridi-imx91_defconfig ${S}/configs/viridi-imx91_defconfig
         install -Dm 0644 ${WORKDIR}/sources-unpack/viridi-imx91.dts ${S}/dts/upstream/src/arm64/viridi-imx91.dts

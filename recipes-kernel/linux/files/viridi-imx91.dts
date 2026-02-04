@@ -84,9 +84,9 @@
 	status = "okay";
 
 	/*RTC --> PCF2131TFY*/
-	pcf2131: pcf2131@51 {
+	pcf2131: pcf2131@53 {
 		compatible = "nxp,pcf2131";
-		reg = <0x51>;								//I2C Address (7bit) 0x51 expander --> 0xa3 (8bit)
+		reg = <0x53>;
 		status = "okay";
 		interrupt-parent = <&gpio3>;
 		interrupts = <7 IRQ_TYPE_EDGE_FALLING>;		//GPIO3_IO07 --> CPU

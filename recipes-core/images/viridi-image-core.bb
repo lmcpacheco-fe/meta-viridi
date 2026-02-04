@@ -7,6 +7,7 @@ IMAGE_INSTALL:append = "\
 	iw \
 	dtc \
 	tmux \
+	iperf3 \
 	bluez5 \
 	ethtool \
 	openssh \
