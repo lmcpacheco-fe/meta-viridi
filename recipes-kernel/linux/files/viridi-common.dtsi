@@ -41,6 +41,14 @@
 		startup-delay-us = <5000>;
 	};
 
+	reg_usb2_vbus: regulator-usb2-vbus {
+        compatible = "regulator-fixed";
+        regulator-name = "VUSB2_VBUS_3V3";
+        regulator-min-microvolt = <3300000>;
+        regulator-max-microvolt = <3300000>;
+        regulator-always-on;
+    };
+
 	// reg_bt_nrst: regulator-bt-nrst {
 	// 	compatible = "regulator-fixed";
 	// 	regulator-name = "BT_nRST_1V8";
@@ -202,12 +210,20 @@
 	status = "okay";
 };
 
+&usbphynop2 {
+	vcc-supply = <&reg_usb2_vbus>;
+	status = "okay";
+};
+
 &usbotg2 {
-	dr_mode = "peripheral";
+	dr_mode = "host";
 	hnp-disable;
 	srp-disable;
 	adp-disable;
 	disable-over-current;
+	vbus-supply = <&reg_usb2_vbus>;
+	phys = <&usbphynop2>;
+	phy-names = "usb2-phy";
 	samsung,picophy-pre-emp-curr-control = <3>;
 	samsung,picophy-dc-vol-level-adjust = <7>;
 	status = "okay";
@@ -281,7 +297,7 @@
 
 &gpio3 {
 	gpio-line-names =
-		"gpio3-00", "gpio3-01", "gpio3-02", "gpio3-03",
+		"gpio3-00", "CAN2_EOL", "gpio3-02", "gpio3-03",
 		"gpio3-04", "gpio3-05", "gpio3-06", "gpio3-07",
 		"gpio3-08", "gpio3-09", "gpio3-10", "gpio3-11",
 		"gpio3-12", "gpio3-13", "gpio3-14", "gpio3-15",

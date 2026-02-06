@@ -1,11 +1,11 @@
 /*
- * Copyright 2025 NXP
+ * Copyright 2026 NXP
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Code generated with DDR Tool v3.8.0_2.1-7343b64b3.
  * DDR PHY FW2022.01 
- * Part number: NXP LPDDR4 EVK and FRDM 11x11 board's default DDR part
+ * Part number: NXP LPDDR4X Viridi-91
  */
 
 #include <linux/kernel.h>

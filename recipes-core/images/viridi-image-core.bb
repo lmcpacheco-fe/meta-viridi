@@ -31,5 +31,7 @@ IMAGE_INSTALL:append = "\
 	wireless-regdb-static \
 	linux-firmware-nxpiw416-sdio \
 	picocom \
+	iperf3 \
+	libqmi \
 "
 
