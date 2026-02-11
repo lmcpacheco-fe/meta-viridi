@@ -38,4 +38,5 @@ IMAGE_INSTALL:append = "\
 	iperf3 \
 	libqmi \
 	kernel-modules \
+	rs-mode-switch \
 "

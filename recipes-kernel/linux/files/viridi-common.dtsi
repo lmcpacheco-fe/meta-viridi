@@ -137,10 +137,8 @@
 	fsl,uart-has-rtscts;
 	/*RS485*/
 	linux,rs485-supported;
-	// linux,rs485-enabled-at-boot-time;
-	// rs485-rts-active-high;
-	// rs485-rts-delay = <1 1>;
-	// rs485-rx-during-tx;
+	rs485-rts-active-high;
+	rs485-rts-delay = <1 1>;
 };
 
 &lpuart7 {
