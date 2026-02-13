@@ -29,6 +29,7 @@ IMAGE_INSTALL:append = "\
 	util-linux-lsblk \
 	openssh-sftp-server \
 	kernel-module-nxp-wlan \
+	kernel-module-btnxpuart \
 	wireless-regdb-static \
 	linux-firmware-nxpiw416-sdio \
 	pipewire \
@@ -39,4 +40,5 @@ IMAGE_INSTALL:append = "\
 	libqmi \
 	kernel-modules \
 	rs-mode-switch \
+	viridi-modprobe-config \
 "
