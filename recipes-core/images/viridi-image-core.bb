@@ -34,5 +34,7 @@ IMAGE_INSTALL:append = "\
 	iperf3 \
 	libqmi \
 	minicom \
+	kernel-module-btnxpuart \
+	condor-conf \
 "
 
