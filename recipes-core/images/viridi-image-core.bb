@@ -8,6 +8,7 @@ IMAGE_INSTALL:append = "\
 	dtc \
 	tmux \
 	bluez5 \
+	bluez5-noinst-tools \
 	ethtool \
 	openssh \
 	phytool \
@@ -20,7 +21,7 @@ IMAGE_INSTALL:append = "\
 	i2c-tools \
 	sdc-tests \
 	python3-spidev \
-	spidev-test \ 
+	spidev-test \
 	bluez5-obex \
 	libgpiod-tools \
 	net-tools \
@@ -28,10 +29,16 @@ IMAGE_INSTALL:append = "\
 	util-linux-lsblk \
 	openssh-sftp-server \
 	kernel-module-nxp-wlan \
+	kernel-module-btnxpuart \
 	wireless-regdb-static \
 	linux-firmware-nxpiw416-sdio \
+	pipewire \
+	pipewire-pulse \
+	wireplumber \
 	picocom \
 	iperf3 \
 	libqmi \
+	kernel-modules \
+	rs-mode-switch \
+	viridi-modprobe-config \
 "
-

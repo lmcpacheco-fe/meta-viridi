@@ -99,7 +99,7 @@
 		gpio-controller;
 		#gpio-cells = <2>;
 		gpio-line-names = "LED1_nEN", "LED2_nEN", "LED3_nEN", "LED4_nEN",
-			"CAN1_EOL", "DSP_CTRL_3V3", "NC", "NC";
+			"CAN1_EOL", "DSP_CTRL_3V3", "RS485_TX_EOL_3V3", "NC";
 	};
 };
 
@@ -259,7 +259,7 @@
 		interrupts = <9 IRQ_TYPE_LEVEL_LOW>;	//Io Expander INT on GPIO1_IO09
 		gpio-line-names = "EXP_IO1", "EXP_IO2",
 			"EXP_IO3", "EXP_IO4", "EXP_PWR_EN",
-			"WF_nEN_1V8", "WF_nRST_1V8", "BT_nRST_1",
+			"WF_nEN_1V8", "WF_nRST_1V8", "BT_nRST_1V8",
 			"GNSS_LNA_EN1", "LTE_ON_OFF_1V8",
 			"LTE_nSHTD_1V8", "NC", "NC", "NC", "NC", "NC";
 	};
