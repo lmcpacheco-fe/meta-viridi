@@ -9,14 +9,16 @@ SRC_URI = " \
     file://check-uart-config.c \
 "
 
+S = "${WORKDIR}/sources-unpack"
+
 # Skip QA check for debug buildpaths
 INSANE_SKIP:${PN}-dbg += "buildpaths"
 
 do_compile() {
-    ${CC} ${CFLAGS} ${LDFLAGS} -o rs485-enable ${WORKDIR}/sources-unpack/rs485-enable.c
-    ${CC} ${CFLAGS} ${LDFLAGS} -o rs232-enable ${WORKDIR}/sources-unpack/rs232-enable.c
-    ${CC} ${CFLAGS} ${LDFLAGS} -o check-rs485-support ${WORKDIR}/sources-unpack/check-rs485-support.c
-    ${CC} ${CFLAGS} ${LDFLAGS} -o check-uart-config ${WORKDIR}/sources-unpack/check-uart-config.c
+    ${CC} ${CFLAGS} ${LDFLAGS} -o rs485-enable ${S}/rs485-enable.c
+    ${CC} ${CFLAGS} ${LDFLAGS} -o rs232-enable ${S}/rs232-enable.c
+    ${CC} ${CFLAGS} ${LDFLAGS} -o check-rs485-support ${S}/check-rs485-support.c
+    ${CC} ${CFLAGS} ${LDFLAGS} -o check-uart-config ${S}/check-uart-config.c
 }
 
 do_install() {
