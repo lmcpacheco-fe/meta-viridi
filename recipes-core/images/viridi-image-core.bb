@@ -33,5 +33,6 @@ IMAGE_INSTALL:append = "\
 	picocom \
 	iperf3 \
 	libqmi \
+	minicom \
 "
 
