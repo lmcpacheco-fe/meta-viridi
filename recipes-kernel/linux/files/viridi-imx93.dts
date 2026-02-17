@@ -402,7 +402,7 @@
 	};
 };
 
-&eqos {
+&eqos {		//ETHERNET1 PHY10/100
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_eqos>;
 	// pinctrl-1 = <&pinctrl_eqos_sleep>;
@@ -424,14 +424,14 @@
 	};
 };
 
-&fec {
+&fec {		//ETHERNET2 PHY10/100
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_fec>;
 	// pinctrl-1 = <&pinctrl_fec_sleep>;
 	phy-mode = "rmii";
 	phy-handle = <&ethphy2>;
 	fsl,magic-packet;
-	fsl,rmii-refclk-in=<&wakeupmix_gpr 0x2c 0x1 0x0>;
+	fsl,rmii-refclk-in=<&wakeupmix_gpr 0x2c 0x1 0x0>;		//RMII clock is input
 	status = "okay";
 	mdio {
 		compatible = "snps,dwmac-mdio";
@@ -519,7 +519,8 @@
 			MX93_PAD_ENET2_MDIO__ENET1_MDIO			0x57e
 			MX93_PAD_ENET2_TD0__ENET1_RGMII_TD0		0x57e
 			MX93_PAD_ENET2_TD1__ENET1_RGMII_TD1		0x57e
-			MX93_PAD_ENET2_TD2__ENET1_TX_CLK		0x4000057e
+			MX93_PAD_ENET2_TD2__ENET1_TX_CLK		0x57e
+			// MX93_PAD_ENET2_TD2__ENET1_TX_CLK		0x4000057e
 			MX93_PAD_ENET2_TX_CTL__ENET1_RGMII_TX_CTL	0x57e
 			MX93_PAD_ENET2_RD0__ENET1_RGMII_RD0		0x57e
 			MX93_PAD_ENET2_RD1__ENET1_RGMII_RD1		0x57e

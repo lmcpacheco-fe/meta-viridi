@@ -14,6 +14,7 @@ SRC_URI:append = " \
     file://viridi-imx93.dts \
     file://Makefile \
     file://imx_v8_defconfig \
+    file://fec_main.c \
 "
 
 # Copy the files to their destinations within the Kernel source tree
@@ -23,6 +24,9 @@ do_override_files() {
     install -Dm 0644 ${WORKDIR}/sources-unpack/viridi-imx93.dts  ${S}/arch/arm64/boot/dts/freescale/viridi-imx93.dts
     install -Dm 0644 ${WORKDIR}/sources-unpack/Makefile ${S}/arch/arm64/boot/dts/freescale/Makefile
     install -Dm 0644 ${WORKDIR}/sources-unpack/${KBUILD_DEFCONFIG} ${S}/arch/arm64/configs/${KBUILD_DEFCONFIG}
+
+    # Override FEC driver
+    install -Dm 0644 ${WORKDIR}/sources-unpack/fec_main.c ${S}/drivers/net/ethernet/freescale/fec_main.c
 }
 
 # Define task execution order 
