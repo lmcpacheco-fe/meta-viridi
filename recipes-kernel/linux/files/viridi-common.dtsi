@@ -134,9 +134,9 @@
 	pinctrl-0 = <&pinctrl_uart6>;
 	pinctrl-names = "default";
 	status = "okay";
-	/*RS485*/
 	fsl,uart-has-rtscts;
-	linux,rs485-enabled-at-boot-time;
+	/*RS485*/
+	linux,rs485-supported;
 	rs485-rts-active-high;
 	rs485-rts-delay = <1 1>;
 	//rs485-rx-during-tx;
