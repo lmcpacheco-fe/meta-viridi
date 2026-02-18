@@ -4332,6 +4332,38 @@ static void fec_enet_get_wakeup_irq(struct platform_device *pdev)
 		fep->wake_irq = fep->irq[0];
 }
 
+static int fec_enet_set_rmii_refclk_direction(struct fec_enet_private *fep,
+					      struct device_node *np)
+{
+	struct device_node *gpr_np;
+	struct regmap *gpr_map;
+	u32 out_val[4];
+	int err;
+
+	/* If this property is not present, use the hardware default
+	 * setting. The hardware defaults to output reference clock.
+	 */
+	gpr_np = of_parse_phandle(np, "fsl,rmii-refclk-in", 0);
+	if (!gpr_np)
+		return 0;
+
+	err = of_property_read_u32_array(np, "fsl,rmii-refclk-in", out_val,
+					 ARRAY_SIZE(out_val));
+	if (err) {
+		dev_dbg(&fep->pdev->dev, "fsl,rmii-refclk-in property is wrong\n");
+		return err;
+	}
+
+	gpr_map = syscon_node_to_regmap(gpr_np);
+	if (IS_ERR(gpr_map)) {
+		dev_err(&fep->pdev->dev, "Could not find gpr regmap\n");
+		err = PTR_ERR(gpr_map);
+		return err;
+	}
+
+	return regmap_update_bits(gpr_map, out_val[1], BIT(out_val[2]), out_val[3]);
+}
+
 static int fec_enet_init_stop_mode(struct fec_enet_private *fep,
 				   struct device_node *np)
 {
@@ -4463,6 +4495,12 @@ fec_probe(struct platform_device *pdev)
 			fep->phy_interface = PHY_INTERFACE_MODE_MII;
 	} else {
 		fep->phy_interface = interface;
+	}
+
+	if (fep->phy_interface == PHY_INTERFACE_MODE_RMII) {
+		ret = fec_enet_set_rmii_refclk_direction(fep, np);
+		if (ret)
+			goto failed_rmii_refclk_dir;
 	}
 
 	ret = fec_enet_parse_rgmii_delay(fep, np);
@@ -4640,6 +4678,7 @@ failed_rgmii_delay:
 	of_node_put(phy_node);
 failed_stop_mode:
 failed_ipc_init:
+failed_rmii_refclk_dir:
 failed_phy:
 	dev_id--;
 failed_ioremap:
