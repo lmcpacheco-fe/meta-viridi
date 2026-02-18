@@ -42,4 +42,6 @@ IMAGE_INSTALL:append = "\
 	condor-conf \
 	kernel-modules \
 	rs-mode-switch \
+        python3-pyserial \
+        python3-pip \
 "
