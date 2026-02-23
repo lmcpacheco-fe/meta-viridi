@@ -44,4 +44,6 @@ IMAGE_INSTALL:append = "\
 	rs-mode-switch \
         python3-pyserial \
         python3-pip \
+        python3-json \
+        zstd \
 "
