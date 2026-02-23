@@ -7,6 +7,8 @@ UNPACKDIR = "${S}"
 SRC_URI = " \
     file://maya-w166.modules-load.conf \
     file://maya-w166.modprobe.conf \
+    file://020-eth1.network \
+    file://020-eth2.network \
 "
 
 do_install() {
@@ -17,8 +19,8 @@ do_install() {
     install -m 0644 ${UNPACKDIR}/maya-w166.modprobe.conf ${D}${nonarch_libdir}/modprobe.d/maya-w166.conf
 
     install -d                                    ${D}${nonarch_libdir}/systemd/network
-    install -m 0644 ${UNPACKDIR}/020-eth0.network ${D}${nonarch_libdir}/systemd/network/
     install -m 0644 ${UNPACKDIR}/020-eth1.network ${D}${nonarch_libdir}/systemd/network/
+    install -m 0644 ${UNPACKDIR}/020-eth2.network ${D}${nonarch_libdir}/systemd/network/
 }
 
 RDEPENDS:${PN} = "kernel-module-btnxpuart kernel-module-nxp-wlan firmware-nxp-wifi"
