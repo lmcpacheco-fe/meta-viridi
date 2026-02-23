@@ -15,6 +15,10 @@ do_install() {
 
     install -d                                           ${D}${nonarch_libdir}/modprobe.d
     install -m 0644 ${UNPACKDIR}/maya-w166.modprobe.conf ${D}${nonarch_libdir}/modprobe.d/maya-w166.conf
+
+    install -d                                    ${D}${nonarch_libdir}/systemd/network
+    install -m 0644 ${UNPACKDIR}/020-eth0.network ${D}${nonarch_libdir}/systemd/network/
+    install -m 0644 ${UNPACKDIR}/020-eth1.network ${D}${nonarch_libdir}/systemd/network/
 }
 
 RDEPENDS:${PN} = "kernel-module-btnxpuart kernel-module-nxp-wlan firmware-nxp-wifi"
@@ -22,4 +26,5 @@ RDEPENDS:${PN} = "kernel-module-btnxpuart kernel-module-nxp-wlan firmware-nxp-wi
 FILES:${PN} = " \
     ${nonarch_libdir}/modprobe.d \
     ${nonarch_libdir}/modules-load.d \
+    ${nonarch_libdir}/systemd/network \
 "
