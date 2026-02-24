@@ -15,6 +15,7 @@ SRC_URI:append = " \
     file://Makefile \
     file://imx_v8_defconfig \
     file://fec_main.c \
+    file://0001-serial-fsl_lpuart-fix-rs485-half-duplex-echo-suppres.patch \
 "
 
 # Copy the files to their destinations within the Kernel source tree
