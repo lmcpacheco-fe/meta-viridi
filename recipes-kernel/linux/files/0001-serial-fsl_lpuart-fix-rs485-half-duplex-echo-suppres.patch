@@ -1,0 +1,335 @@
+From ce0d885fde9065e1dcf0e51dd85b687ac977726f Mon Sep 17 00:00:00 2001
+From: lmcpacheco <luispacheco@futureelectronics.com>
+Date: Mon, 23 Feb 2026 16:29:16 -0500
+Subject: [PATCH] serial: fsl_lpuart: fix RS485 half-duplex echo suppression
+ implementation
+
+ This patch enables software-driven local echo suppression for the
+i.MX93 LPUART by implementing SER_RS485_RX_DURING_TX support.
+
+Upstream-Status: Pending
+
+Signed-off-by: lmcpacheco <luispacheco@futureelectronics.com>
+
+---
+ drivers/tty/serial/fsl_lpuart.c | 164 ++++++++++++++++++++++++++++++--
+ 1 file changed, 155 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/tty/serial/fsl_lpuart.c b/drivers/tty/serial/fsl_lpuart.c
+index f36d50fe056f..d82f1d15e32e 100644
+--- a/drivers/tty/serial/fsl_lpuart.c
++++ b/drivers/tty/serial/fsl_lpuart.c
+@@ -291,6 +291,7 @@ struct lpuart_port {
+ 	bool			is_cs7; /* Set to true when character size is 7 */
+ 					/* and the parity is enabled		*/
+ 	bool			dma_idle_int;
++	bool			rs485_rx_during_tx_active;
+ };
+ 
+ struct lpuart_soc_data {
+@@ -359,6 +360,7 @@ MODULE_DEVICE_TABLE(of, lpuart_dt_ids);
+ 
+ /* Forward declare this for the dma callbacks*/
+ static void lpuart_dma_tx_complete(void *arg);
++static bool lpuart_is_32(struct lpuart_port *sport);
+ 
+ static inline bool is_layerscape_lpuart(struct lpuart_port *sport)
+ {
+@@ -441,22 +443,101 @@ static unsigned int lpuart_get_baud_clk_rate(struct lpuart_port *sport)
+ 
+ static void lpuart_stop_tx(struct uart_port *port)
+ {
++	struct lpuart_port *sport = container_of(port, struct lpuart_port, port);
+ 	u8 cr2;
+ 
+ 	cr2 = readb(port->membase + UARTCR2);
+-	cr2 &= ~(UARTCR2_TIE | UARTCR2_TCIE);
++	cr2 &= ~UARTCR2_TIE;
++	if (!sport->rs485_rx_during_tx_active)
++		cr2 &= ~UARTCR2_TCIE;
+ 	writeb(cr2, port->membase + UARTCR2);
+ }
+ 
+ static void lpuart32_stop_tx(struct uart_port *port)
+ {
++	struct lpuart_port *sport = container_of(port, struct lpuart_port, port);
+ 	u32 ctrl;
+ 
+ 	ctrl = lpuart32_read(port, UARTCTRL);
+-	ctrl &= ~(UARTCTRL_TIE | UARTCTRL_TCIE);
++	ctrl &= ~UARTCTRL_TIE;
++	if (!sport->rs485_rx_during_tx_active)
++		ctrl &= ~UARTCTRL_TCIE;
+ 	lpuart32_write(port, ctrl, UARTCTRL);
+ }
+ 
++static bool lpuart_rs485_rx_during_tx_disabled(struct uart_port *port)
++{
++	return (port->rs485.flags & SER_RS485_ENABLED) &&
++		!(port->rs485.flags & SER_RS485_RX_DURING_TX);
++}
++
++static void lpuart_rs485_prepare_tx(struct lpuart_port *sport)
++{
++	struct uart_port *port = &sport->port;
++
++	if (!lpuart_rs485_rx_during_tx_disabled(port) ||
++	    sport->rs485_rx_during_tx_active)
++		return;
++
++	if (lpuart_is_32(sport)) {
++		u32 ctrl = lpuart32_read(port, UARTCTRL);
++
++		ctrl &= ~UARTCTRL_RE;
++		lpuart32_write(port, ctrl, UARTCTRL);
++	} else {
++		u8 cr2 = readb(port->membase + UARTCR2);
++
++		cr2 &= ~UARTCR2_RE;
++		writeb(cr2, port->membase + UARTCR2);
++	}
++
++	sport->rs485_rx_during_tx_active = true;
++}
++
++static void lpuart_rs485_restore_rx(struct lpuart_port *sport)
++{
++	struct uart_port *port = &sport->port;
++
++	if (!sport->rs485_rx_during_tx_active)
++		return;
++
++	if (lpuart_is_32(sport)) {
++		u32 ctrl = lpuart32_read(port, UARTCTRL);
++
++		ctrl |= UARTCTRL_RE;
++		ctrl &= ~UARTCTRL_TCIE;
++		lpuart32_write(port, ctrl, UARTCTRL);
++	} else {
++		u8 cr2 = readb(port->membase + UARTCR2);
++
++		cr2 |= UARTCR2_RE;
++		cr2 &= ~UARTCR2_TCIE;
++		writeb(cr2, port->membase + UARTCR2);
++	}
++
++	sport->rs485_rx_during_tx_active = false;
++}
++
++static void lpuart_rs485_arm_tc_interrupt(struct lpuart_port *sport)
++{
++	struct uart_port *port = &sport->port;
++
++	if (!sport->rs485_rx_during_tx_active)
++		return;
++
++	if (lpuart_is_32(sport)) {
++		u32 ctrl = lpuart32_read(port, UARTCTRL);
++
++		ctrl |= UARTCTRL_TCIE;
++		lpuart32_write(port, ctrl, UARTCTRL);
++	} else {
++		u8 cr2 = readb(port->membase + UARTCR2);
++
++		cr2 |= UARTCR2_TCIE;
++		writeb(cr2, port->membase + UARTCR2);
++	}
++}
++
+ static void lpuart_stop_rx(struct uart_port *port)
+ {
+ 	u8 cr2;
+@@ -552,6 +633,8 @@ static void lpuart_dma_tx_complete(void *arg)
+ 
+ 	if (!lpuart_stopped_or_empty(&sport->port))
+ 		lpuart_dma_tx(sport);
++	else
++		lpuart_rs485_arm_tc_interrupt(sport);
+ 
+ 	uart_port_unlock_irqrestore(&sport->port, flags);
+ }
+@@ -610,6 +693,12 @@ static void lpuart_flush_buffer(struct uart_port *port)
+ 		dmaengine_terminate_async(chan);
+ 	}
+ 
++	/*
++	 * DMA termination may prevent the TX complete path from restoring RX
++	 * when RS-485 echo suppression is active.
++	 */
++	lpuart_rs485_restore_rx(sport);
++
+ 	if (lpuart_is_32(sport)) {
+ 		fifo = lpuart32_read(port, UARTFIFO);
+ 		fifo |= UARTFIFO_TXFLUSH | UARTFIFO_RXFLUSH;
+@@ -788,6 +877,8 @@ static void lpuart_start_tx(struct uart_port *port)
+ 			struct lpuart_port, port);
+ 	u8 cr2;
+ 
++	lpuart_rs485_prepare_tx(sport);
++
+ 	cr2 = readb(port->membase + UARTCR2);
+ 	writeb(cr2 | UARTCR2_TIE, port->membase + UARTCR2);
+ 
+@@ -805,6 +896,8 @@ static void lpuart32_start_tx(struct uart_port *port)
+ 	struct lpuart_port *sport = container_of(port, struct lpuart_port, port);
+ 	u32 ctrl;
+ 
++	lpuart_rs485_prepare_tx(sport);
++
+ 	if (sport->lpuart_dma_tx_use) {
+ 		if (!lpuart_stopped_or_empty(port))
+ 			lpuart_dma_tx(sport);
+@@ -874,6 +967,8 @@ static void lpuart_txint(struct lpuart_port *sport)
+ {
+ 	uart_port_lock(&sport->port);
+ 	lpuart_transmit_buffer(sport);
++	if (lpuart_stopped_or_empty(&sport->port))
++		lpuart_rs485_arm_tc_interrupt(sport);
+ 	uart_port_unlock(&sport->port);
+ }
+ 
+@@ -951,6 +1046,8 @@ static void lpuart32_txint(struct lpuart_port *sport)
+ {
+ 	uart_port_lock(&sport->port);
+ 	lpuart32_transmit_buffer(sport);
++	if (lpuart_stopped_or_empty(&sport->port))
++		lpuart_rs485_arm_tc_interrupt(sport);
+ 	uart_port_unlock(&sport->port);
+ }
+ 
+@@ -1055,6 +1152,9 @@ static irqreturn_t lpuart_int(int irq, void *dev_id)
+ 	if (sts & UARTSR1_TDRE && !sport->lpuart_dma_tx_use)
+ 		lpuart_txint(sport);
+ 
++	if (sts & UARTSR1_TC)
++		lpuart_rs485_restore_rx(sport);
++
+ 	return IRQ_HANDLED;
+ }
+ 
+@@ -1288,6 +1388,9 @@ static irqreturn_t lpuart32_int(int irq, void *dev_id)
+ 	if ((sts & UARTSTAT_TDRE) && !sport->lpuart_dma_tx_use)
+ 		lpuart32_txint(sport);
+ 
++	if (sts & UARTSTAT_TC)
++		lpuart_rs485_restore_rx(sport);
++
+ 	if ((sts & UARTSTAT_IDLE) && sport->lpuart_dma_rx_use && sport->dma_idle_int)
+ 		lpuart32_dma_idleint(sport);
+ 
+@@ -1446,8 +1549,17 @@ static void lpuart_dma_rx_free(struct uart_port *port)
+ static int lpuart_config_rs485(struct uart_port *port, struct ktermios *termios,
+ 			struct serial_rs485 *rs485)
+ {
++	struct lpuart_port *sport = container_of(port, struct lpuart_port, port);
+ 	u8 modem = readb(port->membase + UARTMODEM) &
+ 		~(UARTMODEM_TXRTSPOL | UARTMODEM_TXRTSE);
++	u8 cr2;
++
++	if (sport->rs485_rx_during_tx_active) {
++		if (readb(port->membase + UARTCR2) & UARTCR2_TE)
++			lpuart_wait_bit_set(port, UARTSR1, UARTSR1_TC);
++		lpuart_rs485_restore_rx(sport);
++	}
++
+ 	writeb(modem, port->membase + UARTMODEM);
+ 
+ 	if (rs485->flags & SER_RS485_ENABLED) {
+@@ -1467,21 +1579,39 @@ static int lpuart_config_rs485(struct uart_port *port, struct ktermios *termios,
+ 	}
+ 
+ 	writeb(modem, port->membase + UARTMODEM);
++
++	if ((rs485->flags & SER_RS485_ENABLED) &&
++	    (rs485->flags & SER_RS485_RX_DURING_TX)) {
++		cr2 = readb(port->membase + UARTCR2);
++		cr2 |= UARTCR2_RE;
++		cr2 &= ~UARTCR2_TCIE;
++		writeb(cr2, port->membase + UARTCR2);
++		sport->rs485_rx_during_tx_active = false;
++	}
++
+ 	return 0;
+ }
+ 
+ static int lpuart32_config_rs485(struct uart_port *port, struct ktermios *termios,
+ 			struct serial_rs485 *rs485)
+ {
++	struct lpuart_port *sport = container_of(port, struct lpuart_port, port);
+ 	u32 modem = lpuart32_read(port, UARTMODIR)
+ 				& ~(UARTMODIR_TXRTSPOL | UARTMODIR_TXRTSE);
+-	u32 ctrl;
++	u32 ctrl, old_ctrl;
+ 
+-	/* TXRTSE and TXRTSPOL only can be changed when transmitter is disabled. */
+ 	ctrl = lpuart32_read(port, UARTCTRL);
++	if (sport->rs485_rx_during_tx_active) {
++		if (ctrl & UARTCTRL_TE)
++			lpuart32_wait_bit_set(port, UARTSTAT, UARTSTAT_TC);
++		lpuart_rs485_restore_rx(sport);
++		ctrl = lpuart32_read(port, UARTCTRL);
++	}
++
++	old_ctrl = ctrl;
++
++	/* TXRTSE and TXRTSPOL only can be changed when transmitter is disabled. */
+ 	if (ctrl & UARTCTRL_TE) {
+-		/* wait for the transmit engine to complete */
+-		lpuart32_wait_bit_set(port, UARTSTAT, UARTSTAT_TC);
+ 		lpuart32_write(port, ctrl & ~UARTCTRL_TE, UARTCTRL);
+ 
+ 		while (lpuart32_read(port, UARTCTRL) & UARTCTRL_TE)
+@@ -1508,8 +1638,17 @@ static int lpuart32_config_rs485(struct uart_port *port, struct ktermios *termio
+ 
+ 	lpuart32_write(port, modem, UARTMODIR);
+ 
+-	if (ctrl & UARTCTRL_TE)
++	if (old_ctrl & UARTCTRL_TE)
++		lpuart32_write(port, old_ctrl, UARTCTRL);
++
++	if ((rs485->flags & SER_RS485_ENABLED) &&
++	    (rs485->flags & SER_RS485_RX_DURING_TX)) {
++		ctrl = lpuart32_read(port, UARTCTRL);
++		ctrl |= UARTCTRL_RE;
++		ctrl &= ~UARTCTRL_TCIE;
+ 		lpuart32_write(port, ctrl, UARTCTRL);
++		sport->rs485_rx_during_tx_active = false;
++	}
+ 
+ 	return 0;
+ }
+@@ -1819,6 +1958,9 @@ static int lpuart_startup(struct uart_port *port)
+ 	struct lpuart_port *sport = container_of(port, struct lpuart_port, port);
+ 	u8 fifo;
+ 
++	/* Reset transient RS-485 suppression state on (re)open. */
++	sport->rs485_rx_during_tx_active = false;
++
+ 	/* determine FIFO size and enable FIFO mode */
+ 	fifo = readb(port->membase + UARTPFIFO);
+ 
+@@ -1879,6 +2021,9 @@ static int lpuart32_startup(struct uart_port *port)
+ 	struct lpuart_port *sport = container_of(port, struct lpuart_port, port);
+ 	u32 fifo;
+ 
++	/* Reset transient RS-485 suppression state on (re)open. */
++	sport->rs485_rx_during_tx_active = false;
++
+ 	/* determine FIFO size */
+ 	fifo = lpuart32_read(port, UARTFIFO);
+ 
+@@ -2805,8 +2950,9 @@ static struct uart_driver lpuart_reg = {
+ };
+ 
+ static const struct serial_rs485 lpuart_rs485_supported = {
+-	.flags = SER_RS485_ENABLED | SER_RS485_RTS_ON_SEND | SER_RS485_RTS_AFTER_SEND,
+-	/* delay_rts_* and RX_DURING_TX are not supported */
++	.flags = SER_RS485_ENABLED | SER_RS485_RTS_ON_SEND |
++		 SER_RS485_RTS_AFTER_SEND | SER_RS485_RX_DURING_TX,
++	/* delay_rts_* are not supported */
+ };
+ 
+ static int lpuart_global_reset(struct lpuart_port *sport)
+-- 
+2.34.1
+
