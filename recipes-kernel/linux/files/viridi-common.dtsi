@@ -195,6 +195,8 @@
 	 *   2. Load moal with disconnect_on_suspend=0
 	 *   3. Run: mlanutl mlan0 hssetpara 0xfff 0xff 0 3 400
 	 *      to restrict firmware wake events to specific triggers only
+	 *   Ref: NXP AN14465 - Wake on Wi-Fi
+	 *        https://www.nxp.com/docs/en/application-note/AN14465.pdf
 	 */
 	// wakeup-source;
 	// wifi_wake_host {
