@@ -3,7 +3,7 @@ LICENSE = "MIT"
 
 require recipes-core/images/core-image-minimal.bb
 
-INHERIT += "image-buildinfo"
+inherit image-buildinfo
 
 IMAGE_INSTALL:append = "\
 	iw \
