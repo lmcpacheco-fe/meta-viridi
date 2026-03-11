@@ -43,6 +43,7 @@ IMAGE_INSTALL:append = "\
 	kernel-modules \
 	rs-mode-switch \
         python3-pyserial \
+        python3-gpiod \
         python3-pip \
         python3-json \
         zstd \
