@@ -1,0 +1,496 @@
+#!/bin/sh
+
+# ========= #
+# Functions #
+# ========= #
+function pretty_print {
+    printf "\e[1;33m ####################################################################### \e[0m\n"
+    for line in "$@"; do
+        printf "\e[1;33m ### %-59s ### \e[0m\n" "$line"
+    done
+    printf "\e[1;33m ####################################################################### \e[0m\n"
+}
+
+function find_i2c_bus_by_addr {
+    local addr_hex
+    local node
+    local bus
+
+    addr_hex=$(printf "%04x" "$1")
+    for node in /sys/bus/i2c/devices/*-"$addr_hex"; do
+        [ -e "$node" ] || continue
+        bus=${node##*/}
+        echo "${bus%%-*}"
+        return 0
+    done
+    return 1
+}
+
+function probe_i2c_device {
+    local bus="$1"
+    local addr="$2"
+    local reg="$3"
+    local label="$4"
+
+    if i2cget -y -f "$bus" "$addr" "$reg" >/dev/null 2>&1; then
+        echo "$label responded on bus $bus"
+    else
+        echo "ERROR: $label did NOT respond on bus $bus"
+        I2C_TEST_RESULT="n"
+    fi
+}
+
+function check_test {
+    printf "\n\n"
+    pretty_print "$1 test complete"
+    printf "\n\n"
+
+    if [ -n "$2" ]; then
+        ANSWER="$2"
+        printf "Auto result for %s: %s\n" "$1" "$ANSWER"
+    else
+        printf "Did the %s test pass? (y/n) " "$1"
+        read -r ANSWER
+    fi
+
+    if [[ "${ANSWER,,}" == "y" ]]; then
+        ((PASSED++))
+    fi
+    ((TOTAL++))
+
+    pretty_print "$PASSED of $TOTAL tests passed so far"
+    printf "\n\n"
+}
+
+# ===== #
+# Setup #
+# ===== #
+PASSED=0
+TOTAL=0
+
+printf "\n\n"
+pretty_print "Starting test for Viridi-imx93"
+printf "\n\n"
+
+# ====================== #
+# Kernel Log Error Check #
+# ====================== #
+printf "\n\n"
+pretty_print "Checking kernel logs for errors"
+printf "\n\n"
+
+ERRORS=$(dmesg | grep -i "error")
+
+if [ -n "$ERRORS" ]; then
+    pretty_print "Kernel errors detected:"
+    echo "$ERRORS"
+    KERNEL_LOG_TEST_RESULT="n"
+else
+    pretty_print "No kernel errors found in kernel logs"
+    KERNEL_LOG_TEST_RESULT="y"
+fi
+
+check_test "Kernel Log Errors" "$KERNEL_LOG_TEST_RESULT"
+
+# ====================== #
+# DDR Memory Test        #
+# ====================== #
+printf "\n\n"
+pretty_print "Starting DDR memory test"
+printf "\n\n"
+
+if ! command -v memtester >/dev/null 2>&1; then
+    pretty_print "ERROR: memtester not installed. Skipping DDR test."
+    DDR_TEST_RESULT="n"
+else
+    MEMSIZE=50M
+    pretty_print "Testing $MEMSIZE of RAM..."
+    if memtester "$MEMSIZE" 1; then
+        DDR_TEST_RESULT="y"
+    else
+        DDR_TEST_RESULT="n"
+    fi
+fi
+
+check_test "DDR Memory" "$DDR_TEST_RESULT"
+
+# ====================== #
+# eMMC Test              #
+# ====================== #
+printf "\n\n"
+pretty_print "Starting eMMC test"
+printf "\n\n"
+
+EMMC_DEV="/dev/mmcblk0"
+
+if [ -b "$EMMC_DEV" ]; then
+    pretty_print "eMMC device $EMMC_DEV found"
+    lsblk "$EMMC_DEV"
+
+    EMMC_TEST_RESULT="y"
+else
+    pretty_print "ERROR: eMMC device $EMMC_DEV not found"
+    EMMC_TEST_RESULT="n"
+fi
+
+check_test "eMMC" "$EMMC_TEST_RESULT"
+
+# ====================== #
+# FlexSPI NOR Test       #
+# ====================== #
+# printf "\n\n"
+# pretty_print "Starting FlexSPI NOR test"
+# printf "\n\n"
+
+# MTD_DEV=/dev/mtd0
+
+# # Write pattern: 11 22 33 44 55 66 77 88 at offset 0
+# printf "\x11\x22\x33\x44\x55\x66\x77\x88" > /tmp/nor_expected.bin
+
+# # Erase first sector
+# flash_erase $MTD_DEV 0 1 >/dev/null 2>&1
+
+# # Write pattern
+# dd if=/tmp/nor_expected.bin of=$MTD_DEV bs=1 seek=0 count=8 conv=notrunc 2>/dev/null
+
+# # Read back 8 bytes
+# dd if=$MTD_DEV of=/tmp/nor_read.bin bs=1 skip=0 count=8 2>/dev/null
+
+# # Compare
+# if cmp -s /tmp/nor_expected.bin /tmp/nor_read.bin; then
+#     pretty_print "FlexSPI NOR test PASSED!"
+#     SPI_TEST_RESULT="y"
+# else
+#     pretty_print "FlexSPI NOR test FAILED!"
+#     SPI_TEST_RESULT="n"
+# fi
+
+# check_test "FlexSPI NOR" $SPI_TEST_RESULT
+
+# # Clean up
+# rm -f /tmp/nor_expected.bin /tmp/nor_read.bin
+
+# ====================== #
+# EEPROM Test (simple)   #
+# ====================== #
+printf "\n\n"
+pretty_print "Starting EEPROM test"
+printf "\n\n"
+
+I2C_BUS=2
+EEPROM_ADDR=0x50    # eeprom@50 in lpi2c3 (7-bit)
+
+# Write 8 bytes: 11 22 33 44 55 66 77 88 at offsets 0x00..0x07
+i2ctransfer -y $I2C_BUS w2@$EEPROM_ADDR 0x00 0x11; usleep 10000
+i2ctransfer -y $I2C_BUS w2@$EEPROM_ADDR 0x01 0x22; usleep 10000
+i2ctransfer -y $I2C_BUS w2@$EEPROM_ADDR 0x02 0x33; usleep 10000
+i2ctransfer -y $I2C_BUS w2@$EEPROM_ADDR 0x03 0x44; usleep 10000
+i2ctransfer -y $I2C_BUS w2@$EEPROM_ADDR 0x04 0x55; usleep 10000
+i2ctransfer -y $I2C_BUS w2@$EEPROM_ADDR 0x05 0x66; usleep 10000
+i2ctransfer -y $I2C_BUS w2@$EEPROM_ADDR 0x06 0x77; usleep 10000
+i2ctransfer -y $I2C_BUS w2@$EEPROM_ADDR 0x07 0x88; usleep 10000
+
+# Read back 8 bytes from offset 0x00
+readback=$(i2ctransfer -y $I2C_BUS w1@$EEPROM_ADDR 0x00 r8 | tr -d '\n')
+
+# Compare
+expected="0x11 0x22 0x33 0x44 0x55 0x66 0x77 0x88"
+if [ "$readback" = "$expected" ]; then
+    pretty_print "EEPROM test PASSED!"
+    echo "Expected: $expected"
+    echo "Read:     $readback"
+    EEPROM_TEST_RESULT="y"
+else
+    pretty_print "EEPROM test FAILED!"
+    echo "Expected: $expected"
+    echo "Read:     $readback"
+    EEPROM_TEST_RESULT="n"
+fi
+
+check_test "I2C EEPROM" "$EEPROM_TEST_RESULT"
+
+# ====================== #
+# SDIO/MMC Test          #
+# ====================== #
+printf "\n\n"
+pretty_print "Starting MMC/SDIO test"
+printf "\n\n"
+
+SDIO_FOUND=0
+declare -A dt_alias
+dt_alias=( ["mmc0"]="usdhc1" ["mmc1"]="usdhc3" )
+
+for host in /sys/class/mmc_host/mmc[0-9]*; do
+    host_name=$(basename "$host")
+    usdhc=${dt_alias[$host_name]:-"unknown"}
+
+    devices=$(ls "$host" 2>/dev/null | grep -E 'mmc[0-9]+:[0-9]+')
+    if [ -n "$devices" ]; then
+        SDIO_FOUND=1
+        for dev in $devices; do
+            devpath="$host/$dev"
+
+            [ -f "$devpath/name" ]   && name=$(tr -d '\0' < "$devpath/name")
+            [ -f "$devpath/manfid" ] && manfid=$(tr -d '\0' < "$devpath/manfid")
+            [ -f "$devpath/serial" ] && serial=$(tr -d '\0' < "$devpath/serial")
+            [ -f "$devpath/type" ]   && type=$(tr -d '\0' < "$devpath/type")
+
+            pretty_print "Device on $host_name ($usdhc)"
+            echo "Name         : ${name:-N/A}"
+            echo "Manufacturer : ${manfid:-N/A}"
+            echo "Serial       : ${serial:-N/A}"
+            echo "Type(sysfs)  : ${type:-N/A}"
+
+            case "$type" in
+                MMC)
+                    echo "Classified   : eMMC (on-board storage)"
+                    ;;
+                SD)
+                    echo "Classified   : SD card (removable)"
+                    ;;
+                SDIO)
+                    echo "Classified   : SDIO device (Wi-Fi/BT/Other)"
+                    ;;
+                *)
+                    echo "Classified   : Unknown"
+                    ;;
+            esac
+        done
+    fi
+done
+
+if [ $SDIO_FOUND -eq 1 ]; then
+    SDIO_TEST_RESULT="y"
+else
+    pretty_print "ERROR: No MMC/SDIO devices found"
+    SDIO_TEST_RESULT="n"
+fi
+
+check_test "MMC/SDIO" "$SDIO_TEST_RESULT"
+
+# ====================== #
+# I2C Test               #
+# ====================== #
+printf "\n\n"
+pretty_print "Starting I2C bus test"
+printf "\n\n"
+
+I2C_TEST_RESULT="y"
+
+pretty_print "Available I2C buses"
+i2cdetect -y -l
+
+if BUS_LPI2C1=$(find_i2c_bus_by_addr 0x53); then
+    pretty_print "Scanning lpi2c1 (expect RTC 0x53, ADV7535 0x3d) on bus $BUS_LPI2C1"
+    i2cdetect -y "$BUS_LPI2C1"
+    probe_i2c_device "$BUS_LPI2C1" 0x53 0x00 "RTC (pcf2131@53)"
+    probe_i2c_device "$BUS_LPI2C1" 0x3d 0x00 "MIPI bridge (adv7535@3d)"
+else
+    echo "ERROR: Could not locate lpi2c1 bus via RTC address 0x53"
+    I2C_TEST_RESULT="n"
+fi
+
+if BUS_LPI2C2=$(find_i2c_bus_by_addr 0x25); then
+    pretty_print "Scanning lpi2c2 (expect PMIC 0x25) on bus $BUS_LPI2C2"
+    i2cdetect -y "$BUS_LPI2C2"
+    probe_i2c_device "$BUS_LPI2C2" 0x25 0x00 "PMIC (pca9451@25)"
+else
+    echo "ERROR: Could not locate lpi2c2 bus via PMIC address 0x25"
+    I2C_TEST_RESULT="n"
+fi
+
+if BUS_LPI2C3=$(find_i2c_bus_by_addr 0x50); then
+    pretty_print "Scanning lpi2c3 (expect EEPROM 0x50) on bus $BUS_LPI2C3"
+    i2cdetect -y "$BUS_LPI2C3"
+    probe_i2c_device "$BUS_LPI2C3" 0x50 0x00 "EEPROM (24c04@50)"
+else
+    echo "ERROR: Could not locate lpi2c3 bus via EEPROM address 0x50"
+    I2C_TEST_RESULT="n"
+fi
+
+if BUS_LPI2C8=$(find_i2c_bus_by_addr 0x20); then
+    pretty_print "Scanning lpi2c8 (expect 0x20, 0x21, 0x44) on bus $BUS_LPI2C8"
+    i2cdetect -y "$BUS_LPI2C8"
+    probe_i2c_device "$BUS_LPI2C8" 0x20 0x00 "IO expander (pca9555@20)"
+    probe_i2c_device "$BUS_LPI2C8" 0x21 0x00 "IO expander (pca9555@21)"
+    probe_i2c_device "$BUS_LPI2C8" 0x44 0x00 "GPIO expander (fxl6408@44)"
+else
+    echo "ERROR: Could not locate lpi2c8 bus via expander address 0x20"
+    I2C_TEST_RESULT="n"
+fi
+
+check_test "I2C" "$I2C_TEST_RESULT"
+
+# ====================== #
+# Ethernet Test          #
+# ====================== #
+printf "\n\n"
+pretty_print "Starting Ethernet test"
+printf "\n\n"
+pretty_print "Starting Ethernet0 test"
+
+IFACE0="eth0"
+IP_ADDR0="192.168.1.75/24"
+ETH_TEST_RESULT="y"
+
+IF_STATUS=$(cat /sys/class/net/$IFACE0/operstate 2>/dev/null)
+
+if ip addr show $IFACE0 | grep -q "inet "; then
+    pretty_print "$IFACE0 already has IP. Skipping IP configuration."
+else
+    pretty_print "$IFACE0 has no IP. Configuring IP."
+    ip addr add $IP_ADDR0 dev $IFACE0
+fi
+
+pretty_print "Interface status:"
+ip addr show $IFACE0
+
+if command -v ethtool >/dev/null 2>&1; then
+    pretty_print "Checking link status with ethtool..."
+    ethtool $IFACE0
+else
+    echo "ethtool not installed, skipping link check."
+fi
+
+pretty_print "Pinging Google"
+if ! ping -c 4 -I $IFACE0 www.google.com; then
+    ETH_TEST_RESULT="n"
+fi
+
+printf "\n\n"
+pretty_print "Starting Ethernet 1 test"
+printf "\n\n"
+
+IFACE1="eth1"
+IP_ADDR1="192.168.1.76/24"
+
+ip link set $IFACE1 up
+
+if ip addr show $IFACE1 | grep -q "inet "; then
+    pretty_print "$IFACE1 already has IP. Skipping IP configuration."
+else
+    pretty_print "$IFACE1 has no IP. Configuring IP."
+    ip addr add $IP_ADDR1 dev $IFACE1
+fi
+
+pretty_print "Interface status:"
+ ifconfig $IFACE1
+
+if command -v ethtool >/dev/null 2>&1; then
+    pretty_print "Checking link status with ethtool..."
+    ethtool $IFACE1
+else
+    echo "ethtool not installed, skipping link check."
+fi
+
+pretty_print "Pinging Google"
+if ! ping -c 4 -I $IFACE1 www.google.com; then
+    ETH_TEST_RESULT="n"
+fi
+
+check_test "Ethernet" "$ETH_TEST_RESULT"
+
+# ====================== #
+# Audio/SAI Test         #
+# ====================== #
+# printf "\n\n"
+# pretty_print "Starting Audio (SAI) test"
+# printf "\n\n"
+# # aplay -l, arecord -l, play/record
+# pretty_print "Listing playback devices:"
+# aplay -l
+
+# pretty_print "Listing capture devices:"
+# arecord -l
+
+# # aplay <archivo_wav> -D <device>
+# # arecord -d 5 -f cd <archivo_wav> -D <device>
+
+# check_test "Audio/SAI" "y"
+
+# ====================== #
+# LED Sequential Test    #
+# ====================== #
+# printf "\n\n"
+# pretty_print "LED Sequential Test"
+# printf "\n\n"
+
+# LED_NAMES=("LED1_nEN" "LED2_nEN" "LED3_nEN" "LED4_nEN")
+# ON_DURATION=3   # seconds
+
+# # Check gpioset
+# if ! command -v gpioset >/dev/null 2>&1; then
+#     pretty_print "ERROR: gpioset not available"
+#     LED_TEST_RESULT="n"
+#     check_test "LED Sequential" LED_TEST_RESULT
+#     return 1
+# fi
+
+# pretty_print "Starting LED sequence..."
+# LED_TEST_RESULT="y"
+
+# # Ensure all LEDs OFF at start
+# for led in "${LED_NAMES[@]}"; do
+#     gpioset ${led}=1
+# done
+
+# # Sequential ON/OFF
+# for led in "${LED_NAMES[@]}"; do
+#     pretty_print "  ${led} ON for ${ON_DURATION}s"
+#     gpioset ${led}=0          # ON (active-low)
+#     sleep ${ON_DURATION}
+#     gpioset ${led}=1          # OFF
+# done
+
+# pretty_print "LED sequence completed. All LEDs OFF."
+
+# check_test "LED Sequential" LED_TEST_RESULT
+
+# ====================== #
+# Temperature Test       #
+# ====================== #
+printf "\n\n"
+pretty_print "Temperature Test"
+printf "\n\n"
+if [ -d /sys/class/thermal ]; then
+    for zone in /sys/class/thermal/thermal_zone*; do
+        [ -f "$zone/temp" ] || continue
+
+        NAME=$(cat "$zone/type" 2>/dev/null)
+        TEMP=$(cat "$zone/temp" 2>/dev/null)
+
+        case "$TEMP" in
+            ''|*[!0-9]*)
+                echo "$NAME: N/A"
+                continue
+                ;;
+        esac
+
+        if [ "$TEMP" -ge 1000 ]; then
+            INT=$(( TEMP / 1000 ))
+            DEC=$(( (TEMP % 1000) / 100 ))
+            printf "%s: %d.%01d °C\n" "$NAME" "$INT" "$DEC"
+        else
+            printf "%s: %d °C\n" "$NAME" "$TEMP"
+        fi
+    done
+    TEMP_TEST_RESULT="y"
+else
+    echo "No thermal sensors found"
+    TEMP_TEST_RESULT="n"
+fi
+
+check_test "Temperature" "$TEMP_TEST_RESULT"
+
+# ============= #
+# Success Check #
+# ============= #
+if [ $PASSED -eq $TOTAL ]; then
+    printf "\n\n\n"
+    pretty_print 'All Tests have passed!'
+    printf "\n\n\n"
+else
+    printf "\n\n\n"
+    pretty_print 'ERROR: Not All Tests have passed!'
+    printf "\n\n\n"
+fi
