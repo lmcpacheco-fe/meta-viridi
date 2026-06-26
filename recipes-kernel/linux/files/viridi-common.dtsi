@@ -114,10 +114,11 @@
 	pinctrl-0 = <&pinctrl_uart5>;
 	status = "okay";
 	fsl,uart-has-rtscts;
+
 	bluetooth {
 		compatible = "nxp,88w8987-bt";
 		fw-init-baudrate = <3000000>;
-		reset-gpios = <&pca9555_21 7 GPIO_ACTIVE_HIGH>;
+		reset-gpios = <&pca9555_21 7 GPIO_ACTIVE_HIGH>; // BT_nRST_1V8 but active high for reset
 		// host-wakeup-gpios = <&gpio2 26 GPIO_ACTIVE_HIGH>;
 		// device-wakeup-gpios = <&gpio2 24 GPIO_ACTIVE_HIGH>;
 	};
@@ -239,7 +240,7 @@
 
 &lpspi4 {
 	fsl,spi-num-chipselects = <1>;
-	pinctrl-names = "default", "sleep";
+	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpspi4>;
 	cs-gpios = <&gpio2 18 GPIO_ACTIVE_LOW>;
 	status = "okay";
@@ -248,14 +249,6 @@
 		compatible = "linux,spidev";			// Generic driver for testing
 		spi-max-frequency = <1000000>;			// 1 MHz, adjust according to peripheral
 	};
-};
-
-&flexcan1 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_flexcan1>;
-	status = "okay";
-	standby-gpios = <&gpio1 14 GPIO_ACTIVE_HIGH>;	/* CAN1_STBY */
-	eol-gpios = <&fxl6408 4 GPIO_ACTIVE_HIGH>;	/* CAN1_EOL */
 };
 
 &gpio1 {
@@ -325,13 +318,6 @@
 		"gpio4-20", "gpio4-21", "gpio4-22", "gpio4-23",
 		"gpio4-24", "gpio4-25", "gpio4-26", "gpio4-27",
 		"gpio4-28", "gpio4-29", "gpio4-30", "gpio4-31";
-
-    rtc_inta_hog: rtc-inta-hog {
-        gpio-hog;
-        gpios = <2 GPIO_ACTIVE_LOW>;    /* GPIO4_IO02 = RTC INTA */
-        input;
-        line-name = "RTC_nINTA_1V8";
-    };
 };
 
 &lpm {						//Low Power Mode
