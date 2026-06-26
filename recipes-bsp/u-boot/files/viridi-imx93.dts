@@ -126,11 +126,11 @@
 
 	backlight_lvds: backlight-lvds {
 		compatible = "pwm-backlight";
-		pwms = <&fxl6408 0 100000 0>;
+		pwms = <&pca9555_20 1 100000 0>; // DSP_CTRL_3V3
 		brightness-levels = <0 100>;
 		num-interpolated-steps = <100>;
 		default-brightness-level = <100>;
-		enable-gpios = <&fxl6408 5 GPIO_ACTIVE_HIGH>;
+		enable-gpios = <&pca9555_20 0 GPIO_ACTIVE_HIGH>; // DSP_EN_3V3
 		status = "disabled";
 	};
 };
@@ -327,15 +327,10 @@
 
 	/*Eeprom --> M34E04-FMC9TG*/
 	eeprom@54 {
-		compatible = "atmel,24c04", "st,m34e04";
-		reg = <0x54>;		//I2C Address --> 0xA8 (8 bits) = 0x54 (7 bits)
+		compatible = "atmel,24c04";
+		reg = <0x50>;		//I2C Address --> 0xA0 (8 bits) = 0x50 (7 bits)
 		pagesize = <16>;
 		size = <512>;
-	};
-
-	m34e04-protect@60 {
-		compatible = "st,m34e04-protect";
-		reg = <0x60>;		// Protection --> 0x60 (7 bits)
 	};
 };
 
@@ -355,11 +350,11 @@
 		#gpio-cells = <2>;
 		interrupt-parent = <&gpio1>;
 		interrupts = <8 IRQ_TYPE_LEVEL_LOW>;	// Io Expander INT on GPIO1_IO08
-		gpio-line-names = "DSP_EN_3V3", "DSP_CTRL_3V3", "LED1_nEN", "FIXME",
-			"FIXME", "FIXME", "FIXME", "NC",
+		gpio-line-names = "DSP_EN_3V3", "DSP_CTRL_3V3", "LED1_nEN", "LED2_nEN",
+			"LED3_nEN", "LED4_nEN", "RS485_TX_EOL_3V3", "RS485_RX_EOL_3V3",
 
-			"DIGITAL_IN0", "DIGITAL_IN1","DIGITAL_IN2", "DIGITAL_IN3",
-			"OUT3_EN", "OUT2_EN", "OUT1_EN", "OUT0_EN";
+			"EXT_GPIO1_3V3", "EXT_GPIO2_3V3","DIGITAL_IN1_3V3", "DIGITAL_IN2_3V3",
+			"OUT_EN_3V3", "NC", "NC", "NC";
 	};
 
 	/* Io Expander --> PCA9555AHF,128 */
@@ -372,7 +367,7 @@
 		gpio-controller;
 		interrupt-parent = <&gpio1>;
 		interrupts = <9 IRQ_TYPE_LEVEL_LOW>;	// Io Expander INT on GPIO1_IO09
-		gpio-line-names = "EXP_IO1", "EXP_IO2", "EXP_IO3", "EXP_IO4",
+		gpio-line-names = "EXP_IO1_1V8", "EXP_IO2_1V8", "EXP_IO3_1V8", "EXP_IO4_1V8",
 					"EXP_PWR_EN", "WF_nEN_1V8", "WF_nRST_1V8", "BT_nRST_1V8",
 
 					"GNSS_LNA_EN1", "LTE_ON_OFF_1V8", "LTE_nSHTD_1V8", "LTE_SW_RDY_1V8",
@@ -385,8 +380,8 @@
 		reg = <0x44>;
 		gpio-controller;
 		#gpio-cells = <2>;
-		gpio-line-names = "FIXME", "FIXME", "FIXME", "FIXME",
-			"FIXME", "FIXME", "FIXME", "NC";
+		gpio-line-names = "RSTRAN_nSHDN_1V8", "RSTRAN_CTRL_1V8", "RSTRAN_DUP_1V8", "RSTRAN_SEL_1V8",
+			"RS485_nRE_1V8", "CONA_EN_1V8", "CONB_EN_1V8", "NC";
 	};
 };
 
@@ -518,17 +513,17 @@
 
 	pinctrl_eqos: eqosgrp {
 		fsl,pins = <
-			MX93_PAD_ENET1_MDC__ENET_QOS_MDC			0x57e
-			MX93_PAD_ENET1_MDIO__ENET_QOS_MDIO			0x57e
-			MX93_PAD_ENET1_TD0__ENET_QOS_RGMII_TD0			0x57e
-			MX93_PAD_ENET1_TD1__ENET_QOS_RGMII_TD1			0x57e
+			MX93_PAD_ENET1_MDC__ENET_QOS_MDC						0x57e
+			MX93_PAD_ENET1_MDIO__ENET_QOS_MDIO						0x57e
+			MX93_PAD_ENET1_TD0__ENET_QOS_RGMII_TD0					0x57e
+			MX93_PAD_ENET1_TD1__ENET_QOS_RGMII_TD1					0x57e
 			MX93_PAD_ENET1_TD2__CCM_ENET_QOS_CLOCK_GENERATE_REF_CLK	0x4000057e
-			MX93_PAD_ENET1_TX_CTL__ENET_QOS_RGMII_TX_CTL		0x57e
-			MX93_PAD_ENET1_RD0__ENET_QOS_RGMII_RD0			0x57e
-			MX93_PAD_ENET1_RD1__ENET_QOS_RGMII_RD1			0x57e
-			MX93_PAD_ENET1_RD2__GPIO4_IO12				0x57e
-			MX93_PAD_ENET1_RXC__ENET_QOS_RX_ER			0x58e
-			MX93_PAD_ENET1_RX_CTL__ENET_QOS_RGMII_RX_CTL		0x57e
+			MX93_PAD_ENET1_TX_CTL__ENET_QOS_RGMII_TX_CTL			0x57e
+			MX93_PAD_ENET1_RD0__ENET_QOS_RGMII_RD0					0x57e
+			MX93_PAD_ENET1_RD1__ENET_QOS_RGMII_RD1					0x57e
+			MX93_PAD_ENET1_RD2__GPIO4_IO12							0x57e
+			MX93_PAD_ENET1_RXC__ENET_QOS_RX_ER						0x58e
+			MX93_PAD_ENET1_RX_CTL__ENET_QOS_RGMII_RX_CTL			0x57e
 		>;
 	};
 
@@ -548,16 +543,16 @@
 
 	pinctrl_fec: fecgrp {
 		fsl,pins = <
-			MX93_PAD_ENET2_MDC__ENET1_MDC			0x57e
-			MX93_PAD_ENET2_MDIO__ENET1_MDIO			0x57e
-			MX93_PAD_ENET2_TD0__ENET1_RGMII_TD0		0x57e
-			MX93_PAD_ENET2_TD1__ENET1_RGMII_TD1		0x57e
-			MX93_PAD_ENET2_TD2__ENET1_TX_CLK		0x4000057e
+			MX93_PAD_ENET2_MDC__ENET1_MDC				0x57e
+			MX93_PAD_ENET2_MDIO__ENET1_MDIO				0x57e
+			MX93_PAD_ENET2_TD0__ENET1_RGMII_TD0			0x57e
+			MX93_PAD_ENET2_TD1__ENET1_RGMII_TD1			0x57e
+			MX93_PAD_ENET2_TD2__ENET1_TX_CLK			0x4000057e
 			MX93_PAD_ENET2_TX_CTL__ENET1_RGMII_TX_CTL	0x57e
-			MX93_PAD_ENET2_RD0__ENET1_RGMII_RD0		0x57e
-			MX93_PAD_ENET2_RD1__ENET1_RGMII_RD1		0x57e
-			MX93_PAD_ENET2_RD2__GPIO4_IO26			0x57e
-			MX93_PAD_ENET2_RXC__ENET1_RX_ER			0x57e
+			MX93_PAD_ENET2_RD0__ENET1_RGMII_RD0			0x57e
+			MX93_PAD_ENET2_RD1__ENET1_RGMII_RD1			0x57e
+			MX93_PAD_ENET2_RD2__GPIO4_IO26				0x57e
+			MX93_PAD_ENET2_RXC__ENET1_RX_ER				0x57e
 			MX93_PAD_ENET2_RX_CTL__ENET1_RGMII_RX_CTL	0x57e
 		>;
 	};

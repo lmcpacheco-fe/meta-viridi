@@ -96,11 +96,11 @@
 
 	backlight_lvds: backlight-lvds {						//Backlight required for the MIPI (DSI) interface
 		compatible = "pwm-backlight";
-		pwms = <&fxl6408 0 100000 0>;
+		pwms = <&pca9555_20 1 100000 0>; // DSP_CTRL_3V3
 		brightness-levels = <0 100>;
 		num-interpolated-steps = <100>;
 		default-brightness-level = <100>;
-		enable-gpios = <&fxl6408 5 GPIO_ACTIVE_HIGH>;
+		enable-gpios = <&pca9555_20 0 GPIO_ACTIVE_HIGH>; // DSP_EN_3V3
 		status = "disabled";
 	};
 
@@ -113,8 +113,8 @@
 		//gnss-lna-gpios = <&pca9555_21 8 GPIO_ACTIVE_HIGH>;			//Opcional: IO_Exp(P1_0) = GNSS LNA controled by SW
 		lte_wake_ready {
 			compatible = "nxp,lte_wake_ready";
-			interrupt-parent = <&gpio2>;
-			interrupts = <12 IRQ_TYPE_LEVEL_LOW>;					//CPU(GPIO2_12) = LTE_SW_RDY_1V8 (Has to be an interruption?)
+			interrupt-parent = <&pca9555_21>;
+			interrupts = <11 IRQ_TYPE_LEVEL_LOW>;					//CPU(GPIO2_12) = LTE_SW_RDY_1V8 (Has to be an interruption?)
 			interrupt-names = "lte-ready";
 		};
 	};
@@ -183,16 +183,16 @@
 		interrupts = <2 IRQ_TYPE_LEVEL_LOW>;	//GPIO4_IO02 --> CPU
 		wakeup-source;
 	};
-
-	/*Io Expander --> FXL6408UMX*/
-	fxl6408: gpio-expander@44 {
-		compatible = "fcs,fxl6408";
-		reg = <0x44>;
-		gpio-controller;
-		#gpio-cells = <2>;
-		gpio-line-names = "LED1_nEN", "LED2_nEN", "LED3_nEN", "LED4_nEN",
-			"CAN1_EOL", "DSP_CTRL_3V3", "RS485_TX_EOL_3V3", "NC";
-	};
+/*  fxl6408 is moved to lpi2c8*/
+	// /*Io Expander --> FXL6408UMX*/
+	// fxl6408: gpio-expander@44 {
+	// 	compatible = "fcs,fxl6408";
+	// 	reg = <0x44>;
+	// 	gpio-controller;
+	// 	#gpio-cells = <2>;
+	// 	gpio-line-names = "LED1_nEN", "LED2_nEN", "LED3_nEN", "LED4_nEN",
+	// 		"CAN1_EOL", "DSP_CTRL_3V3", "RS485_TX_EOL_3V3", "NC";
+	// };
 
 	/*MIPI --> DSI*/
 	adv7535: dtsi@3d {
@@ -303,27 +303,23 @@
 	pinctrl-0 = <&pinctrl_lpi2c3>;
 	status = "okay";
 
-	/*Eeprom --> M34E04-FMC9TG*/
+
+	/*Eeprom --> M24C04-FMC6TG */
 	eeprom@54 {
-		compatible = "atmel,24c04", "st,m34e04";
-		reg = <0x54>;		//I2C Address --> 0xA8 (8 bits) = 0x54 (7 bits)
+		compatible = "atmel,24c04";
+		reg = <0x50>;		//I2C Address --> 0xA0 (8 bits) = 0x50 (7 bits)
 		pagesize = <16>;
 		size = <512>;
 	};
-
-	m34e04-protect@60 {
-		compatible = "st,m34e04-protect";
-		reg = <0x60>;		// Protection --> 0x60 (7 bits)
-	};
 };
 
-&lpi2c5 {
+&lpi2c8 {
 	clock-frequency = <400000>;
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_lpi2c5>;
+	pinctrl-0 = <&pinctrl_lpi2c8>;
 	status = "okay";
 
-	/*Io Expander --> PCA9555AHF,128*/
+	/* Io Expander --> PCA9555AHF,128 */
 	pca9555_20: gpio@20 {
 		compatible = "nxp,pca9555";
 		reg = <0x20>;							//I2C Address (7bit) 0x20 expander
@@ -332,11 +328,12 @@
 		gpio-controller;
 		#gpio-cells = <2>;
 		interrupt-parent = <&gpio1>;
-		interrupts = <8 IRQ_TYPE_LEVEL_LOW>;	//Io Expander INT on GPIO1_IO08
-		gpio-line-names = "RS485_nRE_1V8", "RSTRAN_SEL_1V8", "RSTRAN_DUP_1V8", "RSTRAN_CTRL_1V8",
-			"RSTRAN_nSHDN_1V8", "CONA_EN", "CONB_EN", "NC",
-			"DIGITAL_IN0", "DIGITAL_IN1","DIGITAL_IN2", "DIGITAL_IN3",
-			"OUT3_EN", "OUT2_EN", "OUT1_EN", "OUT0_EN";
+		interrupts = <8 IRQ_TYPE_LEVEL_LOW>;	// Io Expander INT on GPIO1_IO08
+		gpio-line-names = "DSP_EN_3V3", "DSP_CTRL_3V3", "LED1_nEN", "LED2_nEN",
+			"LED3_nEN", "LED4_nEN", "RS485_TX_EOL_3V3", "RS485_RX_EOL_3V3",
+
+			"EXT_GPIO1_3V3", "EXT_GPIO2_3V3","DIGITAL_IN1_3V3", "DIGITAL_IN2_3V3",
+			"OUT_EN_3V3", "NC", "NC", "NC";
 		rs485_nre_hog {
 			gpio-hog;
 			gpios = <0 GPIO_ACTIVE_HIGH>;   /* RS485_nRE_1V8 */
@@ -357,21 +354,31 @@
 		};
 	};
 
-	/*Io Expander --> PCA9555AHF,128*/
+	/* Io Expander --> PCA9555AHF,128 */
 	pca9555_21: gpio@21 {
 		compatible = "nxp,pca9555";
-		reg = <0x21>;							//I2C Address (7bit) 0x21 expander
+		reg = <0x21>;							// I2C Address (7bit) 0x21 expander
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_pca9555_21>;
 		#gpio-cells = <2>;
 		gpio-controller;
 		interrupt-parent = <&gpio1>;
-		interrupts = <9 IRQ_TYPE_LEVEL_LOW>;	//Io Expander INT on GPIO1_IO09
-		gpio-line-names = "EXP_IO1", "EXP_IO2",
-			"EXP_IO3", "EXP_IO4", "EXP_PWR_EN",
-			"WF_nEN_1V8", "WF_nRST_1V8", "BT_nRST_1V8",
-			"GNSS_LNA_EN1", "LTE_ON_OFF_1V8",
-			"LTE_nSHTD_1V8", "NC", "NC", "NC", "NC", "NC";
+		interrupts = <9 IRQ_TYPE_LEVEL_LOW>;	// Io Expander INT on GPIO1_IO09
+		gpio-line-names = "EXP_IO1_1V8", "EXP_IO2_1V8", "EXP_IO3_1V8", "EXP_IO4_1V8",
+					"EXP_PWR_EN", "WF_nEN_1V8", "WF_nRST_1V8", "BT_nRST_1V8",
+
+					"GNSS_LNA_EN1", "LTE_ON_OFF_1V8", "LTE_nSHTD_1V8", "LTE_SW_RDY_1V8",
+					"NC", "NC", "NC", "NC";
+	};
+
+	/* Io Expander --> FXL6408UMX */
+	fxl6408: gpio-expander@44 {
+		compatible = "fcs,fxl6408";
+		reg = <0x44>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		gpio-line-names = "RSTRAN_nSHDN_1V8", "RSTRAN_CTRL_1V8", "RSTRAN_DUP_1V8", "RSTRAN_SEL_1V8",
+			"RS485_nRE_1V8", "CONA_EN_1V8", "CONB_EN_1V8", "NC";
 	};
 };
 
@@ -416,6 +423,16 @@
 			reg = <3>; //ADDR = 3
 		};
 	};
+};
+
+//FIXME check flexcan1 (GPIOs)
+
+&flexcan1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_flexcan1>;
+	status = "okay";
+	standby-gpios = <&gpio1 14 GPIO_ACTIVE_HIGH>;		//CAN1_STBY
+	eol-gpios = <&gpio3 6 GPIO_ACTIVE_HIGH>;			//CAN1_EOL
 };
 
 &flexcan2 {
@@ -518,10 +535,10 @@
 		>;
 	};
 
-	pinctrl_lpi2c5: lpi2c5grp {
+	pinctrl_lpi2c8: lpi2c8grp {
 		fsl,pins = <
-			MX93_PAD_GPIO_IO22__LPI2C5_SDA			0x40000b9e
-			MX93_PAD_GPIO_IO23__LPI2C5_SCL			0x40000b9e
+			MX93_PAD_GPIO_IO12__LPI2C8_SDA          0x40000b9e
+			MX93_PAD_GPIO_IO13__LPI2C8_SCL          0x40000b9e
 		>;
 	};
 
@@ -548,17 +565,18 @@
 
 	pinctrl_flexcan1: flexcan1grp {
 		fsl,pins = <
-			MX93_PAD_SAI1_TXD0__CAN1_TX			0x139e
-			MX93_PAD_SAI1_TXC__CAN1_RX			0x139e
+			MX93_PAD_SAI1_TXD0__CAN1_TX				0x139e
+			MX93_PAD_SAI1_TXC__CAN1_RX				0x139e
 			MX93_PAD_SAI1_RXD0__GPIO1_IO14			0x139e		//CAN1_STBY
+			MX93_PAD_SD2_DATA3__GPIO3_IO06			0x139e		// CAN1_EOL_3V3 FIXME: Verify Pad Control value
 			/* CAN1_EOL moved to FXL6408 GPIO4 - no pinctrl needed */
 		>;
 	};
 
 	pinctrl_flexcan2: flexcan2grp {
 		fsl,pins = <
-			MX93_PAD_SD2_DATA0__CAN2_TX			0x139e
-			MX93_PAD_SD2_DATA1__CAN2_RX			0x139e
+			MX93_PAD_SD2_DATA0__CAN2_TX				0x139e
+			MX93_PAD_SD2_DATA1__CAN2_RX				0x139e
 			MX93_PAD_SD2_CMD__GPIO3_IO02			0x139e		//CAN2_STBY
 			MX93_PAD_SD2_CLK__GPIO3_IO01			0x139e		//CAN2_EOL
 		>;
@@ -655,71 +673,71 @@
 		>;
 	};
 
-	pinctrl_reg_usdhc2_vmmc: regusdhc2vmmcgrp {
-		fsl,pins = <
-			MX93_PAD_SD2_RESET_B__GPIO3_IO07		0x31e
-		>;
-	};
+	// pinctrl_reg_usdhc2_vmmc: regusdhc2vmmcgrp {
+	// 	fsl,pins = <
+	// 		MX93_PAD_SD2_RESET_B__GPIO3_IO07		0x31e
+	// 	>;
+	// };
 
-	pinctrl_usdhc2_gpio: usdhc2gpiogrp {
-		fsl,pins = <
-			MX93_PAD_SD2_CD_B__GPIO3_IO00			0x31e		//0x31e GPIO config
-		>;
-	};
+	// pinctrl_usdhc2_gpio: usdhc2gpiogrp {
+	// 	fsl,pins = <
+	// 		MX93_PAD_SD2_CD_B__GPIO3_IO00			0x31e		//0x31e GPIO config
+	// 	>;
+	// };
 
-	pinctrl_usdhc2_gpio_sleep: usdhc2gpiogrpsleep {
-		fsl,pins = <
-			MX93_PAD_SD2_CD_B__GPIO3_IO00			0x51e		//0x51e Sleep config
-		>;
-	};
+	// pinctrl_usdhc2_gpio_sleep: usdhc2gpiogrpsleep {
+	// 	fsl,pins = <
+	// 		MX93_PAD_SD2_CD_B__GPIO3_IO00			0x51e		//0x51e Sleep config
+	// 	>;
+	// };
 
-	pinctrl_usdhc2: usdhc2grp {
-		fsl,pins = <
-			MX93_PAD_SD2_CLK__USDHC2_CLK			0x1582
-			MX93_PAD_SD2_CMD__USDHC2_CMD			0x40001382
-			MX93_PAD_SD2_DATA0__USDHC2_DATA0		0x40001382
-			MX93_PAD_SD2_DATA1__USDHC2_DATA1		0x40001382
-			MX93_PAD_SD2_DATA2__USDHC2_DATA2		0x40001382
-			MX93_PAD_SD2_DATA3__USDHC2_DATA3		0x40001382
-			MX93_PAD_SD2_VSELECT__USDHC2_VSELECT		0x51e
-		>;
-	};
+	// pinctrl_usdhc2: usdhc2grp {
+	// 	fsl,pins = <
+	// 		MX93_PAD_SD2_CLK__USDHC2_CLK			0x1582
+	// 		MX93_PAD_SD2_CMD__USDHC2_CMD			0x40001382
+	// 		MX93_PAD_SD2_DATA0__USDHC2_DATA0		0x40001382
+	// 		MX93_PAD_SD2_DATA1__USDHC2_DATA1		0x40001382
+	// 		MX93_PAD_SD2_DATA2__USDHC2_DATA2		0x40001382
+	// 		MX93_PAD_SD2_DATA3__USDHC2_DATA3		0x40001382
+	// 		MX93_PAD_SD2_VSELECT__USDHC2_VSELECT		0x51e
+	// 	>;
+	// };
 
-	pinctrl_usdhc2_100mhz: usdhc2-100mhzgrp {
-		fsl,pins = <
-			MX93_PAD_SD2_CLK__USDHC2_CLK			0x158e
-			MX93_PAD_SD2_CMD__USDHC2_CMD			0x4000138e
-			MX93_PAD_SD2_DATA0__USDHC2_DATA0		0x4000138e
-			MX93_PAD_SD2_DATA1__USDHC2_DATA1		0x4000138e
-			MX93_PAD_SD2_DATA2__USDHC2_DATA2		0x4000138e
-			MX93_PAD_SD2_DATA3__USDHC2_DATA3		0x4000138e
-			MX93_PAD_SD2_VSELECT__USDHC2_VSELECT		0x51e
-		>;
-	};
+	// pinctrl_usdhc2_100mhz: usdhc2-100mhzgrp {
+	// 	fsl,pins = <
+	// 		MX93_PAD_SD2_CLK__USDHC2_CLK			0x158e
+	// 		MX93_PAD_SD2_CMD__USDHC2_CMD			0x4000138e
+	// 		MX93_PAD_SD2_DATA0__USDHC2_DATA0		0x4000138e
+	// 		MX93_PAD_SD2_DATA1__USDHC2_DATA1		0x4000138e
+	// 		MX93_PAD_SD2_DATA2__USDHC2_DATA2		0x4000138e
+	// 		MX93_PAD_SD2_DATA3__USDHC2_DATA3		0x4000138e
+	// 		MX93_PAD_SD2_VSELECT__USDHC2_VSELECT		0x51e
+	// 	>;
+	// };
 
-	pinctrl_usdhc2_200mhz: usdhc2-200mhzgrp {
-		fsl,pins = <
-			MX93_PAD_SD2_CLK__USDHC2_CLK			0x15fe
-			MX93_PAD_SD2_CMD__USDHC2_CMD			0x400013fe
-			MX93_PAD_SD2_DATA0__USDHC2_DATA0		0x400013fe
-			MX93_PAD_SD2_DATA1__USDHC2_DATA1		0x400013fe
-			MX93_PAD_SD2_DATA2__USDHC2_DATA2		0x400013fe
-			MX93_PAD_SD2_DATA3__USDHC2_DATA3		0x400013fe
-			MX93_PAD_SD2_VSELECT__USDHC2_VSELECT		0x51e
-		>;
-	};
+	// pinctrl_usdhc2_200mhz: usdhc2-200mhzgrp {
+	// 	fsl,pins = <
+	// 		MX93_PAD_SD2_CLK__USDHC2_CLK			0x15fe
+	// 		MX93_PAD_SD2_CMD__USDHC2_CMD			0x400013fe
+	// 		MX93_PAD_SD2_DATA0__USDHC2_DATA0		0x400013fe
+	// 		MX93_PAD_SD2_DATA1__USDHC2_DATA1		0x400013fe
+	// 		MX93_PAD_SD2_DATA2__USDHC2_DATA2		0x400013fe
+	// 		MX93_PAD_SD2_DATA3__USDHC2_DATA3		0x400013fe
+	// 		MX93_PAD_SD2_VSELECT__USDHC2_VSELECT		0x51e
+	// 	>;
+	// };
 
-	pinctrl_usdhc2_sleep: usdhc2grpsleep {
-		fsl,pins = <
-			MX93_PAD_SD2_CLK__GPIO3_IO01			0x51e
-			MX93_PAD_SD2_CMD__GPIO3_IO02			0x51e
-			MX93_PAD_SD2_DATA0__GPIO3_IO03			0x51e
-			MX93_PAD_SD2_DATA1__GPIO3_IO04			0x51e
-			MX93_PAD_SD2_DATA2__GPIO3_IO05			0x51e
-			MX93_PAD_SD2_DATA3__GPIO3_IO06			0x51e
-			MX93_PAD_SD2_VSELECT__GPIO3_IO19		0x51e
-		>;
-	};
+	// pinctrl_usdhc2_sleep: usdhc2grpsleep {
+	// 	fsl,pins = <
+	// 		MX93_PAD_SD2_CLK__GPIO3_IO01			0x51e
+	// 		MX93_PAD_SD2_CMD__GPIO3_IO02			0x51e
+	// 		MX93_PAD_SD2_DATA0__GPIO3_IO03			0x51e
+	// 		MX93_PAD_SD2_DATA1__GPIO3_IO04			0x51e
+	// 		MX93_PAD_SD2_DATA2__GPIO3_IO05			0x51e
+	// 		MX93_PAD_SD2_DATA3__GPIO3_IO06			0x51e
+	// 		MX93_PAD_SD2_VSELECT__GPIO3_IO19		0x51e
+	// 	>;
+	// };
 
 	pinctrl_usdhc3: usdhc3grp {
 		fsl,pins = <

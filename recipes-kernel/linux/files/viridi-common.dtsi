@@ -19,17 +19,17 @@
 		regulator-max-microvolt = <1800000>;
 	};
 
-	reg_usdhc2_vmmc: regulator-usdhc2 {
-		compatible = "regulator-fixed";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_reg_usdhc2_vmmc>;
-		regulator-name = "VSD_3V3";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-		gpio = <&gpio3 7 GPIO_ACTIVE_HIGH>;
-		off-on-delay-us = <12000>;
-		enable-active-high;
-	};
+	// reg_usdhc2_vmmc: regulator-usdhc2 {
+	// 	compatible = "regulator-fixed";
+	// 	pinctrl-names = "default";
+	// 	pinctrl-0 = <&pinctrl_reg_usdhc2_vmmc>;
+	// 	regulator-name = "VSD_3V3";
+	// 	regulator-min-microvolt = <3300000>;
+	// 	regulator-max-microvolt = <3300000>;
+	// 	gpio = <&gpio3 7 GPIO_ACTIVE_HIGH>;
+	// 	off-on-delay-us = <12000>;
+	// 	enable-active-high;
+	// };
 
 	reg_wifi_en: regulator-wifi-en {
 		compatible = "regulator-fixed";
@@ -154,21 +154,21 @@
 	status = "okay";
 };
 
-&usdhc2 {
-	pinctrl-names = "default", "state_100mhz", "state_200mhz", "sleep";
-	pinctrl-0 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
-	pinctrl-1 = <&pinctrl_usdhc2_100mhz>, <&pinctrl_usdhc2_gpio>;
-	pinctrl-2 = <&pinctrl_usdhc2_200mhz>, <&pinctrl_usdhc2_gpio>;
-	pinctrl-3 = <&pinctrl_usdhc2_sleep>, <&pinctrl_usdhc2_gpio_sleep>;
-	cd-gpios = <&gpio3 00 GPIO_ACTIVE_LOW>;
-	fsl,cd-gpio-wakeup-disable;
-	vmmc-supply = <&reg_usdhc2_vmmc>;
-	bus-width = <4>;
-	fsl,tuning-step = <1>;
-	status = "okay";
-	// no-sdio;
-	no-mmc;
-};
+// &usdhc2 {
+// 	pinctrl-names = "default", "state_100mhz", "state_200mhz", "sleep";
+// 	pinctrl-0 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
+// 	pinctrl-1 = <&pinctrl_usdhc2_100mhz>, <&pinctrl_usdhc2_gpio>;
+// 	pinctrl-2 = <&pinctrl_usdhc2_200mhz>, <&pinctrl_usdhc2_gpio>;
+// 	pinctrl-3 = <&pinctrl_usdhc2_sleep>, <&pinctrl_usdhc2_gpio_sleep>;
+// 	cd-gpios = <&gpio3 00 GPIO_ACTIVE_LOW>;
+// 	fsl,cd-gpio-wakeup-disable;
+// 	vmmc-supply = <&reg_usdhc2_vmmc>;
+// 	bus-width = <4>;
+// 	fsl,tuning-step = <1>;
+// 	status = "okay";
+// 	// no-sdio;
+// 	no-mmc;
+// };
 
 &usdhc3 {
 	pinctrl-names = "default", "state_100mhz", "state_200mhz", "sleep";
