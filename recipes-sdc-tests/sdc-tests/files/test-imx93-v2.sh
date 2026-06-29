@@ -281,8 +281,9 @@ pretty_print "Available I2C buses"
 i2cdetect -y -l
 
 if BUS_LPI2C1=$(find_i2c_bus_by_addr 0x53); then
-    pretty_print "Scanning lpi2c1 (expect RTC 0x53, ADV7535 0x3d) on bus $BUS_LPI2C1"
+    pretty_print "Scanning lpi2c1 (expect PCA9555_21 0x21, RTC 0x53, ADV7535 0x3d) on bus $BUS_LPI2C1"
     i2cdetect -y "$BUS_LPI2C1"
+    probe_i2c_device "$BUS_LPI2C1" 0x20 0x00 "IO expander (pca9555@20)"
     probe_i2c_device "$BUS_LPI2C1" 0x53 0x00 "RTC (pcf2131@53)"
     probe_i2c_device "$BUS_LPI2C1" 0x3d 0x00 "MIPI bridge (adv7535@3d)"
 else
@@ -311,7 +312,7 @@ fi
 if BUS_LPI2C8=$(find_i2c_bus_by_addr 0x20); then
     pretty_print "Scanning lpi2c8 (expect 0x20, 0x21, 0x44) on bus $BUS_LPI2C8"
     i2cdetect -y "$BUS_LPI2C8"
-    probe_i2c_device "$BUS_LPI2C8" 0x20 0x00 "IO expander (pca9555@20)"
+    # probe_i2c_device "$BUS_LPI2C8" 0x20 0x00 "IO expander (pca9555@20)"
     probe_i2c_device "$BUS_LPI2C8" 0x21 0x00 "IO expander (pca9555@21)"
     probe_i2c_device "$BUS_LPI2C8" 0x44 0x00 "GPIO expander (fxl6408@44)"
 else

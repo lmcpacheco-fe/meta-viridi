@@ -22,8 +22,8 @@
 };
 
 / {
-	model = "NXP i.MX91 11X11 EVK board";
-	compatible = "fsl,imx91-11x11-evk", "fsl,imx91";
+	model = "Viridi i.MX91 board";
+	compatible = "viridi,imx91 board", "fsl,imx91";
 
 	chosen {
 		stdout-path = &lpuart1;
@@ -55,11 +55,11 @@
 		serial = <&lpuart3>;
 		reset-gpios = <&pca9555_21 9 GPIO_ACTIVE_LOW>;			//IO_Exp(P1_1) = LTE_ON_OFF_1V8
 		shutdown-gpios = <&pca9555_21 10 GPIO_ACTIVE_LOW>;				//IO_Exp(P1_2) = LTE_nSHTD_1V8
-		//gnss-lna-gpios = <&pca9555_21 8 GPIO_ACTIVE_HIGH>;			//Opcional: IO_Exp(P1_0) = GNSS LNA controled by SW
+		//gnss-lna-gpios = <&pca9555_21 8 GPIO_ACTIVE_HIGH>;			//Optional: IO_Exp(P1_0) = GNSS LNA controled by SW
 		lte_wake_ready {
 			compatible = "nxp,lte_wake_ready";
-			interrupt-parent = <&gpio2>;
-			interrupts = <12 IRQ_TYPE_LEVEL_LOW>;					//CPU(GPIO2_12) = LTE_SW_RDY_1V8 (Has to be an interruption?)
+			interrupt-parent = <&pca9555_21>;
+			interrupts = <11 IRQ_TYPE_LEVEL_LOW>;					//Changed to IO expander input --> LTE_SW_RDY_1V8 (Has to be an interruption?)
 			interrupt-names = "lte-ready";
 		};
 	};
@@ -86,21 +86,50 @@
 	/*RTC --> PCF2131TFY*/
 	pcf2131: pcf2131@53 {
 		compatible = "nxp,pcf2131";
-		reg = <0x53>;							//I2C Address (7bit) 0x53 expander --> 0xa3 (8bit)
+		reg = <0x53>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_pcf2131>;							//I2C Address (7bit) 0x53 expander --> 0xa3 (8bit)
 		status = "okay";
+		
 		interrupt-parent = <&gpio4>;
 		interrupts = <2 IRQ_TYPE_LEVEL_LOW>;	//GPIO4_IO02 --> CPU
 		wakeup-source;
 	};
 
-	/*Io Expander --> FXL6408UMX*/
-	fxl6408: gpio-expander@44 {
-		compatible = "fcs,fxl6408";
-		reg = <0x44>;
+	/*Io Expander --> PCA9555AHF,128*/
+	pca9555_20: gpio@20 {
+		compatible = "nxp,pca9555";
+		reg = <0x20>;							//I2C Address (7bit) 0x20 expander
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_pca9555_20>;
 		gpio-controller;
 		#gpio-cells = <2>;
-		gpio-line-names = "LED1_nEN", "LED2_nEN", "LED3_nEN", "LED4_nEN",
-			"CAN1_EOL", "DSP_CTRL_3V3", "RS485_TX_EOL_3V3", "NC";
+		interrupt-parent = <&gpio1>;
+		interrupts = <8 IRQ_TYPE_LEVEL_LOW>;	//Io Expander INT on GPIO1_IO08
+		gpio-line-names = "DSP_EN_3V3", "DSP_CTRL_3V3", "LED1_nEN", "LED2_nEN",
+			"LED3_nEN", "LED4_nEN", "RS485_TX_EOL_3V3", "RS485_RX_EOL_3V3",
+
+			"EXT_GPIO1_3V3", "EXT_GPIO2_3V3","DIGITAL_IN1_3V3", "DIGITAL_IN2_3V3",
+			"OUT_EN_3V3", "NC", "NC", "NC";
+		// TODO: Verify the following GPIO hogs and their configurations. Uncomment and adjust as necessary.
+		// rs485_nre_hog {
+		// 	gpio-hog;
+		// 	gpios = <0 GPIO_ACTIVE_HIGH>;   /* RS485_nRE_1V8 */
+		// 	output-low;                     /* RE asserted (active-low) */
+		// 	line-name = "RS485_nRE_1V8";
+		// };
+		// rstran_nshdn_hog {
+		// 	gpio-hog;
+		// 	gpios = <4 GPIO_ACTIVE_HIGH>;   /* RSTRAN_nSHDN_1V8 */
+		// 	output-high;                    /* not shutdown */
+		// 	line-name = "RSTRAN_nSHDN_1V8";
+		// };
+		// rstran_ctrl_hog {
+		// 	gpio-hog;
+		// 	gpios = <3 GPIO_ACTIVE_HIGH>;   /* RSTRAN_CTRL_1V8 */
+		// 	output-high;                    /* SLEW = fast */
+		// 	line-name = "RSTRAN_CTRL_1V8";
+		// };
 	};
 };
 
@@ -194,59 +223,25 @@
 	pinctrl-0 = <&pinctrl_lpi2c3>;
 	status = "okay";
 
-	/*Eeprom --> M34E04-FMC9TG*/
-	eeprom@54 {
-		compatible = "atmel,24c04", "st,m34e04";
-		reg = <0x54>;		//I2C Address --> 0xA8 (8 bits) = 0x54 (7 bits)
+	/*Eeprom --> M24C04-FMC6TG */
+	eeprom@50 {
+		compatible = "atmel,24c04"
+		reg = <0x50>;		//I2C Address --> 0xA0 (8 bits) = 0x50 (7 bits)
 		pagesize = <16>;
 		size = <512>;
 	};
 
-	m34e04-protect@60 {
-		compatible = "st,m34e04-protect";
-		reg = <0x60>;		// Protection --> 0x60 (7 bits)
-	};
+	// m34e04-protect@60 {
+	// 	compatible = "st,m34e04-protect";
+	// 	reg = <0x60>;		// Protection --> 0x60 (7 bits)
+	// };
 };
 
-&lpi2c5 {
+&lpi2c8 {
 	clock-frequency = <400000>;
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_lpi2c5>;
+	pinctrl-0 = <&pinctrl_lpi2c8>;
 	status = "okay";
-
-	/*Io Expander --> PCA9555AHF,128*/
-	pca9555_20: gpio@20 {
-		compatible = "nxp,pca9555";
-		reg = <0x20>;							//I2C Address (7bit) 0x20 expander
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_pca9555_20>;
-		gpio-controller;
-		#gpio-cells = <2>;
-		interrupt-parent = <&gpio1>;
-		interrupts = <8 IRQ_TYPE_LEVEL_LOW>;	//Io Expander INT on GPIO1_IO08
-		gpio-line-names = "RS485_nRE_1V8", "RSTRAN_SEL_1V8", "RSTRAN_DUP_1V8", "RSTRAN_CTRL_1V8",
-			"RSTRAN_nSHDN_1V8", "CONA_EN", "CONB_EN", "NC",
-			"DIGITAL_IN0", "DIGITAL_IN1","DIGITAL_IN2", "DIGITAL_IN3",
-			"OUT3_EN", "OUT2_EN", "OUT1_EN", "OUT0_EN";
-		rs485_nre_hog {
-			gpio-hog;
-			gpios = <0 GPIO_ACTIVE_HIGH>;   /* RS485_nRE_1V8 */
-			output-low;                     /* RE asserted (active-low) */
-			line-name = "RS485_nRE_1V8";
-		};
-		rstran_nshdn_hog {
-			gpio-hog;
-			gpios = <4 GPIO_ACTIVE_HIGH>;   /* RSTRAN_nSHDN_1V8 */
-			output-high;                    /* not shutdown */
-			line-name = "RSTRAN_nSHDN_1V8";
-		};
-		rstran_ctrl_hog {
-			gpio-hog;
-			gpios = <3 GPIO_ACTIVE_HIGH>;   /* RSTRAN_CTRL_1V8 */
-			output-high;                    /* SLEW = fast */
-			line-name = "RSTRAN_CTRL_1V8";
-		};
-	};
 
 	/*Io Expander --> PCA9555AHF,128*/
 	pca9555_21: gpio@21 {
@@ -258,11 +253,21 @@
 		gpio-controller;
 		interrupt-parent = <&gpio1>;
 		interrupts = <9 IRQ_TYPE_LEVEL_LOW>;	//Io Expander INT on GPIO1_IO09
-		gpio-line-names = "EXP_IO1", "EXP_IO2",
-			"EXP_IO3", "EXP_IO4", "EXP_PWR_EN",
-			"WF_nEN_1V8", "WF_nRST_1V8", "BT_nRST_1V8",
-			"GNSS_LNA_EN1", "LTE_ON_OFF_1V8",
-			"LTE_nSHTD_1V8", "NC", "NC", "NC", "NC", "NC";
+		gpio-line-names = "EXP_IO1_1V8", "EXP_IO2_1V8",	"EXP_IO3_1V8", "EXP_IO4_1V8",
+			"EXP_PWR_EN", "WF_nEN_1V8", "WF_nRST_1V8", "BT_nRST_1V8",
+
+			"GNSS_LNA_EN1", "LTE_ON_OFF_1V8", "LTE_nSHTD_1V8", "LTE_SW_RDY_1V8",
+			"NC", "NC", "NC", "NC";
+	};
+
+	/*Io Expander --> FXL6408UMX*/
+	fxl6408: gpio-expander@44 {
+		compatible = "fcs,fxl6408";
+		reg = <0x44>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		gpio-line-names = "RSTRAN_nSHDN_1V8", "RSTRAN_CTRL_1V8", "RSTRAN_DUP_1V8", "RSTRAN_SEL_1V8",
+			"RS485_nRE_1V8", "CONA_EN_1V8", "CONB_EN_1V8", "NC";
 	};
 };
 
@@ -294,10 +299,10 @@
 		>;
 	};
 
-	pinctrl_lpi2c5: lpi2c5grp {
+	pinctrl_lpi2c8: lpi2c8grp {
 		fsl,pins = <
-			MX91_PAD_GPIO_IO22__LPI2C5_SDA			0x40000b9e
-			MX91_PAD_GPIO_IO23__LPI2C5_SCL			0x40000b9e
+			MX91_PAD_GPIO_IO12__LPI2C8_SDA			0x40000b9e
+			MX91_PAD_GPIO_IO13__LPI2C8_SCL			0x40000b9e
 		>;
 	};
 
@@ -330,6 +335,15 @@
 			/* CAN1_EOL moved to FXL6408 GPIO4 - no pinctrl needed */
 		>;
 	};
+	
+	pinctrl_flexcan2: flexcan2grp {
+		fsl,pins = <
+			MX93_PAD_SD2_DATA0__CAN2_TX				0x139e
+			MX93_PAD_SD2_DATA1__CAN2_RX				0x139e
+			MX93_PAD_SD2_CMD__GPIO3_IO02			0x139e		//CAN2_STBY
+			MX93_PAD_SD2_CLK__GPIO3_IO01			0x139e		//CAN2_EOL
+		>;
+	};
 
 	pinctrl_uart1: uart1grp {
 		fsl,pins = <
@@ -351,8 +365,8 @@
 		fsl,pins = <
 			MX91_PAD_GPIO_IO00__LPUART5_TX		0x31e
 			MX91_PAD_GPIO_IO01__LPUART5_RX		0x31e
-			MX91_PAD_GPIO_IO03__LPUART5_RTS_B	0x31e
 			MX91_PAD_GPIO_IO02__LPUART5_CTS_B	0x31e
+			MX91_PAD_GPIO_IO03__LPUART5_RTS_B	0x31e
 		>;
 	};
 

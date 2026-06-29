@@ -180,6 +180,23 @@
 	pinctrl-0 = <&pinctrl_lpi2c1>;
 	status = "okay";
 
+	/* Io Expander --> PCA9555AHF,128 */
+	pca9555_20: gpio@20 {
+		compatible = "nxp,pca9555";
+		reg = <0x20>;							//I2C Address (7bit) 0x20 expander
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_pca9555_20>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		interrupt-parent = <&gpio1>;
+		interrupts = <8 IRQ_TYPE_LEVEL_LOW>;	// Io Expander INT on GPIO1_IO08
+		gpio-line-names = "DSP_EN_3V3", "DSP_CTRL_3V3", "LED1_nEN", "LED2_nEN",
+			"LED3_nEN", "LED4_nEN", "RS485_TX_EOL_3V3", "RS485_RX_EOL_3V3",
+
+			"EXT_GPIO1_3V3", "EXT_GPIO2_3V3","DIGITAL_IN1_3V3", "DIGITAL_IN2_3V3",
+			"OUT_EN_3V3", "NC", "NC", "NC";
+	};
+
 	/* RTC --> PCF2131TFY */
 	pcf2131: pcf2131@53 {
 		compatible = "nxp,pcf2131";
@@ -321,22 +338,22 @@
 	pinctrl-0 = <&pinctrl_lpi2c8>;
 	status = "okay";
 
-	/* Io Expander --> PCA9555AHF,128 */
-	pca9555_20: gpio@20 {
-		compatible = "nxp,pca9555";
-		reg = <0x20>;							//I2C Address (7bit) 0x20 expander
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_pca9555_20>;
-		gpio-controller;
-		#gpio-cells = <2>;
-		interrupt-parent = <&gpio1>;
-		interrupts = <8 IRQ_TYPE_LEVEL_LOW>;	// Io Expander INT on GPIO1_IO08
-		gpio-line-names = "DSP_EN_3V3", "DSP_CTRL_3V3", "LED1_nEN", "LED2_nEN",
-			"LED3_nEN", "LED4_nEN", "RS485_TX_EOL_3V3", "RS485_RX_EOL_3V3",
+	// /* Io Expander --> PCA9555AHF,128 */
+	// pca9555_20: gpio@20 {
+	// 	compatible = "nxp,pca9555";
+	// 	reg = <0x20>;							//I2C Address (7bit) 0x20 expander
+	// 	pinctrl-names = "default";
+	// 	pinctrl-0 = <&pinctrl_pca9555_20>;
+	// 	gpio-controller;
+	// 	#gpio-cells = <2>;
+	// 	interrupt-parent = <&gpio1>;
+	// 	interrupts = <8 IRQ_TYPE_LEVEL_LOW>;	// Io Expander INT on GPIO1_IO08
+	// 	gpio-line-names = "DSP_EN_3V3", "DSP_CTRL_3V3", "LED1_nEN", "LED2_nEN",
+	// 		"LED3_nEN", "LED4_nEN", "RS485_TX_EOL_3V3", "RS485_RX_EOL_3V3",
 
-			"EXT_GPIO1_3V3", "EXT_GPIO2_3V3","DIGITAL_IN1_3V3", "DIGITAL_IN2_3V3",
-			"OUT_EN_3V3", "NC", "NC", "NC";
-	};
+	// 		"EXT_GPIO1_3V3", "EXT_GPIO2_3V3","DIGITAL_IN1_3V3", "DIGITAL_IN2_3V3",
+	// 		"OUT_EN_3V3", "NC", "NC", "NC";
+	// };
 
 	/* Io Expander --> PCA9555AHF,128 */
 	pca9555_21: gpio@21 {
