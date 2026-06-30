@@ -32,6 +32,7 @@ IMAGE_INSTALL:append = "\
 	kernel-module-btnxpuart \
 	wireless-regdb-static \
 	linux-firmware-nxpiw416-sdio \
+	firmware-nxp-wifi-nxpiw416-sdio \
 	pipewire \
 	pipewire-pulse \
 	wireplumber \

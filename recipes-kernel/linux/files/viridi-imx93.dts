@@ -648,9 +648,9 @@
 
 	pinctrl_gpio3: gpio3grp {
 		fsl,pins = <
-			MX93_PAD_SD2_DATA2__GPIO3_IO5			0x31e	// HW_B0
-			MX93_PAD_SD2_RESET_B__GPIO3_IO7			0x31e	// HW_B1
-			MX93_PAD_SD2_CD_B__GPIO3_IO0			0x31e	// HW_B2
+			MX93_PAD_SD2_DATA2__GPIO3_IO05			0x31e	// HW_B0
+			MX93_PAD_SD2_RESET_B__GPIO3_IO07			0x31e	// HW_B1
+			MX93_PAD_SD2_CD_B__GPIO3_IO00			0x31e	// HW_B2
 		>;
 	};
 

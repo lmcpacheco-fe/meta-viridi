@@ -1,5 +1,5 @@
 /*
- * Device Tree for the Viridi i.MX91 Board
+ * Device Tree for the Viridi i.MX93 Board
  *
  * @TYPE: Board Device Tree
  * @NAME: viridi-imx91
@@ -23,7 +23,7 @@
 
 / {
 	model = "Viridi i.MX91 board";
-	compatible = "viridi,imx91-board", "fsl,imx91";
+	compatible = "viridi,imx91 board", "fsl,imx91";
 
 	chosen {
 		stdout-path = &lpuart1;
@@ -83,14 +83,14 @@
 	pinctrl-0 = <&pinctrl_lpi2c1>;
 	status = "okay";
 
-	/* RTC --> PCF2131TFY */
+	/*RTC --> PCF2131TFY*/
 	pcf2131: pcf2131@53 {
 		compatible = "nxp,pcf2131";
 		reg = <0x53>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_pcf2131>;							//I2C Address (7bit) 0x53 expander --> 0xa3 (8bit)
 		status = "okay";
-
+		
 		interrupt-parent = <&gpio4>;
 		interrupts = <2 IRQ_TYPE_LEVEL_LOW>;	//GPIO4_IO02 --> CPU
 		wakeup-source;
@@ -111,6 +111,25 @@
 
 			"EXT_GPIO1_3V3", "EXT_GPIO2_3V3","DIGITAL_IN1_3V3", "DIGITAL_IN2_3V3",
 			"OUT_EN_3V3", "NC", "NC", "NC";
+		// TODO: Verify the following GPIO hogs and their configurations. Uncomment and adjust as necessary.
+		// rs485_nre_hog {
+		// 	gpio-hog;
+		// 	gpios = <0 GPIO_ACTIVE_HIGH>;   /* RS485_nRE_1V8 */
+		// 	output-low;                     /* RE asserted (active-low) */
+		// 	line-name = "RS485_nRE_1V8";
+		// };
+		// rstran_nshdn_hog {
+		// 	gpio-hog;
+		// 	gpios = <4 GPIO_ACTIVE_HIGH>;   /* RSTRAN_nSHDN_1V8 */
+		// 	output-high;                    /* not shutdown */
+		// 	line-name = "RSTRAN_nSHDN_1V8";
+		// };
+		// rstran_ctrl_hog {
+		// 	gpio-hog;
+		// 	gpios = <3 GPIO_ACTIVE_HIGH>;   /* RSTRAN_CTRL_1V8 */
+		// 	output-high;                    /* SLEW = fast */
+		// 	line-name = "RSTRAN_CTRL_1V8";
+		// };
 	};
 };
 
@@ -241,7 +260,7 @@
 			"NC", "NC", "NC", "NC";
 	};
 
-	/* Io Expander --> FXL6408UMX */
+	/*Io Expander --> FXL6408UMX*/
 	fxl6408: gpio-expander@44 {
 		compatible = "fcs,fxl6408";
 		reg = <0x44>;
@@ -249,43 +268,7 @@
 		#gpio-cells = <2>;
 		gpio-line-names = "RSTRAN_nSHDN_1V8", "RSTRAN_CTRL_1V8", "RSTRAN_DUP_1V8", "RSTRAN_SEL_1V8",
 			"RS485_nRE_1V8", "CONA_EN_1V8", "CONB_EN_1V8", "NC";
-
-		rstran_nshdn_hog {
-			gpio-hog;
-			gpios = <0 GPIO_ACTIVE_HIGH>;   /* RSTRAN_nSHDN_1V8 */
-			output-high;                    /* not shutdown */
-		};
-
-		rstran_ctrl_hog {
-			gpio-hog;
-			gpios = <1 GPIO_ACTIVE_HIGH>;   /* RSTRAN_CTRL_1V8 */
-			output-high;                    /* SLEW = fast */
-		};
-
-		rs485_nre_hog {
-			gpio-hog;
-			gpios = <4 GPIO_ACTIVE_HIGH>;   /* RS485_nRE_1V8 */
-			output-low;                     /* RE asserted (active-low) */
-		};
 	};
-};
-
-&flexcan1 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_flexcan1>;
-	status = "okay";
-
-	standby-gpios = <&gpio1 14 GPIO_ACTIVE_HIGH>;		// CAN1_STBY_3V3
-	eol-gpios = <&gpio3 6 GPIO_ACTIVE_HIGH>;			// CAN1_EOL_3V3
-};
-
-&flexcan2 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_flexcan2>;
-	status = "okay";
-
-	standby-gpios = <&gpio3 2 GPIO_ACTIVE_HIGH>; // CAN2_STBY
-	eol-gpios = <&gpio3 1 GPIO_ACTIVE_HIGH>; // CAN2_EOL
 };
 
 &iomuxc {
@@ -348,17 +331,17 @@
 		fsl,pins = <
 			MX91_PAD_SAI1_TXD0__CAN1_TX				0x139e
 			MX91_PAD_SAI1_TXC__CAN1_RX				0x139e
-			MX91_PAD_SAI1_RXD0__GPIO1_IO14			0x139e		// CAN1_STBY
-			MX91_PAD_SD2_DATA3__GPIO3_IO06			0x139e		// CAN1_EOL
+			// MX91_PAD_SAI1_RXD0__GPIO1_IO14			0x139e		//CAN1_STBY
+			/* CAN1_EOL moved to FXL6408 GPIO4 - no pinctrl needed */
 		>;
 	};
-
+	
 	pinctrl_flexcan2: flexcan2grp {
 		fsl,pins = <
-			MX91_PAD_SD2_DATA0__CAN2_TX				0x139e
+			MX91_PAD_SD2_DATA0__CAN2_TX 			0x139e
 			MX91_PAD_SD2_DATA1__CAN2_RX				0x139e
-			MX91_PAD_SD2_CMD__GPIO3_IO02			0x139e		// CAN2_STBY
-			MX91_PAD_SD2_CLK__GPIO3_IO01			0x139e		// CAN2_EOL
+			MX91_PAD_SD2_CMD__GPIO3_IO2				0x139e		//CAN2_STBY
+			MX91_PAD_SD2_CLK__GPIO3_IO1				0x139e		//CAN2_EOL
 		>;
 	};
 
@@ -402,20 +385,6 @@
 			MX91_PAD_GPIO_IO09__LPUART7_RX			0x31e
 			MX91_PAD_GPIO_IO10__LPUART7_CTS_B		0x31e
 			MX91_PAD_GPIO_IO11__LPUART7_RTS_B		0x31e
-		>;
-	};
-
-	pinctrl_gpio3: gpio3grp {
-		fsl,pins = <
-			MX91_PAD_SD2_DATA2__GPIO3_IO5			0x31e	// HW_B0
-			MX91_PAD_SD2_RESET_B__GPIO3_IO7			0x31e	// HW_B1
-			MX91_PAD_SD2_CD_B__GPIO3_IO0			0x31e	// HW_B2
-		>;
-	};
-
-	pinctrl_gpio4: gpio4grp {
-		fsl,pins = <
-			MX91_PAD_ENET2_TXC__GPIO4_IO21			0x31e	// HW_B3
 		>;
 	};
 
@@ -467,7 +436,6 @@
 		>;
 	};
 
-
 	pinctrl_usdhc2: usdhc2grp {
 		fsl,pins = <
 			MX91_PAD_SD2_CLK__USDHC2_CLK			0x1582
@@ -477,6 +445,18 @@
 			MX91_PAD_SD2_DATA2__USDHC2_DATA2		0x1382
 			MX91_PAD_SD2_DATA3__USDHC2_DATA3		0x1382
 			MX91_PAD_SD2_VSELECT__USDHC2_VSELECT	0x51e
+		>;
+	};
+
+	pinctrl_reg_usdhc2_vmmc: regusdhc2vmmcgrp {
+		fsl,pins = <
+			MX91_PAD_SD2_RESET_B__GPIO3_IO7			0x31e
+		>;
+	};
+
+	pinctrl_usdhc2_gpio: usdhc2gpiogrp {
+		fsl,pins = <
+			MX91_PAD_SD2_CD_B__GPIO3_IO0			0x31e
 		>;
 	};
 
@@ -566,16 +546,31 @@
 		>;
 	};
 
-	pinctrl_wakeup: wakeupgrp {
+	pinctrl_pcf2131: pcf2131grp {
 		fsl,pins = <
-			MX91_PAD_ENET1_TXC__GPIO4_IO7			0x31e	// RTC_nINTB_1V8
-			MX91_PAD_ENET2_TD3__GPIO4_IO16			0x31e	// SL_WAKEUP_1V8
+			MX91_PAD_ENET1_TD3__GPIO4_IO2			0x31e // RTC_nINTA_1V8
 		>;
 	};
 
-	pinctrl_pcf2131: pcf2131grp {
+	pinctrl_wakeup: wakeupgrp {
 		fsl,pins = <
-			MX91_PAD_ENET1_TD3__GPIO4_IO02			0x31e	// RTC_nINTA_1V8
+			MX91_PAD_ENET1_TD3__GPIO4_IO2			0x31e
+			MX91_PAD_ENET1_TXC__GPIO4_IO7			0x31e
+			MX91_PAD_ENET2_TD3__GPIO4_IO16			0x31e
+		>;
+	};
+
+	pinctrl_gpio3: gpio3grp {
+		fsl,pins = <
+			MX91_PAD_SD2_DATA2__GPIO3_IO5			0x31e	// HW_B0
+			MX91_PAD_SD2_RESET_B__GPIO3_IO7			0x31e	// HW_B1
+			MX91_PAD_SD2_CD_B__GPIO3_IO0			0x31e	// HW_B2
+		>;
+	};
+
+	pinctrl_gpio4: gpio4grp {
+		fsl,pins = <
+			MX91_PAD_ENET2_TXC__GPIO4_IO21			0x31e	// HW_B3
 		>;
 	};
 };
