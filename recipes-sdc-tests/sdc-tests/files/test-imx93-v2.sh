@@ -309,7 +309,7 @@ else
     I2C_TEST_RESULT="n"
 fi
 
-if BUS_LPI2C8=$(find_i2c_bus_by_addr 0x20); then
+if BUS_LPI2C8=$(find_i2c_bus_by_addr 0x21); then
     pretty_print "Scanning lpi2c8 (expect 0x20, 0x21, 0x44) on bus $BUS_LPI2C8"
     i2cdetect -y "$BUS_LPI2C8"
     # probe_i2c_device "$BUS_LPI2C8" 0x20 0x00 "IO expander (pca9555@20)"
