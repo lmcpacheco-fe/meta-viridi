@@ -228,9 +228,10 @@
 	pinctrl-0 = <&pinctrl_lpspi4>;
 	cs-gpios = <&gpio2 18 GPIO_ACTIVE_LOW>;
 	status = "okay";
+
 	spidev0: spidev@0 {
 		reg = <0>;								// CS0
-		compatible = "linux,spidev";			// Generic driver for testing
+		compatible = "rohm,bh2228fv";			// Generic driver for testing
 		spi-max-frequency = <1000000>;			// 1 MHz, adjust according to peripheral
 	};
 };
