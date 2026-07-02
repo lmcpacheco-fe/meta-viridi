@@ -466,6 +466,11 @@
 };
 
 &iomuxc {
+	pinctrl_fe910: fe910grp {
+		fsl,pins = <
+			MX93_PAD_GPIO_IO22__GPIO2_IO22			0x31e	// GNSS_SYNC_1V8
+		>;
+	};
 	pinctrl_eqos: eqosgrp {
 		fsl,pins = <
 			MX93_PAD_ENET1_MDC__ENET_QOS_MDC			0x57e
